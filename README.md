@@ -1,18 +1,14 @@
 # Copyright notice #
 Everything contained in this directory and its subdirectories is the property of the Industrial Process and Energy Systems Engineering (IPESE) group, École Polytechnique Fédérale de Lausanne (EPFL).
-
 This program is distributed "as is" and WITHOUT ANY WARRANTY, either expressed or implied, without even the implied warranties of merchantability or fitness for a particular purpose.
-
 You can freely use, modify and adapt the code, as long as you comply with the following restrictions. 
 
 The restrictions are that:
-
 (i) In the academic spirit of collaboration, the source code should be appropriately acknowledged in the resulting scientific disseminations. 
 You may cite it as follows: 
 - [1], for reference to the Swiss-EnergyScope project or the online version of the calculator energyscope.ch
 - [2], for reference to the MILP modeling framework
 - [3], for reference to the MILP modeling framework and the data for the application to the Swiss energy system
-
 (ii) the recipient agrees to publicly share further developments of the source code, under the same restrictions. This means that no commercial product can be developed using this code. Opportunities for commercial applications may be discussed with the owner of the code.
 
 You are welcome to report any bugs related to the code to the following:
@@ -44,15 +40,10 @@ b) on Mac Os X (Option 2)/Linux:
 - Install GLPK from the command line
 
 $ cd ~/Downloads
-
 $ tar -xzf glpk-4.63.tar.gz
-
 $ cd  glpk-4.63 [or newer version]
-
 $ ./configure --prefix=/usr/local
-
 $ make
-
 $ sudo make install
 
 See if your system recognises it:

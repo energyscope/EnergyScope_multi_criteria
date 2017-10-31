@@ -9,6 +9,7 @@ You may cite it as follows:
 - [1], for reference to the Swiss-EnergyScope project or the online version of the calculator energyscope.ch
 - [2], for reference to the MILP modeling framework
 - [3], for reference to the MILP modeling framework and the data for the application to the Swiss energy system  
+
 (ii) the recipient agrees to publicly share further developments of the source code, under the same restrictions. This means that no commercial product can be developed using this code. Opportunities for commercial applications may be discussed with the owner of the code.
 
 You are welcome to report any bugs related to the code to the following:  

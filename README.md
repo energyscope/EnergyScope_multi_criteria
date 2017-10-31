@@ -74,7 +74,7 @@ $ glpsol -m ses_main.mod -d ses_main.dat -o ses_main.out
 
 4. Check that the ses_main.out file is correctly generated.
 
-If the command at point (4) did not run, it might be that glpsol is not on your PATH. Two solutions for that:
+If the command at point (3) did not run, it might be that glpsol is not on your PATH. Two solutions for that:
 - (not best) instead of "glpsol" use the full path, e.g. on Mac '/usr/local/bin/glpsol  -m ses_main.mod -d ses_main.dat -o ses_main.out'
 - (best) add the folder in which glpsol is installed to the PATH. e.g. on Windows 7 (http://geekswithblogs.net/renso/archive/2009/10/21/how-to-set-the-windows-path-in-windows-7.aspx). on mac (from terminal) 'export PATH=/usr/local/bin:$PATH' (if glpsol is installed in /usr/local/bin)
 

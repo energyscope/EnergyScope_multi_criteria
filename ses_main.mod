@@ -328,4 +328,39 @@ subject to totalGWP_calc:
 ### OBJECTIVE FUNCTION ###
 
 # Can choose between TotalGWP and TotalCost
-minimize obj: TotalCost; 
+minimize obj: TotalCost;
+
+solve;
+
+### Printing output
+# The lines below are simply an example of the syntax to use to write results in output text files.
+
+## Print total yearly output to txt file
+
+printf "%s\t%s\n", "Name", "Yearly output" > "output/total_output.txt"; 
+for {i in TECHNOLOGIES union RESOURCES diff STORAGE_TECH}{
+		printf "%s\t%.3f\n", i, sum{t in PERIODS} (F_Mult_t [i, t] * t_op [t]) >> "output/total_output.txt";
+}
+
+## Print cost breakdown to txt file.
+printf "%s\t%s\t%s\t%s\n", "Name", "C_inv", "C_maint", "C_op" > "output/cost_breakdown.txt"; 
+for {i in TECHNOLOGIES union RESOURCES}{
+		printf "%s\t%.6f\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then (tau [i] * C_inv [i]) else 0, if i in TECHNOLOGIES then C_maint [i] else 0, if i in RESOURCES then C_op [i] else 0 >> "output/cost_breakdown.txt";
+}
+
+## Print F_Mult_t to txt file.
+printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", "Name", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" > "output/f_mult_t.txt"; 
+for {i in TECHNOLOGIES union RESOURCES}{
+	printf "%s\t", i  >> "output/f_mult_t.txt";
+	for {t in PERIODS}{
+		printf "\t%.6f", F_Mult_t[i,t] >> "output/f_mult_t.txt";
+	}
+	printf "\n" >> "output/f_mult_t.txt";
+}
+
+
+## Print F_Mult to txt file
+printf "%s\t%s\n", "Name", "Mult" > "output/f_mult.txt"; 
+for {i in TECHNOLOGIES}{
+	printf "%s\t%.6f\n", i, F_Mult[i] >> "output/f_mult.txt";
+}

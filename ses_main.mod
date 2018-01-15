@@ -154,6 +154,7 @@ subject to capacity_factor {i in TECHNOLOGIES}:
 	sum {t in PERIODS} (F_Mult_t [i, t] * t_op [t]) <= F_Mult [i] * c_p [i] * total_time;	
 	
 # [Eq. 1.19] Operating strategy in the for decentralized heat supply: output heat in each month proportional to installed capacity (more realistic).
+# Note that in Moret (2017), page 20, Eq. 1.19 is not correctly reported. In fact, if there are losses in the DHN, the concise formulation using the EndUses variable cannot be used, and should be replaced by the extended version here below.
 # When solar thermal is installed, it replaces one technology which is chosen as backup. The sum of the % production of solar + backup must respect the minimum share of the backup technology
 # Here written in a compact non linear form, below it is linearized  
 # subject to op_strategy_decen_1 {i in TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DECEN"] diff {"DEC_SOLAR"}, t in PERIODS}:
@@ -207,14 +208,15 @@ subject to storage_layer_in {i in STORAGE_TECH, l in LAYERS, t in PERIODS}:
 subject to storage_layer_out {i in STORAGE_TECH, l in LAYERS, t in PERIODS}:
 	Storage_Out [i, l, t] * (ceil (storage_eff_out [i, l]) - 1) = 0;
 
-# [Eq. 1.14] Storage can't be a transfer unit in a given period: either output or input.
+# [Eq. 1.17] Storage can't be a transfer unit in a given period: either output or input.
+# Note that in Moret (2017), page 20, Eq. 1.17 is not correctly reported (the "<= 1" term is missing)
 # Nonlinear formulation would be as follows:
 # subject to storage_no_transfer {i in STORAGE_TECH, t in PERIODS}:
 # 	ceil (sum {l in LAYERS: storage_eff_in [i,l] > 0} (Storage_In [i, l, t] * storage_eff_in_mult [i, l])  * t_op [t] / f_max [i]) +
 # 	ceil (sum {l in LAYERS: storage_eff_out [i,l] > 0} (Storage_Out [i, l, t] / storage_eff_out_mult [i, l])  * t_op [t] / f_max [i]) <= 1;
 # Could be written in a linear way as follows (3 equations):
 
-# Linearization of Eq. 1.14
+# Linearization of Eq. 1.17
 var Y_Sto_In {STORAGE_TECH, PERIODS} binary;
 var Y_Sto_Out {STORAGE_TECH, PERIODS} binary;
 
@@ -259,7 +261,8 @@ subject to storage_level_hydro_dams:
 subject to hydro_dams_shift {t in PERIODS}: 
 	Storage_In ["PUMPED_HYDRO", "ELECTRICITY", t] <= (F_Mult_t ["HYDRO_DAM", t] + F_Mult_t ["NEW_HYDRO_DAM", t]);
 
-## [Eq. 1.26] DHN: assigning a cost to the network	
+## [Eq. 1.26] DHN: assigning a cost to the network
+# Note that in Moret (2017), page 26, there is a ">=" sign instead of an "=". The two formulations are equivalent as long as the problem minimises cost and the DHN has a cost > 0
 subject to extra_dhn:
 	F_Mult ["DHN"] = sum {j in TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DHN"]} (F_Mult [j]);
 
@@ -274,6 +277,8 @@ subject to peak_dhn:
 	sum {j in TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DHN"]} (F_Mult [j]) >= peak_dhn_factor * Max_Heat_Demand_DHN;
 
 # [Eq. 1.28] 9.4 BCHF is the extra investment needed if there is a big deployment of stochastic renewables
+# Note that in Moret (2017), page 26, Eq. 1.28 is not correctly reported (the "1 +" term is missing).
+# Also, in Moret (2017) there is a ">=" sign instead of an "=". The two formulations are equivalent as long as the problem minimises cost and the grid has a cost > 0
 subject to extra_grid:
 	F_Mult ["GRID"] = 1 + (9400 / c_inv["GRID"]) * (F_Mult ["WIND"] + F_Mult ["PV"]) / (f_max ["WIND"] + f_max ["PV"]);
 
@@ -333,7 +338,7 @@ minimize obj: TotalCost;
 solve;
 
 ### Printing output
-# The lines below are simply an example of the syntax to use to write results in output text files.
+# The lines below are simply an example of the syntax to use to write results in output text files. 
 
 ## Print total yearly output to txt file
 

@@ -408,7 +408,7 @@ for {i in END_USES_TYPES}{
 
 ## SANKEY DIAGRAM ##
 # The code to plot the Sankey diagrams is originally taken from: http://bl.ocks.org/d3noob/c9b90689c1438f57d649
-# Adapted to the scope of the course by the IPESE team
+# Adapted by the IPESE team
 
 ## Generate CSV file to be used as input to Sankey diagram
 # Notes:

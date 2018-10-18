@@ -412,7 +412,6 @@ for {i in END_USES_TYPES}{
 
 ## Generate CSV file to be used as input to Sankey diagram
 # Notes:
-# - Assuming that SNG and BioOil are used in boilers
 # - workaround to write if-then-else statements in GLPK: https://en.wikibooks.org/wiki/GLPK/GMPL_Workarounds#If–then–else_conditional
 # - to visualize the Sankey, open the html file in any browser. If it does not work, try this: https://github.com/mrdoob/three.js/wiki/How-to-run-things-locally
  
@@ -586,10 +585,10 @@ for{{0}: sum{t in PERIODS}((F_Mult_t ["GASIFICATION_SNG",t] + F_Mult_t ["PYROLYS
 	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "Elec", sum{t in PERIODS}(layers_in_out["GASIFICATION_SNG","ELECTRICITY"] * F_Mult_t ["GASIFICATION_SNG", t] * t_op [t] + layers_in_out["PYROLYSIS","ELECTRICITY"] * F_Mult_t ["PYROLYSIS", t] * t_op [t]) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
 }
 for{{0}: sum{t in PERIODS}((F_Mult_t ["GASIFICATION_SNG",t]) * t_op [t]) > 10}{
-	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "Boilers", sum{t in PERIODS}(layers_in_out["GASIFICATION_SNG","NG"] * F_Mult_t ["GASIFICATION_SNG", t] * t_op [t]) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "NG", sum{t in PERIODS}(layers_in_out["GASIFICATION_SNG","NG"] * F_Mult_t ["GASIFICATION_SNG", t] * t_op [t]) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
 }
 for{{0}: sum{t in PERIODS}((F_Mult_t ["PYROLYSIS",t]) * t_op [t]) > 10}{
-	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "Boilers", sum{t in PERIODS}(layers_in_out["PYROLYSIS","LFO"] * F_Mult_t ["PYROLYSIS", t] * t_op [t]) / 1000 , "Oil", "#8B008B", "TWh" >> "output/sankey/input2sankey.csv";
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "Oil", sum{t in PERIODS}(layers_in_out["PYROLYSIS","LFO"] * F_Mult_t ["PYROLYSIS", t] * t_op [t]) / 1000 , "Oil", "#8B008B", "TWh" >> "output/sankey/input2sankey.csv";
 }
 for{{0}: sum{t in PERIODS}((F_Mult_t ["GASIFICATION_SNG",t]) * t_op [t]) > 10}{
 	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "DHN", sum{t in PERIODS}(layers_in_out["GASIFICATION_SNG","HEAT_LOW_T_DHN"] * F_Mult_t ["GASIFICATION_SNG", t] * t_op [t]) / 1000, "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";

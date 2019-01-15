@@ -476,7 +476,7 @@ for{{0}: sum{t in PERIODS}((F_Mult_t ["COAL_US", t] + F_Mult_t ["COAL_IGCC", t])
 	printf "%s,%s,%.2f,%s,%s,%s\n", "Coal" , "Elec", sum{t in PERIODS}(-layers_in_out["COAL_US","COAL"] * F_Mult_t ["COAL_US", t] * t_op [t] - layers_in_out["COAL_IGCC","COAL"] * F_Mult_t ["COAL_IGCC", t] * t_op [t]) / 1000 , "Coal", "#A0522D", "TWh" >> "output/sankey/input2sankey.csv";
 }
 for{{0}: sum{t in PERIODS}((F_Mult_t ["COAL_US_CCS", t] + F_Mult_t ["COAL_IGCC_CCS", t]) * t_op [t]) > 10}{
-	printf "%s,%s,%.2f,%s,%s,%s\n", "Coal CCS" , "Elec", sum{t in PERIODS}(-layers_in_out["COAL_US_CCS","COAL_CSS"] * F_Mult_t ["COAL_US_CCS", t] * t_op [t] - layers_in_out["COAL_IGCC_CCS","COAL"] * F_Mult_t ["COAL_IGCC_CCS", t] * t_op [t]) / 1000 , "Coal", "#A0522D", "TWh" >> "output/sankey/input2sankey.csv";
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Coal CCS" , "Elec", sum{t in PERIODS}(-layers_in_out["COAL_US_CCS","COAL_CCS"] * F_Mult_t ["COAL_US_CCS", t] * t_op [t] - layers_in_out["COAL_IGCC_CCS","COAL_CCS"] * F_Mult_t ["COAL_IGCC_CCS", t] * t_op [t]) / 1000 , "Coal", "#A0522D", "TWh" >> "output/sankey/input2sankey.csv";
 }
 for{{0}: sum{t in PERIODS}(F_Mult_t ["IND_BOILER_COAL", t] * t_op [t]) > 10}{
 	printf "%s,%s,%.2f,%s,%s,%s\n", "Coal" , "Boilers", sum{t in PERIODS}(-layers_in_out["IND_BOILER_COAL","COAL"] * F_Mult_t ["IND_BOILER_COAL", t] * t_op [t]) / 1000 , "Coal", "#A0522D", "TWh" >> "output/sankey/input2sankey.csv";

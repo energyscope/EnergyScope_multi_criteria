@@ -1,18 +1,19 @@
 # Acknowledging authorship #
 In the academic spirit of collaboration, the source code should be appropriately acknowledged in the resulting scientific disseminations.  
 You may cite it as follows: 
-- [1], for reference to the Swiss-EnergyScope project or the online version of the calculator energyscope.ch
-- [2], for reference to the MILP modeling framework
-- [3], for reference to the MILP modeling framework and the data for the application to the Swiss energy system  
+- [1], for reference to the origins of the EnergyScope project or to the first online version of the calculator energyscope.ch
+- [2], for reference to the energyscope MILP modeling framework
+- [3], for reference to this specific release of the model (v1 monthly MILP)
 
 You are welcome to report any bugs related to the code to the following:  
 moret.stefano@gmail.com
 
 
 # Content #
-This folder contains the Swiss-EnergyScope (SES) MILP model.  
-The version of the model corresponds to the one documented in [4], Chapter 1.  
-The data used in the model are fully documented in [4], Appendix A.
+This folder contains the first release (v1, monthly MILP) of the EnergyScope (ES) model.  
+More recent releases are available @ the energyscope project repository: https://github.com/energyscope/EnergyScope   
+This version of the model corresponds to the one documented in [3], Chapter 1.  
+The data used in this version of the model are fully documented in [3], Appendix A.
 
 
 # How to run the model #
@@ -74,5 +75,4 @@ The model was originally developed in AMPL. Compatible solvers are CPLEX, Gurobi
 References:  
 [1] V. Codina Gironès, S. Moret, F. Maréchal, D. Favrat (2015). Strategic energy planning for large-scale energy systems: A modelling framework to aid decision-making. Energy, 90(PA1), 173–186. https://doi.org/10.1016/j.energy.2015.06.008  
 [2] S. Moret, M. Bierlaire, F. Maréchal (2016). Strategic Energy Planning under Uncertainty: a Mixed-Integer Linear Programming Modeling Framework for Large-Scale Energy Systems. https://doi.org/10.1016/B978-0-444-63428-3.50321-0  
-[3] S. Moret, V. Codina Gironès, M. Bierlaire, F. Maréchal (2017). Characterization of input uncertainties in strategic energy planning models. Applied Energy 202, 597–617. https://doi.org/10.1016/j.apenergy.2017.05.106  
-[4] S. Moret (2017). Strategic Energy Planning under Uncertainty. PhD Thesis n. 7961, EPFL, Switzerland. http://dx.doi.org/10.5075/epfl-thesis-7961
+[3] S. Moret (2017). Strategic Energy Planning under Uncertainty. PhD Thesis n. 7961, EPFL, Switzerland. http://dx.doi.org/10.5075/epfl-thesis-7961

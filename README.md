@@ -11,10 +11,10 @@ You are welcome to report any bugs related to the code to the following:
  moret.stefano@gmail.com or gauthierLimpens@gmail.com  
  
 # Content #
-This folder contains the second release (v2, hourly LP) of the EnergyScope Typical Day (ESTD) model.  
+This folder contains the second release (v2, hourly LP) of the EnergyScope Typical Day (ESTD) model applied to a case study.  
 More recent releases are available @ the energyscope project repository: https://github.com/energyscope/EnergyScope   
 This version of the model corresponds to the one documented in [5], Supplementary Material.  
-The data used in this version of the model are fully documented in [5], Supplementary Material. 
+The data used in this version of the model are fully documented in [5], Supplementary Material and [6]. 
 
 
 # How to run the model #
@@ -73,7 +73,8 @@ If the command at point (3) did not run, it might be that glpsol is not on your 
 The model was originally developed in AMPL. Compatible solvers are CPLEX, Gurobi, etc. Running the model in AMPL requires the licences of AMPL and of at least one MILP solver.  
 
 # Previous versions #  
--first release (v1, monthly MILP) of the EnergyScope (ES) model   
+-first release (v1, monthly MILP) of the EnergyScope (ES) model  
+-second release (v2, hourly LP) of the EnergyScope Typical Day (ESTD) model  
 
 # References:  #  
 [1] V. Codina Gironès, S. Moret, F. Maréchal, D. Favrat (2015). Strategic energy planning for large-scale energy systems: A modelling framework to aid decision-making. Energy, 90(PA1), 173-186. https://doi.org/10.1016/j.energy.2015.06.008   
@@ -81,3 +82,4 @@ The model was originally developed in AMPL. Compatible solvers are CPLEX, Gurobi
 [3] S. Moret (2017). Strategic Energy Planning under Uncertainty. PhD Thesis n. 7961, EPFL, Switzerland. http://dx.doi.org/10.5075/epfl-thesis-7961  
 [4] S. Moret (2017). Strategic Energy Planning under Uncertainty. PhD Thesis n. 7961, EPFL, Switzerland. http://dx.doi.org/10.5075/epfl-thesis-7961  
 [5] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). EnergyScope TD: an open-source model for national energy systems. (Under revision)   
+[6] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). The role of storage in the Swiss energy transition. Proceedings of ECOS 2019   

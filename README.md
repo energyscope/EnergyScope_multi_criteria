@@ -1,19 +1,20 @@
 # Acknowledging authorship #
 In the academic spirit of collaboration, the source code should be appropriately acknowledged in the resulting scientific disseminations.  
 You may cite it as follows: 
-- [1], for reference to the origins of the EnergyScope project or to the first online version of the calculator energyscope.ch
-- [2], for reference to the energyscope MILP modeling framework
-- [3], for reference to this specific release of the model (v1 monthly MILP)
+- [1], for reference to the origins of the EnergyScope project or to the first online version of the calculator energyscope.ch  
+- [2], for reference to the energyscope MILP modeling framework  
+- [3], for reference to this specific release of the model (v1 monthly MILP) 
+- [5], for reference to the LP modeling framework (hourly)  
+- [6], for reference to this specific version/release of the model   
 
-You are welcome to report any bugs related to the code to the following:  
-moret.stefano@gmail.com
-
-
+You are welcome to report any bugs related to the code to the following:    
+ moret.stefano@gmail.com or gauthierLimpens@gmail.com  
+ 
 # Content #
-This folder contains the first release (v1, monthly MILP) of the EnergyScope (ES) model.  
+This folder contains the second release (v2, hourly LP) of the EnergyScope Typical Day (ESTD) model.  
 More recent releases are available @ the energyscope project repository: https://github.com/energyscope/EnergyScope   
-This version of the model corresponds to the one documented in [3], Chapter 1.  
-The data used in this version of the model are fully documented in [3], Appendix A.
+This version of the model corresponds to the one documented in [5], Supplementary Material.  
+The data used in this version of the model are fully documented in [5], Supplementary Material. 
 
 
 # How to run the model #
@@ -60,19 +61,23 @@ c) on Windows:
 2. Clone/download the content of this folder
 3. Navigate to that folder via terminal/cmd prompt and execute (check glpsol documentation for more options):
 
-$ glpsol -m ses_main.mod -d ses_main.dat -o ses_main.out
+$ glpsol -m ESTD_ECOS2019_main.mod -d ESTD_ECOS2019_data.dat -d ESTD_ECOS2019_12TD.dat -o ESTD_ECOS2019_main.out
 (You might need to use 'glspol.exe' on Windows)
 
-4. Check that the ses_main.out file is correctly generated.
+4. Check that the ESTD_main.out file is correctly generated.
 
 If the command at point (3) did not run, it might be that glpsol is not on your PATH. Two solutions for that:
-- (not best) instead of "glpsol" use the full path, e.g. on Mac '/usr/local/bin/glpsol  -m ses_main.mod -d ses_main.dat -o ses_main.out'
+- (not best) instead of "glpsol" use the full path, e.g. on Mac '/usr/local/bin/glpsol  -m ESTD_ECOS2019_main.mod -d ESTD_ECOS2019_data.dat -d ESTD_ECOS2019_12TD.dat -o ESTD_ECOS2019_main.out'
 - (best) add the folder in which glpsol is installed to the PATH. e.g. on Windows 7 (http://geekswithblogs.net/renso/archive/2009/10/21/how-to-set-the-windows-path-in-windows-7.aspx). on mac (from terminal) 'export PATH=/usr/local/bin:$PATH' (if glpsol is installed in /usr/local/bin)
 
-The model was originally developed in AMPL. Compatible solvers are CPLEX, Gurobi, etc. Running the model in AMPL requires the licences of AMPL and of at least one MILP solver.
+The model was originally developed in AMPL. Compatible solvers are CPLEX, Gurobi, etc. Running the model in AMPL requires the licences of AMPL and of at least one MILP solver.  
 
+# Previous versions #  
+-first release (v1, monthly MILP) of the EnergyScope (ES) model   
 
-References:  
-[1] V. Codina Gironès, S. Moret, F. Maréchal, D. Favrat (2015). Strategic energy planning for large-scale energy systems: A modelling framework to aid decision-making. Energy, 90(PA1), 173–186. https://doi.org/10.1016/j.energy.2015.06.008  
-[2] S. Moret, M. Bierlaire, F. Maréchal (2016). Strategic Energy Planning under Uncertainty: a Mixed-Integer Linear Programming Modeling Framework for Large-Scale Energy Systems. https://doi.org/10.1016/B978-0-444-63428-3.50321-0  
-[3] S. Moret (2017). Strategic Energy Planning under Uncertainty. PhD Thesis n. 7961, EPFL, Switzerland. http://dx.doi.org/10.5075/epfl-thesis-7961
+# References:  #  
+[1] V. Codina Gironès, S. Moret, F. Maréchal, D. Favrat (2015). Strategic energy planning for large-scale energy systems: A modelling framework to aid decision-making. Energy, 90(PA1), 173-186. https://doi.org/10.1016/j.energy.2015.06.008   
+[2] S. Moret, M. Bierlaire, F. Maréchal (2016). Strategic Energy Planning under Uncertainty: a Mixed-Integer Linear Programming Modeling Framework for Large-Scale Energy Systems. https://doi.org/10.1016/B978-0-444-63428-3.50321-0    
+[3] S. Moret (2017). Strategic Energy Planning under Uncertainty. PhD Thesis n. 7961, EPFL, Switzerland. http://dx.doi.org/10.5075/epfl-thesis-7961  
+[4] S. Moret (2017). Strategic Energy Planning under Uncertainty. PhD Thesis n. 7961, EPFL, Switzerland. http://dx.doi.org/10.5075/epfl-thesis-7961  
+[5] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). EnergyScope TD: an open-source model for national energy systems. (Under revision)   

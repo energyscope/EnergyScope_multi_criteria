@@ -70,13 +70,13 @@ c) on Windows:
 2. Clone/download the content of this folder
 3. Navigate to the folder 'STEP_2_Energy_Model' folder via terminal/cmd prompt and execute (check glpsol documentation for more options):
 
-$ glpsol -m ESTD_model.mod -d ESTD_data.dat -d ESTD_12TD.dat -o ESTD_output.out
+$ glpsol -m ESTD_ECOS2019_model.mod -d ESTD_ECOS2019_data.dat -d ESTD_ECOS2019_12TD.dat -o ESTD_output.out
 (You might need to use 'glspol.exe' instead of 'glpsol' on Windows)
 
 4. Check that the ESTD_main.out file is correctly generated.
 
 If the command at point (3) did not run, it might be that glpsol is not on your PATH. Two solutions for that:
-- (not best) instead of "glpsol" use the full path, e.g. on Mac '/usr/local/bin/glpsol  -m ESTD_model.mod -d ESTD_data.dat -d ESTD_12TD.dat -o ESTD_output.out'
+- (not best) instead of "glpsol" use the full path, e.g. on Mac '/usr/local/bin/glpsol  -m ESTD_ECOS2019_model.mod -d ESTD_ECOS2019_data.dat -d ESTD_ECOS2019_12TD.dat -o ESTD_output.out'
 - (best) add the folder in which glpsol is installed to the PATH. e.g. on Windows 7 (http://geekswithblogs.net/renso/archive/2009/10/21/how-to-set-the-windows-path-in-windows-7.aspx). on mac (from terminal) 'export PATH=/usr/local/bin:$PATH' (if glpsol is installed in /usr/local/bin)
 
 The model was originally developed in AMPL. Compatible solvers are CPLEX, Gurobi, etc. Running the model in AMPL requires the licences of AMPL and of at least one LP solver.  
@@ -95,4 +95,4 @@ Authors:
 	
 [3] S. Moret, M. Bierlaire, F. Maréchal (2016). Strategic Energy Planning under Uncertainty: a Mixed-Integer Linear Programming Modeling Framework for Large-Scale Energy Systems. https://doi.org/10.1016/B978-0-444-63428-3.50321-0 	
 	
-[4] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). The role of storage in the Swiss energy transition. Proceedings of ECOS 2019
+[4] G. Limpens, S . Moret, G. Guidati, X. Li, H. Jeanmart, F. Maréchal (2019). The role of storage in the Swiss energy transition. Proceedings of ECOS 2019

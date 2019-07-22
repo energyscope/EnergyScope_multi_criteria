@@ -1,22 +1,22 @@
-# -------------------------------------------------------------------------------------------------------------------------													
-#	EnergyScope TD is an open-source energy model suitable for country scale analysis. It is a simplified representation of an urban or national energy system accounting for the energy flows												
-#	within its boundaries. Based on a hourly resolution, it optimises the design and operation of the energy system while minimizing the cost of the system.												
-#													
+# -------------------------------------------------------------------------------------------------------------------------	
+#	EnergyScope TD is an open-source energy model suitable for country scale analysis. It is a simplified representation of an urban or national energy system accounting for the energy flows
+#	within its boundaries. Based on a hourly resolution, it optimises the design and operation of the energy system while minimizing the cost of the system.
+#	
 #	Copyright (C) <2018-2019> <Ecole Polytechnique Fédérale de Lausanne (EPFL), Switzerland and Université catholique de Louvain (UCLouvain), Belgium>
-#													
-#	Licensed under the Apache License, Version 2.0 (the "License");												
-#	you may not use this file except in compliance with the License.												
-#	You may obtain a copy of the License at												
-#													
-#		http://www.apache.org/licenses/LICENSE-2.0												
-#													
-#	Unless required by applicable law or agreed to in writing, software												
-#	distributed under the License is distributed on an "AS IS" BASIS,												
-#	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.												
-#	See the License for the specific language governing permissions and												
-#	limitations under the License.												
-#													
-#	Description and complete License: see LICENSE file.												
+#	
+#	Licensed under the Apache License, Version 2.0 (the "License";
+#	you may not use this file except in compliance with the License.
+#	You may obtain a copy of the License at
+#	
+#		http://www.apache.org/licenses/LICENSE-2.0
+#	
+#	Unless required by applicable law or agreed to in writing, software
+#	distributed under the License is distributed on an "AS IS" BASIS,
+#	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#	See the License for the specific language governing permissions and
+#	limitations under the License.
+#	
+#	Description and complete License: see LICENSE file.
 # -------------------------------------------------------------------------------------------------------------------------		
 
 
@@ -158,23 +158,23 @@ var Storage_level {STORAGE_TECH, PERIODS} >= 0; # Sto_level [GWh]: Energy stored
 subject to end_uses_t {l in LAYERS, h in HOURS, td in TYPICAL_DAYS}:
 	End_Uses [l, h, td] = (if l == "ELECTRICITY" 
 		then
-			(end_uses_input[l] / total_time + end_uses_input["LIGHTING"] * electricity_time_series [h, td] / t_op [h, td] ) + Network_losses [l,h,td]
+(end_uses_input[l] / total_time + end_uses_input["LIGHTING"] * electricity_time_series [h, td] / t_op [h, td] ) + Network_losses [l,h,td]
 		else (if l == "HEAT_LOW_T_DHN" then
-			(end_uses_input["HEAT_LOW_T_HW"] / total_time + end_uses_input["HEAT_LOW_T_SH"] * heating_time_series [h, td] / t_op [h, td] ) * Share_Heat_Dhn + Network_losses [l,h,td]
+(end_uses_input["HEAT_LOW_T_HW"] / total_time + end_uses_input["HEAT_LOW_T_SH"] * heating_time_series [h, td] / t_op [h, td] ) * Share_Heat_Dhn + Network_losses [l,h,td]
 		else (if l == "HEAT_LOW_T_DECEN" then
-			(end_uses_input["HEAT_LOW_T_HW"] / total_time + end_uses_input["HEAT_LOW_T_SH"] * heating_time_series [h, td] / t_op [h, td] ) * (1 - Share_Heat_Dhn)
+(end_uses_input["HEAT_LOW_T_HW"] / total_time + end_uses_input["HEAT_LOW_T_SH"] * heating_time_series [h, td] / t_op [h, td] ) * (1 - Share_Heat_Dhn)
 		else (if l == "MOB_PUBLIC" then
-			(end_uses_input["MOBILITY_PASSENGER"] * mob_pass_time_series [h, td] / t_op [h, td]  ) * Share_Mobility_Public
+(end_uses_input["MOBILITY_PASSENGER"] * mob_pass_time_series [h, td] / t_op [h, td]  ) * Share_Mobility_Public
 		else (if l == "MOB_PRIVATE" then
-			(end_uses_input["MOBILITY_PASSENGER"] * mob_pass_time_series [h, td] / t_op [h, td]  ) * (1 - Share_Mobility_Public)
+(end_uses_input["MOBILITY_PASSENGER"] * mob_pass_time_series [h, td] / t_op [h, td]  ) * (1 - Share_Mobility_Public)
 		else (if l == "MOB_FREIGHT_RAIL" then
-			(end_uses_input["MOBILITY_FREIGHT"]   * mob_freight_time_series [h, td] / t_op [h, td] ) *  Share_Freight_Train
+(end_uses_input["MOBILITY_FREIGHT"]   * mob_freight_time_series [h, td] / t_op [h, td] ) *  Share_Freight_Train
 		else (if l == "MOB_FREIGHT_ROAD" then
-			(end_uses_input["MOBILITY_FREIGHT"]   * mob_freight_time_series [h, td] / t_op [h, td] ) *(1 - Share_Freight_Train)
+(end_uses_input["MOBILITY_FREIGHT"]   * mob_freight_time_series [h, td] / t_op [h, td] ) *(1 - Share_Freight_Train)
 		else (if l == "HEAT_HIGH_T" then
-			end_uses_input[l] / total_time
+end_uses_input[l] / total_time
 		else 
-			0 )))))))); # For all layers which don't have an end-use demand
+0 )))))))); # For all layers which don't have an end-use demand
 	
 
 ## Cost
@@ -252,14 +252,14 @@ subject to layer_balance {l in LAYERS, h in HOURS, td in TYPICAL_DAYS}:
 # [Eq. 14] The level of the storage represents the amount of energy stored at a certain time.
 subject to storage_level {j in STORAGE_TECH, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}:
 	Storage_level [j, t] = (if t == 1 then
-	 			Storage_level [j, card(PERIODS)] * (1.0 -  storage_losses[j])
-				+ t_op [h, td] * (   (sum {l in LAYERS: storage_eff_in [j,l] > 0}  (Storage_in [j, l, h, td]  * storage_eff_in  [j, l])) 
-				                   - (sum {l in LAYERS: storage_eff_out [j,l] > 0} (Storage_out [j, l, h, td] / storage_eff_out [j, l])))
+	 Storage_level [j, card(PERIODS)] * (1.0 -  storage_losses[j])
+	+ t_op [h, td] * (   (sum {l in LAYERS: storage_eff_in [j,l] > 0}  (Storage_in [j, l, h, td]  * storage_eff_in  [j, l])) 
+	                   - (sum {l in LAYERS: storage_eff_out [j,l] > 0} (Storage_out [j, l, h, td] / storage_eff_out [j, l])))
 	else
-	 			Storage_level [j, t-1] * (1.0 -  storage_losses[j])
-				+ t_op [h, td] * (   (sum {l in LAYERS: storage_eff_in [j,l] > 0}  (Storage_in [j, l, h, td]  * storage_eff_in  [j, l])) 
-				                   - (sum {l in LAYERS: storage_eff_out [j,l] > 0} (Storage_out [j, l, h, td] / storage_eff_out [j, l])))
-				);
+	 Storage_level [j, t-1] * (1.0 -  storage_losses[j])
+	+ t_op [h, td] * (   (sum {l in LAYERS: storage_eff_in [j,l] > 0}  (Storage_in [j, l, h, td]  * storage_eff_in  [j, l])) 
+	                   - (sum {l in LAYERS: storage_eff_out [j,l] > 0} (Storage_out [j, l, h, td] / storage_eff_out [j, l])))
+	);
 
 # [Eq. 15] Bounding daily storage
 subject to impose_daily_storage {j in STORAGE_DAILY, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}:
@@ -424,7 +424,471 @@ minimize obj: TotalCost;
 
 solve;
 
-### Printing output
+##############################################
+###              OUTPUTS                   ###
+##############################################
+## Saving sets and parameters to output file
 
 
+## Print cost breakdown to txt file.
+printf "%s\t%s\t%s\t%s\n", "Name", "C_inv", "C_maint", "C_op" > "output/cost_breakdown.txt"; 
+for {i in TECHNOLOGIES union RESOURCES}{
+	printf "%s\t%.6f\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then (tau[i] * C_inv[i]) else 0, if i in TECHNOLOGIES then C_maint [i] else 0, if i in RESOURCES then C_op [i] else 0 >> "output/cost_breakdown.txt";
+}
+
+
+## Print GWP breakdown
+printf "%s\t%s\t%s\n", "Name", "GWP_constr", "GWP_op" > "output/gwp_breakdown.txt"; 
+for {i in TECHNOLOGIES union RESOURCES}{
+	printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then GWP_constr [i] / lifetime [i] else 0, if i in RESOURCES then GWP_op [i] else 0 >> "output/gwp_breakdown.txt";
+}
+
+## Print losses to txt file
+printf "%s\t%s\n", "End use", "Losses" > "output/losses.txt";
+for {i in END_USES_TYPES}{
+		printf "%s\t%.3f\n",i,  sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t] }(Network_losses [i,h,td] * t_op [h,td])  >> "output/losses.txt";
+}
+
+## Print ASSETS to txt file
+printf "TECHNOLOGIES\t c_inv\t c_maint\t lifetime\t  f_min\t f\t f_max\t fmin_perc\t" > "output/assets.txt"; 
+printf "f_perc\t fmax_perc\t c_p\t tau\t gwp_constr" >> "output/assets.txt"; # Must be split in 2 parts, otherwise too long for GLPK
+printf "\n UNITS\t[MCHCapitalf/GW]\t [MCHCapitalf/GW]\t [y]\t [GW or GWh]\t" >> "output/assets.txt"; 
+printf " [GW or GWh]\t [GW or GWh]\t [0-1]\t [0-1]\t [0-1]\t [0-1]\t [-]\t [ktCO2-eq./GW or GWh] " >> "output/assets.txt"; 
+for {i in END_USES_TYPES, tech in TECHNOLOGIES_OF_END_USES_TYPE[i]}{
+	printf "\n%s\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t",tech,
+C_inv[tech],C_maint[tech],lifetime[tech],f_min[tech],F[tech],f_max[tech],
+fmin_perc[tech],
+sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [tech,h,td] ) / sum {j2 in 
+TECHNOLOGIES_OF_END_USES_TYPE[i], t2 in PERIODS, h2 in HOUR_OF_PERIOD[t2], td2 in TYPICAL_DAY_OF_PERIOD[t2]} (F_t [j2, h2, 
+td2] ),
+fmax_perc[tech],c_p[tech],tau[tech],GWP_constr[tech] >> "output/assets.txt";
+}
+for {tech in STORAGE_TECH union INFRASTRUCTURE}{
+	printf "\n%s\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t",tech,
+C_inv[tech],C_maint[tech],lifetime[tech],f_min[tech],F[tech],f_max[tech],
+fmin_perc[tech],
+-1,
+fmax_perc[tech],c_p[tech],tau[tech],GWP_constr[tech] >> "output/assets.txt"; 
+}
+
+## STORAGE distribution CURVES
+printf "Time\t" > "output/hourly_data/energy_stored.txt";
+for {i in STORAGE_TECH }{
+	printf "%s\t", i >> "output/hourly_data/energy_stored.txt";
+}
+for {i in STORAGE_TECH }{
+	printf "%s_in\t" , i >> "output/hourly_data/energy_stored.txt";
+	printf "%s_out\t", i >> "output/hourly_data/energy_stored.txt";
+}
+for {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}{
+	printf "\n %d\t",t  >> "output/hourly_data/energy_stored.txt";
+	for {i in STORAGE_TECH}{
+		printf "%f\t", Storage_level[i, t] >> "output/hourly_data/energy_stored.txt";
+	}
+	for {i in STORAGE_TECH}{
+		printf "%f\t", (sum {l in LAYERS: storage_eff_in [i,l] > 0}
+-(Storage_in [i, l, h, td] * storage_eff_in [i, l]))
+	>> "output/hourly_data/energy_stored.txt";
+		printf "%f\t", (sum {l in LAYERS: storage_eff_in [i,l] > 0}
+(Storage_out [i, l, h, td] / storage_eff_out [i, l]))
+	>> "output/hourly_data/energy_stored.txt";
+	}
+}
+
+## LAYERS FLUXES
+for {l in LAYERS}{
+	printf "Td \t Time\t" > "output/hourly_data/layer_" & l &".txt"; 
+	for {i in RESOURCES union TECHNOLOGIES diff STORAGE_TECH }{
+		printf "%s\t",i >> "output/hourly_data/layer_" & l &".txt"; 
+	}
+	for {j in STORAGE_TECH }{
+		printf "%s_Pin\t",j >> "output/hourly_data/layer_" & l &".txt"; 
+		printf "%s_Pout\t",j >> "output/hourly_data/layer_" & l &".txt"; 
+	}
+	printf "END_USE\t" >> "output/hourly_data/layer_" & l &".txt"; 
+
+	for {td in TYPICAL_DAYS, h in HOURS}{
+		printf "\n %d \t %d\t",td,h   >> "output/hourly_data/layer_" & l &".txt"; 
+		for {i in RESOURCES union TECHNOLOGIES diff STORAGE_TECH}{
+			printf "%f\t",(layers_in_out[i, l] * F_t [i, h, td]) >> "output/hourly_data/layer_" & l &".txt"; 
+		}
+		for {j in STORAGE_TECH}{
+			printf "%f\t",(-Storage_in [j, l, h, td]) >> "output/hourly_data/layer_" & l &".txt"; 
+			printf "%f\t", (Storage_out [j, l, h, td])>> "output/hourly_data/layer_" & l &".txt"; 
+		}
+		printf "%f\t", -End_Uses [l, h, td]  >> "output/hourly_data/layer_" & l &".txt"; 
+	}
+}
+
+## Energy yearly balance
+printf "Tech\t" > "output/year_balance.txt";
+for {l in LAYERS}{
+	printf "%s\t",l >> "output/year_balance.txt";
+}
+for {i in RESOURCES union TECHNOLOGIES diff STORAGE_TECH}{
+	printf "\n %s \t", i >> "output/year_balance.txt";
+	for {l in LAYERS}{
+		printf " %f\t", sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+layers_in_out[i, l] * F_t [i, h, td] >> "output/year_balance.txt";
+	}
+}
+for {j in STORAGE_TECH}{
+	printf "\n %s \t", j >> "output/year_balance.txt";
+	for {l in LAYERS}{
+		printf " %f\t", sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+(Storage_out [j, l, h, td] - Storage_in [j, l, h, td]) >> "output/year_balance.txt";
+	}
+}
+printf "\n END_USES_DEMAND \t" >> "output/year_balance.txt";
+for {l in LAYERS}{
+	printf " %f\t", sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+		End_Uses [l, h, td] >> "output/year_balance.txt";
+}
+
+##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##
+##SANKEY : THIS IS A ALPHA VERSION AND MIGHT CONTAIN MISTAKES. TO BE USED CAREFULLY##
+##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##
+
+# The code to plot the Sankey diagrams is originally taken from: http://bl.ocks.org/d3noob/c9b90689c1438f57d649
+# Adapted by the IPESE team
+
+## Generate CSV file to be used as input to Sankey diagram
+# Notes:
+# - workaround to write if-then-else statements in GLPK: https://en.wikibooks.org/wiki/GLPK/GMPL_Workarounds#If–then–else_conditional
+# - to visualize the Sankey, open the html file in any browser. If it does not work, try this: https://github.com/mrdoob/three.js/wiki/How-to-run-things-locally
+# - Assuming that SNG and BioOil are used in boilers
+printf "%s,%s,%s,%s,%s,%s\n", "source" , "target", "realValue", "layerID", "layerColor", "layerUnit" > "output/sankey/input2sankey.csv";
+
+#------------------------------------------
+# SANKEY - RESOURCES
+#------------------------------------------
+## Gasoline
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["GASOLINE", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Gasoline" , "Mob priv", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["GASOLINE","GASOLINE"] * F_t ["GASOLINE", h, td]  ) / 1000 , "Gasoline","#808080", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+## Diesel
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["CAR_DIESEL", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Diesel" , "Mob priv", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["CAR_DIESEL","DIESEL"] * F_t ["CAR_DIESEL", h, td]  ) / 1000 , "Diesel", "#D3D3D3", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} ((F_t ["BUS_COACH_DIESEL", h, td] + F_t["BUS_COACH_HYDIESEL", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Diesel" , "Mob public", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["BUS_COACH_DIESEL","DIESEL"] * F_t ["BUS_COACH_DIESEL", h, td]   - layers_in_out["BUS_COACH_HYDIESEL","DIESEL"] * F_t ["BUS_COACH_HYDIESEL", h, td]   ) / 1000 , "Diesel", "#D3D3D3", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} ((F_t ["TRUCK", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Diesel" , "Freight", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["TRUCK","DIESEL"] * F_t ["TRUCK", h, td]  ) / 1000 , "Diesel", "#D3D3D3", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+## Natural Gas
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["CAR_NG", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "NG" , "Mob priv", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["CAR_NG","NG"] * F_t ["CAR_NG", h, td]  ) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["BUS_COACH_CNG_STOICH", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "NG" , "Mob public", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["BUS_COACH_CNG_STOICH","NG"] * F_t ["BUS_COACH_CNG_STOICH", h, td]  ) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["H2_NG", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "NG" , "H2 prod", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["H2_NG","NG"] * F_t ["H2_NG", h, td]  ) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["CCGT", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "NG" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["CCGT","NG"] * F_t ["CCGT", h, td]  ) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["CCGT_CCS", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "NG CCS" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["CCGT_CCS","NG_CCS"] * F_t ["CCGT_CCS", h, td]  ) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["IND_COGEN_GAS", h, td] + F_t ["DHN_COGEN_GAS", h, td] + F_t ["DEC_COGEN_GAS", h, td] + F_t ["DEC_ADVCOGEN_GAS", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "NG" , "CHP", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["IND_COGEN_GAS","NG"] * F_t ["IND_COGEN_GAS", h, td]   - layers_in_out["DHN_COGEN_GAS","NG"] * F_t ["DHN_COGEN_GAS", h, td]   - layers_in_out["DEC_COGEN_GAS","NG"] * F_t ["DEC_COGEN_GAS", h, td]   - layers_in_out["DEC_ADVCOGEN_GAS","NG"] * F_t ["DEC_ADVCOGEN_GAS", h, td]  ) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["DEC_THHP_GAS", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "NG" , "HPs", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["DEC_THHP_GAS","NG"] * F_t ["DEC_THHP_GAS", h, td]  ) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["IND_BOILER_GAS", h, td] + F_t ["DHN_BOILER_GAS", h, td] + F_t ["DEC_BOILER_GAS", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "NG" , "Boilers", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["IND_BOILER_GAS","NG"] * F_t ["IND_BOILER_GAS", h, td]   - layers_in_out["DHN_BOILER_GAS","NG"] * F_t ["DHN_BOILER_GAS", h, td]   - layers_in_out["DEC_BOILER_GAS","NG"] * F_t ["DEC_BOILER_GAS", h, td]  ) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+## Electricity production
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["ELECTRICITY", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Electricity" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["ELECTRICITY","ELECTRICITY"] * F_t ["ELECTRICITY", h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["NUCLEAR", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Nuclear" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["NUCLEAR","ELECTRICITY"] * F_t ["NUCLEAR", h, td]  ) / 1000 , "Nuclear", "#FFC0CB", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["WIND", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Wind" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["WIND","ELECTRICITY"] * F_t ["WIND", h, td]  ) / 1000 , "Wind", "#27AE34", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["HYDRO_DAM", h, td] + F_t ["NEW_HYDRO_DAM", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Hydro Dams" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["HYDRO_DAM","ELECTRICITY"] * F_t ["HYDRO_DAM", h, td]   + layers_in_out["NEW_HYDRO_DAM","ELECTRICITY"] * F_t ["NEW_HYDRO_DAM", h, td]  ) / 1000 , "Hydro Dam", "#00CED1", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["HYDRO_RIVER", h, td] + F_t ["NEW_HYDRO_RIVER", h, 
+td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Hydro River" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["HYDRO_RIVER","ELECTRICITY"] * F_t ["HYDRO_RIVER", h, td]   + layers_in_out["NEW_HYDRO_RIVER","ELECTRICITY"] * F_t ["NEW_HYDRO_RIVER", h, td]  ) / 1000 , "Hydro River", "#0000FF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+# Coal
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["COAL_US", h, td] + F_t ["COAL_IGCC", h, td]) ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Coal" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["COAL_US","COAL"] * F_t ["COAL_US", h, td]   - layers_in_out["COAL_IGCC","COAL"] * F_t ["COAL_IGCC", h, td]  ) / 1000 , "Coal", "#A0522D", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["COAL_US_CCS", h, td] + F_t ["COAL_IGCC_CCS", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Coal CCS" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["COAL_US_CCS","COAL_CCS"] * F_t ["COAL_US_CCS", h, td]   - layers_in_out["COAL_IGCC_CCS","COAL"] * F_t ["COAL_IGCC_CCS", h, td]  ) / 1000 , "Coal", "#A0522D", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["IND_BOILER_COAL", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Coal" , "Boilers", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["IND_BOILER_COAL","COAL"] * F_t ["IND_BOILER_COAL", h, td]  ) / 1000 , "Coal", "#A0522D", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+# Solar
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["PV", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Solar" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["PV","ELECTRICITY"] * F_t ["PV", h, td]  ) / 1000 , "Solar", "#FFFF00", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["DEC_SOLAR", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Solar" , "Heat LT Dec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+		(layers_in_out["DEC_SOLAR","HEAT_LOW_T_DECEN"] * (F_t ["DEC_SOLAR", h, td])# SUPPRESSED # - Solar_excess [ h, td] ) 
+		-((max(Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_DIRECT_ELEC"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_HP_ELEC"      ,h,td]  /max(0.0001,Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_THHP_GAS"     ,h,td]  /max(0.0001,Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_BOILER_GAS"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_BOILER_WOOD"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_BOILER_OIL"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_COGEN_GAS"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_ADVCOGEN_GAS" ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_COGEN_OIL"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_ADVCOGEN_H2"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] )))
+		)/ 1000
+		, "Solar", "#FFFF00", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["DEC_SOLAR", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Solar" , "Dec. Sto", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+		((max(Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_DIRECT_ELEC"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_HP_ELEC"      ,h,td]  /max(0.0001,Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_THHP_GAS"     ,h,td]  /max(0.0001,Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_BOILER_GAS"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_BOILER_WOOD"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_BOILER_OIL"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_COGEN_GAS"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_ADVCOGEN_GAS" ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_COGEN_OIL"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td],0))*(  F_t_Solar["DEC_ADVCOGEN_H2"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] ))
+		)/ 1000
+		, "Solar", "#FFFF00", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+
+# Geothermal
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["GEOTHERMAL", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Geothermal" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["GEOTHERMAL","ELECTRICITY"] * F_t ["GEOTHERMAL", h, td]  ) / 1000 , "Geothermal", "#FF0000", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["DHN_DEEP_GEO", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Geothermal" , "DHN", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["DHN_DEEP_GEO","HEAT_LOW_T_DHN"] * F_t ["DHN_DEEP_GEO", h, td]  ) / 1000 , "Geothermal", "#FF0000", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+# Waste
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["IND_COGEN_WASTE", h, td] + F_t ["DHN_COGEN_WASTE", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Waste" , "CHP", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["IND_COGEN_WASTE","WASTE"] * F_t ["IND_COGEN_WASTE", h, td]  -layers_in_out["DHN_COGEN_WASTE","WASTE"] * F_t ["DHN_COGEN_WASTE", h, td]  ) / 1000 , "Waste", "#808000", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["IND_BOILER_WASTE", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Waste" , "Boilers", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["IND_BOILER_WASTE","WASTE"] * F_t ["IND_BOILER_WASTE", h, td]  ) / 1000 , "Waste", "#808000", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+# Oil
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["DEC_COGEN_OIL", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Oil" , "CHP", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["DEC_COGEN_OIL","LFO"] * F_t ["DEC_COGEN_OIL", h, td]  ) / 1000 , "Oil", "#8B008B", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["IND_BOILER_OIL", h, td] + F_t ["DHN_BOILER_OIL", h, td] + F_t ["DEC_BOILER_OIL", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Oil" , "Boilers", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["IND_BOILER_OIL","LFO"] * F_t ["IND_BOILER_OIL", h, td] - layers_in_out["DHN_BOILER_OIL","LFO"] * F_t ["DHN_BOILER_OIL", h, td]   - layers_in_out["DEC_BOILER_OIL","LFO"] * F_t ["DEC_BOILER_OIL", h, td]  ) / 1000 , "Oil", "#8B008B", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+# Wood
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["H2_BIOMASS", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Wood" , "H2 prod", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["H2_BIOMASS","WOOD"] * F_t ["H2_BIOMASS", h, td]  ) / 1000 , "Wood", "#CD853F", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["GASIFICATION_SNG", h, td] + F_t ["PYROLYSIS", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Wood" , "Biofuels", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["GASIFICATION_SNG","WOOD"] * F_t ["GASIFICATION_SNG", h, td]   - layers_in_out["PYROLYSIS","WOOD"] * F_t ["PYROLYSIS", h, td]  ) / 1000 , "Wood", "#CD853F", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["IND_COGEN_WOOD", h, td] + F_t ["DHN_COGEN_WOOD", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Wood" , "CHP", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["IND_COGEN_WOOD","WOOD"] * F_t ["IND_COGEN_WOOD", h, td]   - layers_in_out["DHN_COGEN_WOOD","WOOD"] * F_t ["DHN_COGEN_WOOD", h, td]  ) / 1000 , "Wood", "#CD853F", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["IND_BOILER_WOOD", h, td] + F_t ["DHN_BOILER_WOOD", h, td] + F_t ["DEC_BOILER_WOOD", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Wood" , "Boilers", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["IND_BOILER_WOOD","WOOD"] * F_t ["IND_BOILER_WOOD", h, td]   - layers_in_out["DHN_BOILER_WOOD","WOOD"] * F_t ["DHN_BOILER_WOOD", h, td]   - layers_in_out["DEC_BOILER_WOOD","WOOD"] * F_t ["DEC_BOILER_WOOD", h, td]  ) / 1000 , "Wood", "#CD853F", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+#------------------------------------------
+# SANKEY - Electricity use
+#------------------------------------------
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["CAR_PHEV", h, td] + F_t ["CAR_BEV", h, td]) ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Mob priv", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["CAR_PHEV","ELECTRICITY"] * F_t ["CAR_PHEV", h, td]   - layers_in_out["CAR_BEV","ELECTRICITY"] * F_t ["CAR_BEV", h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["TRAIN_PUB", h, td] + F_t ["TRAMWAY_TROLLEY", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Mob public", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["TRAIN_PUB","ELECTRICITY"] * F_t ["TRAIN_PUB", h, td]   - layers_in_out["TRAMWAY_TROLLEY","ELECTRICITY"] * F_t ["TRAMWAY_TROLLEY", h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["TRAIN_FREIGHT", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Freight", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["TRAIN_FREIGHT","ELECTRICITY"] * F_t ["TRAIN_FREIGHT", h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Network_losses ["ELECTRICITY", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Exp & Loss", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Network_losses ["ELECTRICITY", h, td]   - layers_in_out["ELEC_EXPORT","ELECTRICITY"] * F_t ["ELEC_EXPORT", h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(End_Uses ["ELECTRICITY", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Elec demand", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((End_Uses ["ELECTRICITY", h, td]  - Network_losses ["ELECTRICITY", h, td] - sum {i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"]} (Storage_out [i, "ELECTRICITY", h, td]))  )/ 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+# New boxes for Electricity storage
+for{{0}: sum{i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"], t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Storage_in [i, "ELECTRICITY", h, td]) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Storage", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (sum {i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"] }(Storage_in [i, "ELECTRICITY", h, td]))/ 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"], t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Storage_in [i, "ELECTRICITY", h, td]) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Storage" , "Elec demand", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(sum {i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"] } (Storage_out [i, "ELECTRICITY", h, td] / storage_eff_out [i, "ELECTRICITY"])  )/ 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"], t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Storage_in [i, "ELECTRICITY", h, td]) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Storage" , "Exp & Loss", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (sum {i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"] }((Storage_in [i, "ELECTRICITY", h, td])- (Storage_out [i, "ELECTRICITY", h, td] / storage_eff_out [i, "ELECTRICITY"]))  )/ 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["DHN_HP_ELEC", h, td] + F_t ["DEC_HP_ELEC", h, td]) ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "HPs", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["DHN_HP_ELEC","ELECTRICITY"] * F_t ["DHN_HP_ELEC", h, td]   - layers_in_out["DEC_HP_ELEC","ELECTRICITY"] * F_t ["DEC_HP_ELEC", h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["H2_ELECTROLYSIS", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "H2 prod", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["H2_ELECTROLYSIS","ELECTRICITY"] * F_t ["H2_ELECTROLYSIS", h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["DEC_DIRECT_ELEC", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Heat LT Dec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["DEC_DIRECT_ELEC","HEAT_LOW_T_DECEN"] * F_t ["DEC_DIRECT_ELEC", h, td]  - ((max(Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_DIRECT_ELEC"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] )))) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["DEC_DIRECT_ELEC", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Heat LT Dec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["DEC_DIRECT_ELEC","HEAT_LOW_T_DECEN"] * F_t ["DEC_DIRECT_ELEC", h, td]  		- ((max(Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_DIRECT_ELEC"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] )))) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]: Storage_in["TS_DEC_DIRECT_ELEC", "HEAT_LOW_T_DECEN", h, td] > Storage_out["TS_DEC_DIRECT_ELEC", "HEAT_LOW_T_DECEN", h, td] }    	((Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td])*(1-F_t_Solar["DEC_DIRECT_ELEC"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] ))) >10 }{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Dec. Sto", sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} 	((max(Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_DIRECT_ELEC"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_DIRECT_ELEC" , "HEAT_LOW_T_DECEN", h, td] ))) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";	
+}	
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["IND_DIRECT_ELEC", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Heat HT", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["IND_DIRECT_ELEC","HEAT_HIGH_T"] * F_t ["IND_DIRECT_ELEC", h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+# H2 use
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["DEC_ADVCOGEN_H2", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "H2 prod" , "CHP", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["DEC_ADVCOGEN_H2","H2"] * F_t ["DEC_ADVCOGEN_H2", h, td]  ) / 1000 , "H2", "#FF00FF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["CAR_FUEL_CELL", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "H2 prod" , "Mob priv", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["CAR_FUEL_CELL","H2"] * F_t ["CAR_FUEL_CELL", h, td]  ) / 1000 , "H2", "#FF00FF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["BUS_COACH_FC_HYBRIDH2", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "H2 prod" , "Mob public", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(-layers_in_out["BUS_COACH_FC_HYBRIDH2","H2"] * F_t ["BUS_COACH_FC_HYBRIDH2", h, td]  ) / 1000 , "H2", "#FF00FF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+#------------------------------------------
+# SANKEY - HEATING
+#------------------------------------------
+# CHP
+for{{0}: sum{i in COGEN, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t [ i, h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "CHP" , "Elec", sum{i in COGEN, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out[i,"ELECTRICITY"] * F_t [i, h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["DEC_COGEN_GAS", h, td] + F_t ["DEC_COGEN_OIL", h, td] + F_t ["DEC_ADVCOGEN_GAS", h, td] + F_t ["DEC_ADVCOGEN_H2", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "CHP" , "Heat LT Dec", sum{i in COGEN, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+		(layers_in_out[i,"HEAT_LOW_T_DECEN"] * F_t [i, h, td]  
+		 -((max(Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_COGEN_GAS"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_ADVCOGEN_GAS" ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_COGEN_OIL"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] ))+
+		  (max(Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_ADVCOGEN_H2"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] )))
+	    ) / 1000 
+	, "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+for{{0}: sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} 
+		    ((max(Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_COGEN_GAS"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] ))+
+		     (max(Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_ADVCOGEN_GAS" ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] ))+
+		     (max(Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_COGEN_OIL"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] ))+
+		     (max(Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_ADVCOGEN_H2"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] )))> 10}{
+		printf "%s,%s,%.2f,%s,%s,%s\n", "CHP" , "Dec. Sto", 
+			sum{i in COGEN, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+				((max(Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_COGEN_GAS"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_GAS"   , "HEAT_LOW_T_DECEN", h, td] ))+
+				(max(Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_ADVCOGEN_GAS" ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_GAS", "HEAT_LOW_T_DECEN", h, td] ))+
+				(max(Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_COGEN_OIL"    ,h,td]  /max(0.0001,Storage_in["TS_DEC_COGEN_OIL"   , "HEAT_LOW_T_DECEN", h, td] ))+
+				(max(Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_ADVCOGEN_H2"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_ADVCOGEN_H2" , "HEAT_LOW_T_DECEN", h, td] ))
+		    ) / 1000 
+		, "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["DHN_COGEN_GAS", h, td] + F_t ["DHN_COGEN_WOOD", h, td] + F_t ["DHN_COGEN_WASTE", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "CHP" , "DHN", sum{i in COGEN, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out[i,"HEAT_LOW_T_DHN"] * F_t [i, h, td]  ) / 1000 , "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["IND_COGEN_GAS", h, td] + F_t ["IND_COGEN_WOOD", h, td] + F_t ["IND_COGEN_WASTE", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "CHP" , "Heat HT", sum{i in COGEN, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out[i,"HEAT_HIGH_T"] * F_t [i, h, td]  ) / 1000 , "Heat HT", "#DC143C", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+# HPs
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["DEC_HP_ELEC", h, td] + F_t ["DEC_THHP_GAS", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "HPs" , "Heat LT Dec", 
+		sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((layers_in_out["DEC_HP_ELEC","HEAT_LOW_T_DECEN"] * F_t ["DEC_HP_ELEC", h, td]   +	layers_in_out["DEC_THHP_GAS","HEAT_LOW_T_DECEN"] * F_t ["DEC_THHP_GAS", h, td]  
+		-((max(Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_HP_ELEC"      ,h,td]  /max(0.0001,Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] ))
+     	 +(max(Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_THHP_GAS"     ,h,td]  /max(0.0001,Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] )))
+		) / 1000 ) , "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["DHN_HP_ELEC", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "HPs" , "DHN", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((layers_in_out["DHN_HP_ELEC","HEAT_LOW_T_DHN"] * F_t ["DHN_HP_ELEC", h, td]  ) / 1000  - ( (Storage_in ["TS_DEC_HP_ELEC", "ELECTRICITY", h, td]) )/ 1000), "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+#storage
+for{{0}: sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} 
+    		((max(Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_HP_ELEC"      ,h,td]  /max(0.0001,Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] ))+
+     	    (max(Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_THHP_GAS"     ,h,td]  /max(0.0001,Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] ))) >10 }{
+		printf "%s,%s,%.2f,%s,%s,%s\n", "HPs" , "Dec. Sto", 		 
+			sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} 
+			((max(Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_HP_ELEC"      ,h,td]  /max(0.0001,Storage_in["TS_DEC_HP_ELEC"     , "HEAT_LOW_T_DECEN", h, td] ))+
+			(max(Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_THHP_GAS"     ,h,td]  /max(0.0001,Storage_in["TS_DEC_THHP_GAS"    , "HEAT_LOW_T_DECEN", h, td] )))/1000
+			,"Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";	
+}
+
+# Biofuels
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["GASIFICATION_SNG", h, td] + F_t ["PYROLYSIS", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["GASIFICATION_SNG","ELECTRICITY"] * F_t ["GASIFICATION_SNG", h, td]   + layers_in_out["PYROLYSIS","ELECTRICITY"] * F_t ["PYROLYSIS", h, td]  ) / 1000 , "Electricity", "#00BFFF", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["GASIFICATION_SNG", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "Boilers", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["GASIFICATION_SNG","NG"] * F_t ["GASIFICATION_SNG", h, td]  ) / 1000 , "NG", "#FFD700", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["PYROLYSIS", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "Boilers", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["PYROLYSIS","LFO"] * F_t ["PYROLYSIS", h, td]  ) / 1000 , "Oil", "#8B008B", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["GASIFICATION_SNG", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Biofuels" , "DHN", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["GASIFICATION_SNG","HEAT_LOW_T_DHN"] * F_t ["GASIFICATION_SNG", h, td]  ) / 1000, "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+# Boilers
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["DEC_BOILER_GAS", h, td] + F_t ["DEC_BOILER_WOOD", h, td] + F_t ["DEC_BOILER_OIL", h, td] ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Boilers" , "Heat LT Dec", 
+	sum{i in BOILERS, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (layers_in_out[i,"HEAT_LOW_T_DECEN"] * F_t [i, h, td] )/1000
+	-sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+		((max(Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_BOILER_GAS"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] ))+
+		     (max(Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_BOILER_WOOD"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] ))+
+		     (max(Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_BOILER_OIL"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] ))) / 1000 ,"Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} 
+		    ((max(Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_BOILER_GAS"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] ))+
+		     (max(Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_BOILER_WOOD"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] ))+
+		     (max(Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_BOILER_OIL"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] ))) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Boilers" , "Dec. Sto", 
+		sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} 
+		    ((max(Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_BOILER_GAS"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_GAS"  , "HEAT_LOW_T_DECEN", h, td] ))+
+		     (max(Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_BOILER_WOOD"  ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_WOOD" , "HEAT_LOW_T_DECEN", h, td] ))+
+		     (max(Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] - Storage_out["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td],0))*(1-F_t_Solar["DEC_BOILER_OIL"   ,h,td]  /max(0.0001,Storage_in["TS_DEC_BOILER_OIL"  , "HEAT_LOW_T_DECEN", h, td] ))		 ) / 1000 ,"Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["DHN_BOILER_GAS", h, td] + F_t ["DHN_BOILER_WOOD", h, td] + F_t ["DHN_BOILER_OIL", h, td])  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Boilers" , "DHN", sum{i in BOILERS, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out[i,"HEAT_LOW_T_DHN"] * F_t [i, h, td]  ) / 1000 , "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["IND_BOILER_GAS", h, td] + F_t ["IND_BOILER_WOOD", h, td] + F_t ["IND_BOILER_OIL", h, td] + F_t ["IND_BOILER_COAL", h, td] + F_t ["IND_BOILER_WASTE", h, td])  ) > 10 }{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "Boilers" , "Heat HT", sum{i in BOILERS, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out[i,"HEAT_HIGH_T"] * F_t [i, h, td]  ) / 1000 , "Heat HT", "#DC143C", "TWh" >> "output/sankey/input2sankey.csv";
+
+
+}
+for{{0}: sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t], i in STORAGE_OF_END_USES_TYPES["HEAT_LOW_T_DECEN"]: Storage_in[i, "HEAT_LOW_T_DECEN", h, td] < Storage_out[i, "HEAT_LOW_T_DECEN", h, td] } (Storage_out[i , "HEAT_LOW_T_DECEN", h, td] - Storage_in[i , "HEAT_LOW_T_DECEN", h, td]) > 10}{
+   printf "%s,%s,%.2f,%s,%s,%s\n", "Dec. Sto" , "Heat LT Dec", sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t], i in STORAGE_OF_END_USES_TYPES["HEAT_LOW_T_DECEN"]: Storage_in[i, "HEAT_LOW_T_DECEN", h, td] < Storage_out[i, "HEAT_LOW_T_DECEN", h, td] } (Storage_out[i , "HEAT_LOW_T_DECEN", h, td] - Storage_in[i , "HEAT_LOW_T_DECEN", h, td])/1000 , "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+
+# DHN 
+}
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(End_Uses ["HEAT_LOW_T_DHN", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "DHN" , "Heat LT DHN", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (sum {i in TECHNOLOGIES diff STORAGE_TECH } (layers_in_out[i, "HEAT_LOW_T_DHN"] * F_t [i, h, td]  ) 	- Network_losses ["HEAT_LOW_T_DHN", h, td]   	- sum {i in STORAGE_OF_END_USES_TYPES["HEAT_LOW_T_DHN"]} (Storage_in  [i, "HEAT_LOW_T_DHN", h, td])) / 1000	, "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+
+for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Network_losses ["HEAT_LOW_T_DHN", h, td]  ) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "DHN" , "Loss DHN", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Network_losses ["HEAT_LOW_T_DHN", h, td]  ) / 1000 , "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+# DHN storage :
+for{{0}: sum {i in STORAGE_OF_END_USES_TYPES["HEAT_LOW_T_DHN"],t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Storage_in  [i, "HEAT_LOW_T_DHN", h, td]) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "DHN" , "DHN Sto", sum {i in STORAGE_OF_END_USES_TYPES["HEAT_LOW_T_DHN"],t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (Storage_in  [i, "HEAT_LOW_T_DHN", h, td])/1000	, "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
+for{{0}: sum {i in STORAGE_OF_END_USES_TYPES["HEAT_LOW_T_DHN"],t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Storage_out  [i, "HEAT_LOW_T_DHN", h, td]) > 10}{
+	printf "%s,%s,%.2f,%s,%s,%s\n", "DHN Sto" , "Heat LT DHN", sum {i in STORAGE_OF_END_USES_TYPES["HEAT_LOW_T_DHN"],t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (Storage_out  [i, "HEAT_LOW_T_DHN", h, td])/1000	, "Heat LT", "#FA8072", "TWh" >> "output/sankey/input2sankey.csv";
+}
 

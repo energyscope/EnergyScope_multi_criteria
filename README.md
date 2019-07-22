@@ -72,11 +72,20 @@ c) on Windows:
 $ glpsol -m ESTD_model.mod -d ESTD_data.dat -d ESTD_12TD.dat -o ESTD_output.out
 (You might need to use 'glspol.exe' instead of 'glpsol' on Windows)
 
-4. Check that the ESTD_main.out file is correctly generated.
-
+4. Check the output files: 
+if the ESTD_main.out file is correctly generated.
 If the command at point (3) did not run, it might be that glpsol is not on your PATH. Two solutions for that:
 - (not best) instead of "glpsol" use the full path, e.g. on Mac '/usr/local/bin/glpsol  -m ESTD_model.mod -d ESTD_data.dat -d ESTD_12TD.dat -o ESTD_output.out'
 - (best) add the folder in which glpsol is installed to the PATH. e.g. on Windows 7 (http://geekswithblogs.net/renso/archive/2009/10/21/how-to-set-the-windows-path-in-windows-7.aspx). on mac (from terminal) 'export PATH=/usr/local/bin:$PATH' (if glpsol is installed in /usr/local/bin)
+
+Descriptions of outputs files and folders: 
+- ./assets.txt : Installed capacity of each technology and its specific cost, gwp... 
+- ./cost_breakdown.txt : Cost of resources and technologies. 
+- ./gwp_breakdown.txt : GWP of resources and technologies. 
+- ./losses.txt : Losses in the networks. 
+- ./hourly_data/ : Folder containing the hourly data for each layer and for each storage technology. 
+- ./sankey/ : Folder containing the SANKEY diagram. 
+
 
 The model was originally developed in AMPL. Compatible solvers are CPLEX, Gurobi, etc. Running the model in AMPL requires the licences of AMPL and of at least one LP solver.  
 

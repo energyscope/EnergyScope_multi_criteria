@@ -10,7 +10,7 @@ You are welcome to report any bugs related to the code to the following:
  moret.stefano@gmail.com or gauthierLimpens@gmail.com  
  
 # Content #
-This folder contains the second release (v2, hourly LP) of the EnergyScope model.  
+This version of the model corresponds to the one in [4].  
 More recent releases are available @ the EnergyScope project repository: https://github.com/energyscope/EnergyScope   
 This version of the model corresponds to the one in [4].  
 The data used in this version of the model are documented in [1], Supplementary Material and [4]. 
@@ -89,7 +89,7 @@ Authors:
 - Gauthier Limpens, Université catholique de Louvain (Belgium), <gauthierLimpens@gmail.com>  
 
 # References:  #  
-[1] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). EnergyScope TD: a novel open-source model for regional energy systems and its application to the case of Switzerland. (Under revision)
+[1] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). EnergyScope TD: a novel open-source model for regional energy systems. Appl Energy; Volume 255. https://doi.org/10.1016/j.apenergy.2019.113729
  	
 [2] V. Codina Gironès, S. Moret, F. Maréchal, D. Favrat (2015). Strategic energy planning for large-scale energy systems: A modelling framework to aid decision-making. Energy, 90(PA1), 173–186. https://doi.org/10.1016/j.energy.2015.06.008 	
 	

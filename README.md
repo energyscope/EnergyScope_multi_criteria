@@ -97,7 +97,7 @@ Authors:
 - Gauthier Limpens, Université catholique de Louvain (Belgium), <gauthierLimpens@gmail.com>  
 
 # References:  #  
-[1] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). EnergyScope TD: a novel open-source model for regional energy systems and its application to the case of Switzerland. (Under revision)
+[1] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). EnergyScope TD: a novel open-source model for regional energy systems. Appl Energy 2019; Volume 255. https://doi.org/10.1016/j.apenergy.2019.113729 
  	
 [2] V. Codina Gironès, S. Moret, F. Maréchal, D. Favrat (2015). Strategic energy planning for large-scale energy systems: A modelling framework to aid decision-making. Energy, 90(PA1), 173–186. https://doi.org/10.1016/j.energy.2015.06.008 	
 	

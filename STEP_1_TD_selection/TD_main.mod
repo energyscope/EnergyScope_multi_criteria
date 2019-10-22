@@ -57,15 +57,30 @@ minimize Euclidean_distance:
 	sum{i in DAYS,j in DAYS} Distance[i,j]*Cluster_matrix[i,j];
 
 ##############################################
-###            GLPK version                ###
+###               SOLVERS                  ###
 ##############################################
+# WARNING: Results might differ between solvers (little difference).
+# As an example, Authors found a difference for the Swiss case:
+#                         TD:  1	2	3	4	5	6	7	8	9	10	11	12
+#                AMPL-CPLEX : 13	49	84	95	107	156	209	238	259	325	347	359
+#                GLPSOL     : 13	49	84	95	107	156	209	238	259	319	325	347
+#                The paper is based on AMPL results. 
+
+###  AMPL version  
+/*
+option solver cplex;
+data data.dat;
+
+solve;
+*/
+###  GLPK version 
 
 solve;
 
-### Printing output
+##############################################
+###            Printing output             ###
+##############################################
 for {i in DAYS}{
  printf "%d\t\n",(sum{j in DAYS} j*Cluster_matrix[j,i]) >> "TD_of_days.out";
 }
  
-
-

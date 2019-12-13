@@ -4,16 +4,16 @@ You may cite it as follows:
 - [1], for general reference to the EnergyScope project and the EnergyScope modeling framework  	
 - [2], for reference to the origins of the EnergyScope project or to the first online version of the calculator energyscope.ch 	
 - [3], for reference to the energyscope MILP modeling framework 	
-- [1], for reference to the current code 	
+- [4], for reference to the current code 	
 
 You are welcome to report any bugs related to the code to the following:    
  moret.stefano@gmail.com or gauthierLimpens@gmail.com  
  
 # Content #
-This folder contains the second release (v2, hourly LP) of the EnergyScope model.  
+This folder contains the second release (v2, hourly LP) of the EnergyScope model adapted to the Belgian case.  
 More recent releases are available @ the EnergyScope project repository: https://github.com/energyscope/EnergyScope   
-This version of the model corresponds to the one in [1].  
-The data used in this version of the model are fully documented in [1], Supplementary Material. The latest version of the Supplementary Material is available in the Documentation folder.
+This version of the model corresponds to the one in [4].  
+The data used in this version of the model are fully documented in [4], Supplementary Material. The latest version of the Supplementary Material is available in the Documentation folder.
 
 
 # License:  # 
@@ -90,15 +90,18 @@ Descriptions of outputs files and folders:
 The model was originally developed in AMPL. Compatible solvers are CPLEX, Gurobi, etc. Running the model in AMPL requires the licences of AMPL and of at least one LP solver.  
 
 # Previous versions and Authors: #  
-- first release (v1, monthly MILP) of the EnergyScope (ES) model: https://github.com/energyscope/EnergyScope/tree/v1.0 .	
+- first release (v1, monthly MILP) of the EnergyScope (ES) model: https://github.com/energyscope/EnergyScope/tree/v1.0 .
+- second release (v2, hourly LP) of the EnergyScope (ES) model: https://github.com/energyscope/EnergyScope/tree/v2.0 .	
 
 Authors: 
 - Stefano Moret, Ecole Polytechnique Fédérale de Lausanne (Switzerland), <moret.stefano@gmail.com> 
 - Gauthier Limpens, Université catholique de Louvain (Belgium), <gauthierLimpens@gmail.com>  
 
 # References:  #  
-[1] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). EnergyScope TD: a novel open-source model for regional energy systems. Appl Energy 2019; Volume 255. https://doi.org/10.1016/j.apenergy.2019.113729 
- 	
-[2] V. Codina Gironès, S. Moret, F. Maréchal, D. Favrat (2015). Strategic energy planning for large-scale energy systems: A modelling framework to aid decision-making. Energy, 90(PA1), 173–186. https://doi.org/10.1016/j.energy.2015.06.008 	
-	
-[3] S. Moret, M. Bierlaire, F. Maréchal (2016). Strategic Energy Planning under Uncertainty: a Mixed-Integer Linear Programming Modeling Framework for Large-Scale Energy Systems. https://doi.org/10.1016/B978-0-444-63428-3.50321-0 	
+[1] G. Limpens, S . Moret, H. Jeanmart, F. Maréchal (2019). EnergyScope TD: a novel open-source model for regional energy systems and its application to the case of Switzerland. https://doi.org/10.1016/j.apenergy.2019.113729	
+
+[2] V. Codina Gironès, S. Moret, F. Maréchal, D. Favrat (2015). Strategic energy planning for large-scale energy systems: A modelling framework to aid decision-making. Energy, 90(PA1), 173–186. https://doi.org/10.1016/j.energy.2015.06.008   	
+
+[3] S. Moret, M. Bierlaire, F. Maréchal (2016). Strategic Energy Planning under Uncertainty: a Mixed-Integer Linear Programming Modeling Framework for Large-Scale Energy Systems. https://doi.org/10.1016/B978-0-444-63428-3.50321-0  	
+
+[4] G. Limpens, H. Jeanmart, F. Maréchal (2020). Belgian energy transition: what are the options?  (under review)

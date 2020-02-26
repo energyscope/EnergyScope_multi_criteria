@@ -497,26 +497,26 @@ for {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}{
 
 ## LAYERS FLUXES
 for {l in LAYERS}{
-	printf "Td \t Time\t" > "output/hourly_data/layer_" & l &".txt"; 
+	printf "Td \t Time\t" > ("output/hourly_data/layer_" & l &".txt"); 
 	for {i in RESOURCES union TECHNOLOGIES diff STORAGE_TECH }{
-		printf "%s\t",i >> "output/hourly_data/layer_" & l &".txt"; 
+		printf "%s\t",i >> ("output/hourly_data/layer_" & l &".txt"); 
 	}
 	for {j in STORAGE_TECH }{
-		printf "%s_Pin\t",j >> "output/hourly_data/layer_" & l &".txt"; 
-		printf "%s_Pout\t",j >> "output/hourly_data/layer_" & l &".txt"; 
+		printf "%s_Pin\t",j >> ("output/hourly_data/layer_" & l &".txt"); 
+		printf "%s_Pout\t",j >> ("output/hourly_data/layer_" & l &".txt"); 
 	}
-	printf "END_USE\t" >> "output/hourly_data/layer_" & l &".txt"; 
+	printf "END_USE\t" >> ("output/hourly_data/layer_" & l &".txt"); 
 
 	for {td in TYPICAL_DAYS, h in HOURS}{
-		printf "\n %d \t %d\t",td,h   >> "output/hourly_data/layer_" & l &".txt"; 
+		printf "\n %d \t %d\t",td,h   >> ("output/hourly_data/layer_" & l &".txt"); 
 		for {i in RESOURCES union TECHNOLOGIES diff STORAGE_TECH}{
-			printf "%f\t",(layers_in_out[i, l] * F_t [i, h, td]) >> "output/hourly_data/layer_" & l &".txt"; 
+			printf "%f\t",(layers_in_out[i, l] * F_t [i, h, td]) >> ("output/hourly_data/layer_" & l &".txt"); 
 		}
 		for {j in STORAGE_TECH}{
-			printf "%f\t",(-Storage_in [j, l, h, td]) >> "output/hourly_data/layer_" & l &".txt"; 
-			printf "%f\t", (Storage_out [j, l, h, td])>> "output/hourly_data/layer_" & l &".txt"; 
+			printf "%f\t",(-Storage_in [j, l, h, td]) >> ("output/hourly_data/layer_" & l &".txt"); 
+			printf "%f\t", (Storage_out [j, l, h, td])>> ("output/hourly_data/layer_" & l &".txt"); 
 		}
-		printf "%f\t", -End_Uses [l, h, td]  >> "output/hourly_data/layer_" & l &".txt"; 
+		printf "%f\t", -End_Uses [l, h, td]  >> ("output/hourly_data/layer_" & l &".txt"); 
 	}
 }
 

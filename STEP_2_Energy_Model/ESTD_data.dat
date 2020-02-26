@@ -380,8 +380,8 @@ DAM_STORAGE	1	1	1	0
 LNG_STO	1	1	1	0																					
 PHES	203	203	1	0																					
 BATT_LI	4	4	1	0.0002																					
-BEV_BATT	10	4	0.8	0.0002	% In this propose version, we assume a very high share of connected vehicles (cfr paper). To be more realistic, we advise 20% of storage_availability_share																				
-PHEV_BATT	10	4	0.8	0.0002	% In this propose version, we assume a very high share of connected vehicles (cfr paper). To be more realistic, we advise 20% of storage_availability_share																				
+BEV_BATT	10	4	0.8	0.0002	# In this version, we assume a very high share of connected vehicles (cfr paper). To be more realistic, we advise 20% of storage_availability_share																				
+PHEV_BATT	10	4	0.8	0.0002	# In this version, we assume a very high share of connected vehicles (cfr paper). To be more realistic, we advise 20% of storage_availability_share																				
 TS_DEC_DIRECT_ELEC 	4	4	1	0.00824																					
 TS_DEC_HP_ELEC 	4	4	1	0.00824																					
 TS_DEC_THHP_GAS	4	4	1	0.00824																					

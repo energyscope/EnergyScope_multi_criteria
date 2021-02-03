@@ -10,11 +10,10 @@ You are welcome to report any bugs related to the code to the following:
  moret.stefano@gmail.com or gauthierLimpens@gmail.com  
  
 # Content #
-This folder contains the second release (v2, hourly LP) of the EnergyScope model adapted to the Belgian case.  
+This folder contains the third release (v2_1, hourly LP) of the EnergyScope model adapted to the Belgian case.  
 More recent releases are available @ the EnergyScope project repository: https://github.com/energyscope/EnergyScope   
 This version of the model corresponds to the one in [4].  
-The data used in this version of the model are fully documented in [4], Supplementary Material. The latest version of the Supplementary Material is available in the Documentation folder.
-
+The data used in this version of the model are fully documented in [4], Appendix B. 
 
 # License:  # 
 Copyright (C) <2018-2019> <Ecole Polytechnique Fédérale de Lausanne (EPFL), Switzerland and Université catholique de Louvain (UCLouvain), Belgium>
@@ -104,4 +103,4 @@ Authors:
 
 [3] S. Moret, M. Bierlaire, F. Maréchal (2016). Strategic Energy Planning under Uncertainty: a Mixed-Integer Linear Programming Modeling Framework for Large-Scale Energy Systems. https://doi.org/10.1016/B978-0-444-63428-3.50321-0  	
 
-[4] G. Limpens, H. Jeanmart, F. Maréchal (2020). Belgian energy transition: what are the options?  (under review)
+[4] G. Limpens (2021). Optimisation of energy transition pathways - application to the case of Belgium. PhD thesis  (under review)

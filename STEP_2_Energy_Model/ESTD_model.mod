@@ -457,9 +457,9 @@ for {i in END_USES_TYPES, tech in TECHNOLOGIES_OF_END_USES_TYPE[i]}{
 	printf "\n%s\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t",tech,
 C_inv[tech],C_maint[tech],lifetime[tech],f_min[tech],F[tech],f_max[tech],
 fmin_perc[tech],
-sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [tech,h,td] ) / sum {j2 in 
+sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [tech,h,td] ) / max(0.00001,sum {j2 in 
 TECHNOLOGIES_OF_END_USES_TYPE[i], t2 in PERIODS, h2 in HOUR_OF_PERIOD[t2], td2 in TYPICAL_DAY_OF_PERIOD[t2]} (F_t [j2, h2, 
-td2] ),
+td2] )),
 fmax_perc[tech],c_p[tech],tau[tech],GWP_constr[tech] >> "output/assets.txt";
 }
 for {tech in STORAGE_TECH union INFRASTRUCTURE}{

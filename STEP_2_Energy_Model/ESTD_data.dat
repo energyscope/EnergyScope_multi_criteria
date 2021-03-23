@@ -94,14 +94,14 @@ set BOILERS	:=	IND_BOILER_GAS	IND_BOILER_WOOD	IND_BOILER_OIL	IND_BOILER_COAL	IND
 # -----------------------------																													
 																													
 ## PARAMETERS presented in Table 2.2																													
-param i_rate := 	0.015	; # Appendix B.2.4																											
+param i_rate := 	0.015	; # Appendix C.2.4																											
 param re_share_primary := 	0	;	# Minimum RE share in primary consumption																										
 param gwp_limit := 	55716	;	# [ktCO2-eq./year]	# yearly GWP maximum emissions																									
 param solar_area :=	250	;	# [GW] Maximum power of electrical interconnections																										
 param power_density_pv :=	0.2367	;	# PV :            1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2																										
 param power_density_solar_thermal :=	0.2857	;	# Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2																										
 																													
-# Appendix B.3.3 [2.4]																													
+# see Appendix C.3.3 [2.4]																													
 param : batt_per_car := #ev_batt,size [GWh]: Size of batteries per car per technology of EV  																													
 CAR_PHEV	4.4																												
 CAR_BEV 	24	;																											
@@ -110,10 +110,10 @@ param : vehicule_capacity :=	# km-pass/h/veh. : Gives the equivalence between ca
 CAR_PHEV	50.4																												
 CAR_BEV	50.4	;																											
 																													
-param c_grid_extra :=	367.8	;	# cost to reinforce the grid due to intermittent renewable energy penetration. See B.3.6																										
+param c_grid_extra :=	367.8	;	# cost to reinforce the grid due to intermittent renewable energy penetration. See Appendix C.3.6																										
 param import_capacity :=	9.72	;	# [GW] Maximum power of electrical interconnections																										
 																													
-# end_Uses_year see B.2.																													
+# end_Uses_year see Appendix C.2.																													
 param end_uses_demand_year: 	HOUSEHOLDS	SERVICES	INDUSTRY	TRANSPORTATION	:=																								
 ELECTRICITY	21115.389	20066.19569	39964.38484	0																									
 LIGHTING	827.4399999	5081.415355	4836.212914	0																									
@@ -141,7 +141,7 @@ param share_heat_dhn_min := 	0.02	;
 param share_heat_dhn_max := 	0.37	;																											
 																													
 																													
-# Link between layers  (data from Tables B.5-B.9, B.12, B.15 and B.18-21)																													
+# Link between layers  (data from Tables C.5-C.9, C.12, C.15 and C.18-21)																													
 param layers_in_out:	ELECTRICITY	GASOLINE	DIESEL	LFO	NG	WOOD	WET_BIOMASS	COAL	URANIUM	WASTE	H2	SLF	HEAT_HIGH_T	HEAT_LOW_T_DHN	HEAT_LOW_T_DECEN	MOB_PUBLIC	MOB_PRIVATE	MOB_FREIGHT_RAIL	MOB_FREIGHT_ROAD	MOB_FREIGHT_BOAT	RES_WIND	RES_SOLAR	RES_HYDRO	RES_GEO 	NON_ENERGY	CO2_ATM 	CO2_INDUSTRY	CO2_CAPTURED	:=
 ELECTRICITY	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
 GASOLINE	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
@@ -252,7 +252,7 @@ SLF_TO_GASOLINE	0	1	0	0	0	0	0	0	0	0	0	-1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
 SLF_TO_LFO	0	0	0	1	0	0	0	0	0	0	0	-1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
 ;																													
 																													
-# Technologies data from  (data from Tables B.5-B.9, B.11, B.14, B.16 and B.18-21)																													
+# Technologies data from  (data from Tables C.5-C.9, C.11, C.14, C.16 and C.18-21)																													
 param:	c_inv	c_maint	gwp_constr	lifetime	c_p	fmin_perc	fmax_perc	f_min	f_max :=																				
 NUCLEAR	4845.734619	102.930986	707.88	60	0.849	0	1	0	0																				
 CCGT	771.9917595	19.55202588	183.79	25	0.961538462	0	1	0	1E+15																				
@@ -360,7 +360,7 @@ CO2_STORAGE	49.5	0.495	0	30	1	0	1	0	1E+15
 SLF_STO	0.00635	0.000397	0	20	1	0	1	0	1E+15																				
 ;																													
 																													
-# RESOURCES: Table B.2																													
+# RESOURCES: Table C.2																													
 param:	avail	gwp_op	c_op	:=																									
 ELECTRICITY	27567.31134	0.206485714	0.08433																										
 GASOLINE	1000000	0.3448	0.082366044																										
@@ -388,7 +388,7 @@ CO2_INDUSTRY 	0	0	0
 CO2_CAPTURED	0	0	0																										
 ;																													
 																													
-# Storage inlet/outlet efficiency : B.17																													
+# Storage inlet/outlet efficiency : Table C.17																													
 param storage_eff_in:	ELECTRICITY	GASOLINE	DIESEL	LFO	NG	WOOD	WET_BIOMASS	COAL	URANIUM	WASTE	H2	SLF	HEAT_HIGH_T	HEAT_LOW_T_DHN	HEAT_LOW_T_DECEN	MOB_PUBLIC	MOB_PRIVATE	MOB_FREIGHT_RAIL	MOB_FREIGHT_ROAD	MOB_FREIGHT_BOAT	RES_WIND	RES_SOLAR	RES_HYDRO	RES_GEO	NON_ENERGY	CO2_ATM	CO2_INDUSTRY	CO2_CAPTURED	:=
 PHS	0.866	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
 BATT_LI	0.95	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
@@ -437,7 +437,7 @@ CO2_STORAGE	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1
 SLF_STO	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
 ;																													
 																													
-# Storage characteristics : B.17																													
+# Storage characteristics : Table C.17																													
 param :	storage_charge_time	storage_discharge_time	storage_availability	storage_losses	:=																								
 PHS	4.8309	4.2955	1	0																									
 BATT_LI	4	4	1	0.0002																									
@@ -464,7 +464,7 @@ SLF_STO	1	1	1	0
 																													
 																													
 																													
-# Networks B.3.6																													
+# Networks see Appendix C.3.6																													
 param loss_network	:=																												
 ELECTRICITY	0.047																												
 HEAT_LOW_T_DHN	0.05																												

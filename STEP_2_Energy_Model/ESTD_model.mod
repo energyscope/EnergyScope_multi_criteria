@@ -2,7 +2,7 @@
 #	EnergyScope TD is an open-source energy model suitable for country scale analysis. It is a simplified representation of an urban or national energy system accounting for the energy flows												
 #	within its boundaries. Based on a hourly resolution, it optimises the design and operation of the energy system while minimizing the cost of the system.												
 #													
-#	Copyright (C) <2018-2019> <Ecole Polytechnique FÃ©dÃ©rale de Lausanne (EPFL), Switzerland and UniversitÃ© catholique de Louvain (UCLouvain), Belgium>
+#	Copyright (C) <2018-2019> <Ecole Polytechnique Fédérale de Lausanne (EPFL), Switzerland and Université catholique de Louvain (UCLouvain), Belgium>
 #													
 #	Licensed under the Apache License, Version 2.0 (the "License");												
 #	you may not use this file except in compliance with the License.												
@@ -34,6 +34,7 @@ set END_USES_INPUT; # Types of demand (end-uses). Input to the model
 set END_USES_CATEGORIES; # Categories of demand (end-uses): electricity, heat, mobility
 set END_USES_TYPES_OF_CATEGORY {END_USES_CATEGORIES}; # Types of demand (end-uses).
 set RESOURCES; # Resources: fuels (renewables and fossils) and electricity imports
+set RES_IMPORT_CONSTANT within RESOURCES; # resources imported at constant power (e.g. NG, diesel, ...)
 set BIOFUELS within RESOURCES; # imported biofuels.
 set EXPORT within RESOURCES; # exported resources
 set END_USES_TYPES := setof {i in END_USES_CATEGORIES, j in END_USES_TYPES_OF_CATEGORY [i]} j; # secondary set
@@ -113,6 +114,7 @@ param storage_discharge_time {STORAGE_TECH} >= 0; # t_sto_out [h]: Time to disch
 param storage_availability {STORAGE_TECH} >=0, default 1;# %_sto_avail [-]: Storage technology availability to charge/discharge. Used for EVs 
 param loss_network {END_USES_TYPES} >= 0 default 0; # %_net_loss: Losses coefficient [0; 1] in the networks (grid and DHN)
 param batt_per_car {V2G} >= 0; # ev_batt_size [GWh]: Battery size per EVs car technology
+param state_of_charge_ev {EVs_BATT,HOURS} >= 0, default 0; # Minimum state of charge of the EV during the day. 
 param c_grid_extra >=0; # Cost to reinforce the grid due to IRE penetration [Meuros/GW of (PV + Wind)].
 param import_capacity >= 0; # Maximum electricity import capacity [GW]
 param solar_area >= 0; # Maximum land available for PV deployment [km2]
@@ -251,6 +253,11 @@ subject to capacity_factor {j in TECHNOLOGIES}:
 subject to resource_availability {i in RESOURCES}:
 	sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [i, h, td] * t_op [h, td]) <= avail [i];
 
+# [Eq. 2.12-bis] Constant flow of import for resources listed in SET RES_IMPORT_CONSTANT
+var Import_constant {RES_IMPORT_CONSTANT} >= 0;
+subject to resource_constant_import { i in RES_IMPORT_CONSTANT, h in HOURS, td in TYPICAL_DAYS}:
+	F_t [i, h, td] * t_op [h, td] = Import_constant [i];
+
 ## Layers
 #--------
 
@@ -292,10 +299,13 @@ subject to storage_layer_in {j in STORAGE_TECH, l in LAYERS, h in HOURS, td in T
 subject to storage_layer_out {j in STORAGE_TECH, l in LAYERS, h in HOURS, td in TYPICAL_DAYS}:
 	Storage_out [j, l, h, td] * (ceil (storage_eff_out [j, l]) - 1) = 0;
 		
-# [Eq. 2.19] limit the Energy to power ratio. 
-subject to limit_energy_to_power_ratio {j in STORAGE_TECH , l in LAYERS, h in HOURS, td in TYPICAL_DAYS}:
+# [Eq. 2.19] limit the Energy to power ratio for storage technologies except EV batteries
+subject to limit_energy_to_power_ratio {j in STORAGE_TECH diff {"BEV_BATT","PHEV_BATT"}, l in LAYERS, h in HOURS, td in TYPICAL_DAYS}:
 	Storage_in [j, l, h, td] * storage_charge_time[j] + Storage_out [j, l, h, td] * storage_discharge_time[j] <=  F [j] * storage_availability[j];
 	
+# [Eq. 2.19-bis] limit the Energy to power ratio for EV batteries
+subject to limit_energy_to_power_ratio_bis {i in V2G, j in EVs_BATT_OF_V2G[i], l in LAYERS, h in HOURS, td in TYPICAL_DAYS}:
+	Storage_in [j, l, h, td] * storage_charge_time[j] + (Storage_out [j, l, h, td] + layers_in_out[i,"ELECTRICITY"]* F_t [i, h, td]) * storage_discharge_time[j]  <= ( F [j] - F_t [i,h,td] / vehicule_capacity [i] * batt_per_car[i] ) * storage_availability[j];
 
 ## Networks
 #----------------
@@ -309,9 +319,9 @@ subject to extra_grid:
 	F ["GRID"] = 1 +  (c_grid_extra / c_inv["GRID"]) *(    (F ["WIND_ONSHORE"]     + F ["WIND_OFFSHORE"]     + F ["PV"]      )
 					                                     - (f_min ["WIND_ONSHORE"] + f_min ["WIND_OFFSHORE"] + f_min ["PV"]) );
 
-# [Eq. 2.22] DHN: assigning a cost to the network
+# [Eq. 2.22] DHN: assigning a cost to the network equal to the power capacity connected to the grid
 subject to extra_dhn:
-	F ["DHN"] = sum {j in TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DHN"]} (F [j]);
+	F ["DHN"] = sum {j in TECHNOLOGIES diff STORAGE_TECH: layers_in_out [j,"HEAT_LOW_T_DHN"] > 0} (layers_in_out [j,"HEAT_LOW_T_DHN"] * F [j]);
 	
 ## Additional constraints
 #------------------------
@@ -361,6 +371,10 @@ subject to EV_storage_size {j in V2G, i in EVs_BATT_OF_V2G[j]}:
 subject to EV_storage_for_V2G_demand {j in V2G, i in EVs_BATT_OF_V2G[j], h in HOURS, td in TYPICAL_DAYS}:
 	Storage_out [i,"ELECTRICITY",h,td] >=  - layers_in_out[j,"ELECTRICITY"]* F_t [j, h, td];
 		
+# [Eq. 2.31-bis]  Impose a minimum state of charge at some hours of the day:
+subject to ev_minimum_state_of_charge {j in V2G, i in EVs_BATT_OF_V2G[j],  t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}:
+	Storage_level [i, t] >=  F [i] * state_of_charge_ev [i, h];
+		
 ## Peak demand :
 
 # [Eq. 2.32] Peak in decentralized heating
@@ -405,7 +419,7 @@ subject to max_elec_import {h in HOURS, td in TYPICAL_DAYS}:
 	
 # [Eq. 2.39] Limit surface area for solar
 subject to solar_area_limited :
-	F["PV"]/power_density_pv+(F["DEC_SOLAR"]+F["DHN_SOLAR"])/power_density_solar_thermal <= solar_area;
+	F["PV"] / power_density_pv + ( F ["DEC_SOLAR"] + F ["DHN_SOLAR"] ) / power_density_solar_thermal <= solar_area;
 
 
 ##########################

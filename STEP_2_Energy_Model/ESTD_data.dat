@@ -250,7 +250,7 @@ PYROLYSIS	0.0238	0	0	0	0	-1.5017	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.58566
 ATM_CCS	-1.3	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	-1	0	1	
 INDUSTRY_CCS	-0.233	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	-1	0.9	
 SYN_METHANOLATION	0	0	0	0	0	0	0	0	0	0	-1.5	1	0	0.261	0	0	0	0	0	0	0	0	0	0	0	0	0	-0.247	
-SYN_METHANATION	0	0	0	0	1	0	0	0	0	0	-1.2	0	0	0.295	0	0	0	0	0	0	0	0	0	0	0	0	0	-0.198	
+SYN_METHANATION	0	0	0	0	1	0	0	0	0	0	-1.2	0	0	0.095	0	0	0	0	0	0	0	0	0	0	0	0	0	-0.198	
 BIOMETHANATION	0	0	0	0	1	0	-3.3462	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1.105018	0	
 BIO_HYDROLYSIS	0.094562648	0	0	0	1	0	-2.364066194	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.721985816	0	
 METHANE_TO_METHANOL	0	0	0	0	-1.529051988	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.305810398	0	
@@ -454,8 +454,8 @@ SLF_STO	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
 param :	storage_charge_time	storage_discharge_time	storage_availability	storage_losses	:=																								
 PHS	4.8309	4.2955	1	0																									
 BATT_LI	4	4	1	0.0002																									
-BEV_BATT	10	4	0.2	0.0002																									
-PHEV_BATT	10	4	0.2	0.0002																									
+BEV_BATT	4	4	0.2	0.0002																									
+PHEV_BATT	4	4	0.2	0.0002																									
 TS_DEC_DIRECT_ELEC	4	4	1	0.00824																									
 TS_DEC_HP_ELEC	4	4	1	0.00824																									
 TS_DEC_THHP_GAS	4	4	1	0.00824																									

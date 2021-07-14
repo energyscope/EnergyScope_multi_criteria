@@ -103,4 +103,4 @@ Authors:
 
 [3] S. Moret, M. Bierlaire, F. Maréchal (2016). Strategic Energy Planning under Uncertainty: a Mixed-Integer Linear Programming Modeling Framework for Large-Scale Energy Systems. https://doi.org/10.1016/B978-0-444-63428-3.50321-0  	
 
-[4] G. Limpens (2021). Optimisation of energy transition pathways - application to the case of Belgium. PhD thesis  (under review)
+[4] G. Limpens (2021). Generating energy transition pathways: application to Belgium. PhD thesis Université Catholique de Louvain. http://hdl.handle.net/2078.1/249196

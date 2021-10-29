@@ -33,7 +33,7 @@ set DAYS := 1 .. 365;			# Number of days
 ### parameters
 param Nbr_TD default 12; 				#Number of TD days
 param Ndata{DAYS,DIMENSIONS}; 			#Input data (already normalized)
-param Distance{i in DAYS,j in DAYS} := sum{k in DIMENSIONS}((Ndata[i,k]-Ndata[j,k])*(Ndata[i,k]-Ndata[j,k])) ; # Distance matrix.
+param Distance{i in DAYS,j in DAYS} := sum{k in DIMENSIONS} abs(Ndata[i,k]-Ndata[j,k]) ; # Distance matrix.
 
 ### Variables
 var Selected_TD {DAYS} 				binary;# default 0; #which are the typical days 

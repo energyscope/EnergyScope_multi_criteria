@@ -16,8 +16,8 @@ Model formulation
 
    Overview of the LP modeling framework.
 
-Section intro
--------------
+Overview
+--------
 
 Due to computational restrictions, energy system models rarely optimise
 the 8760h of the year. As an example, running our model with 8760h time
@@ -28,8 +28,8 @@ introducing an approximation error in the representation of the energy
 system (especially for short-term dynamics) and computational time.
 
 -  the first step consists in pre-processing the time series and solving
-   a MILP problem to determine the adequate set of (
-   Section :ref:`sec_td_selection`).
+   a MILP problem to determine the adequate set of 
+   (Section :ref:`sec_td_selection`).
 
 -  the second step is the main energy model: it identifies the optimal
    design and operation of the energy system over the selected (Section
@@ -53,31 +53,29 @@ scenario). The following :numref:`Figure %s <fig:ProcessStructure>`  illustrates
 
 
 
-This documentation is built from previous works (:raw-latex:`\citep{Moret2017PhDThesis,Limpens2019,Limpens2021thesis}`). 
-For more details about the research approach, the choice of clustering method or the reconstruction method; refer to :raw-latex:`\cite{Limpens2021thesis}`.
+This documentation is built from previous works (:cite:`Moret2017PhDThesis,Limpens2019,Limpens2021thesis`). 
+For more details about the research approach, the choice of clustering method or the reconstruction method; refer to :cite:`Limpens2021thesis`.
 
 
 .. _sec_td_selection:
 
-Curse of dimensionality: selection of typical days
---------------------------------------------------
-
-
+Typical days selection
+----------------------
 
 Resorting to TDs has the main advantage of reducing the computational
 time by several orders of magnitude. Usually, studies use between 6 and
-20 TDs
-:raw-latex:`\citep{Gabrielli2018,Despres2017,Nahmmacher2014,Pina2013}`,
+20 TDs 
+:cite:`Gabrielli2018,Despres2017,Nahmmacher2014,Pina2013`
 sometimes even less
-:raw-latex:`\citep{Poncelet2017,Dominguez-Munoz2011}`. 
+:cite:`Poncelet2017,Dominguez-Munoz2011`. 
 
-Selecting Typical Days
-~~~~~~~~~~~~~~~~~~~~~~
+Clustering methods
+~~~~~~~~~~~~~~~~~~
 
-In a previous work :raw-latex:`\citep{Limpens2019}`, it has been estimated 
+In a previous work :cite:`Limpens2019`, it has been estimated 
 that 12 typical days were appropriate for this model. 
 Moreover, a comparison between different clustering algorithm shown that the method of 
-:raw-latex:`\citep{Dominguez-Munoz2011}` had the best performances.
+:cite:`Dominguez-Munoz2011` had the best performances.
 
 .. caution :: 
     A small mistake has been corrected on the distance used in the clustering method.
@@ -93,10 +91,10 @@ storage due to the discontinuity between the selected days. Thus, they
 assess only the capacity of production without accounting for storage
 capacities. Carbon-neutral energy system will require long term storage
 and thus, this limitation must be overcome. Therefore, we implemented a
-method proposed by :raw-latex:`\citet{Gabrielli2018}` to rebuild a year
+method proposed by :cite:t:`Gabrielli2018` to rebuild a year
 based on the typical days by defining a sequence of . This allows to
 optimise the storage level of charge over the 8760h of the year.
-:raw-latex:`\citet{Gabrielli2018}` assigned a TD to each day of the
+:cite:t:`Gabrielli2018` assigned a TD to each day of the
 year; all decision variables are optimised over the TDs, apart from the
 amount of energy stored, which is optimised over 8760h. This methodology 
 is illustrated in the follwing   :numref:`Figure %s <fig:SeasonalityImplementation>`.
@@ -108,7 +106,7 @@ is illustrated in the follwing   :numref:`Figure %s <fig:SeasonalityImplementati
    :width: 14cm
    
    Illustration of the typical days reconstruction method proposed by
-   :raw-latex:`\cite{Gabrielli2018}` over a week. The example is based
+   :cite:`Gabrielli2018` over a week. The example is based
    on 3 TDs: TD 1 represents a cloudy weekday, applied to Monday,
    Thursday and Friday; TD 2 is a sunny weekday, applied to Tuesday and
    Wednesday; and TD 3 represents sunny weekend days. The power profile
@@ -117,7 +115,7 @@ is illustrated in the follwing   :numref:`Figure %s <fig:SeasonalityImplementati
    Note that the level of charge is not the same at the beginning
    (Monday 1 am) and at the end of the week (Sunday 12 pm).
 
-The performances of this method has been quantified in a previous work :raw-latex:`\citep{Limpens2019}`.
+The performances of this method has been quantified in a previous work :cite:`Limpens2019`.
 With 12 Typical days, the key performances indicators (cost, emissions, installed capacity and primary energy used) are well captured.
 The only exception are the long term storage capacities which are slightly underestimated (by maximum a factor of 2). 
 
@@ -132,7 +130,7 @@ Hereafter, we present the core of the energy model. First, we introduce
 the conceptual modelling framework with an illustrative example, in
 order to clarify as well the nomenclature. Second, we introduce the
 constraints of the energy model (data used are detailed in
-the Section :doc:`/sections/Data for the Belgian energy system`).
+the Section :doc:`/sections/Input Data`).
 
 
 .. _ssec_lp_framework:
@@ -142,7 +140,7 @@ Linear programming formulation
 
 
 The model is mathematically formulated as a LP problem
-:raw-latex:`\cite{fourer1990modeling}`. 
+:cite:`fourer1990modeling`. 
 :numref:`Figure %s <fig:linear_programming_example>` represents - in a simple
 manner - what is a LP problem and the nomenclature used. In italic
 capital letters, *SETS* are collections of distinct items (as in the
@@ -175,8 +173,8 @@ maximised (or minimised).
    Conceptual illustration of a LP problem and the nomenclature used.
    Symbol description: maximum installed size of a technology
    (*f\ max*), installed capacity of a technology (**F**) and total
-   system cost (**C\ tot**). In this example, a specific technology (PV
-   (*’PV’*)) has been chosen from the set TECHNOLOGY.
+   system cost (**C\ tot**). In this example, a specific technology (**F**
+   [*’PV’*]) has been chosen from the set TECHNOLOGY.
 
 .. _ssec_conceptual_modelling_framework:
 
@@ -190,7 +188,7 @@ that the demand is known and the supply has to meet it. In the energy
 modelling practice, the energy demand is often expressed in terms of
 FEC. According to the definition of the European commission, FEC is
 defined as “*the energy which reaches the final consumer’s door*”
-:raw-latex:`\cite{EU_FEC}`. In other words, the FEC is the amount of
+:cite:`EU_FEC`. In other words, the FEC is the amount of
 input energy needed to satisfy the EUD in energy services. As an
 example, in the case of decentralised heat production with a NG boiler,
 the FEC is the amount of NG consumed by the boiler; the EUD is the
@@ -206,10 +204,10 @@ space heating and low temperature for hot water. Mobility is divided in
 two EUTs: passenger mobility and freight [1]_. Non-energy demand is,
 based on the IEA definition, “*fuels that are used as raw materials in
 the different sectors and are not consumed as a fuel or transformed into
-another fuel.*” :raw-latex:`\cite{IEA_websiteDefinition}`. As examples,
+another fuel.*” :cite:`IEA_websiteDefinition`. As examples,
 the European Commission includes as non-energy the following materials:
 “*chemical feed-stocks, lubricants and asphalt for road construction.*”
-:raw-latex:`\cite{EuropeanCommission2016}`.
+:cite:`EuropeanCommission2016`.
 
 .. figure:: /images/model_formulation/chp_estd_conceptual_framework.png
    :alt: Conceptual example of an energy system.
@@ -220,7 +218,7 @@ the European Commission includes as non-energy the following materials:
    technologies (of which 2 storages (in colored oval) and 1
    infrastructure (grey rectangle)) and 3 end use demands.
    Abbreviations: PHS, electrical heat pump (eHP), CHP, CNG. Some icons
-   from :raw-latex:`\cite{FlatIcon}`.
+   from :cite:`FlatIcon`.
 
 A simplified conceptual example of the energy system structure is
 proposed in  :numref:`Figure %s <fig:conceptual_example>`. The system is
@@ -254,7 +252,7 @@ As an illustrative example of the concept of *layer*, Figure
 :numref:`Figure %s <fig:LayerElec>` gives a perspective of the electricity layer
 which is the most complex one, since the electrification of other
 sectors is foreseen as a key of the energy transition
-:raw-latex:`\cite{Sugiyama2012}`. In the proposed version, 42
+:cite:`Sugiyama2012`. In the proposed version, 42
 technologies are related to the electricity layer. 9 technologies
 produce exclusively electricity, such as CCGT, PV or wind. 12
 cogenerations of heat and power (CHPs) produce heat and electricity,
@@ -276,7 +274,7 @@ trains for freight.
    :width: 16cm
 
    Representation of the Electricity layer with all the technologies
-   implemented in ESTD. **Bold Italic technologies** represent a group
+   implemented in ESTD v2.1. **Bold Italic technologies** represent a group
    of different technologies. Abbreviations: atmospheric (atm.), Carbon
    capture (CC), CCGT, CHP, HP, electricity (elec.), HP, industrial
    (ind.) IGCC, PHS, synthetic methanolation (S. Methanol.), V2G, EUD.
@@ -287,13 +285,13 @@ operation in each period, to meet the energy demand and minimize the
 total annual cost of the system. In the following, we present the
 complete formulation of the model in two parts. First, all the terms
 used are summarised in a figure and tables:  :numref:`Figure %s <fig:sets>`
-for sets, Tables `Table time series <tab:paramsDistributions>` and
-`Table parameters <tab:params>` for parameters, and 
-`Table variables independents <tab:variablesIndependent>` and
-`Table variable dependents <tab:variablesdependent>` for variables. On
+for sets, Tables :numref:`%s <tab:paramsDistributions>` and
+:numref:`%s <tab:params>` for parameters, and 
+:numref:`%s <tab:variablesIndependent>` and
+:numref:`%s <tab:variablesdependent>` for variables. On
 this basis, the equations representing the constraints and the objective
 function are formulated in  :numref:`Figure %s <fig:EndUseDemand>` and
-Eqs. :eq:`eq:obj_func` -:eq:`eq:efficiency`
+Eqs. :eq:`eq:obj_func` - :eq:`eq:efficiency`
 and described in the following paragraphs.
 
 .. _ssec_sets_params_vars:
@@ -303,10 +301,10 @@ Sets, parameters and variables
 
 :numref:`Figure %s <fig:sets>` gives a visual representation of the sets
 with their relative indices used in the followings. 
-`Table time series <tab:paramsDistributions>` and `Table parameters <tab:params>`
+:numref:`%s <tab:paramsDistributions>` and :numref:`%s <tab:params>`
 list and describe the model parameters. Tables
-`Table variables independents <tab:variablesIndependent>` and
-`Table variable dependents <tab:variablesdependent>` list and describe
+:numref:`%s <tab:variablesIndependent>` and
+:numref:`%s <tab:variablesdependent>` list and describe
 the independent and dependent variables, respectively.
 
 .. figure:: /images/model_formulation/ses_sets_v2.png
@@ -318,9 +316,9 @@ the independent and dependent variables, respectively.
    (*Pass.*), V2G, TS.
 
 .. container::
-   :name: tab:paramsDistributions
 
    .. table:: Time series parameters
+      :name: tab:paramsDistributions
 
       +---------------------------+-----------+---------------------------+
       | **Parameter**             | **Units** | **Description**           |
@@ -349,9 +347,9 @@ the independent and dependent variables, respectively.
 
 
 .. container::
-   :name: tab:params
 
    .. table:: List of parameters (except time series).
+      :name: tab:params
 
       +----------------------+----------------------+----------------------+
       | Parameter            | Units                | Description          |
@@ -361,8 +359,8 @@ the independent and dependent variables, respectively.
       +----------------------+----------------------+----------------------+
       | :math:`i_{rate}`     | [-]                  | Real discount rate   |
       +----------------------+----------------------+----------------------+
-      | :math:`endUses       | [GWh/y] [a]_         | Annual end-uses in   |
-      | _{year}              |                      | energy services per  |
+      | :math:`endUses_      | [GWh/y] [a]_         | Annual end-uses in   |
+      | {year}               |                      | energy services per  |
       | (eui,s)`             |                      | sector               |
       +----------------------+----------------------+----------------------+
       | :math:`endUsesInput  | [GWh/y] [a]_         | Total annual         |
@@ -378,28 +376,32 @@ the independent and dependent variables, respectively.
       +----------------------+----------------------+----------------------+
       | :math:`\%_           | [-]                  | Lower and upper      |
       | {public,min},        |                      | limit to             |
-      | \%_{public,max}`     |                      | :math:`\textbf{%}    |
-      |                      |                      | _{\textbf{Public}}`  |
+      | \%_{public,max}`     |                      | :math:`\textbf{%}_   |
+      |                      |                      | {\textbf{Public}}`   |
       +----------------------+----------------------+----------------------+
       | :math:`\%_           | [-]                  | Lower and upper      |
       | {fr,rail,min},       |                      | limit to             |
-      | \%_{fr,rail,max}`    |                      | :math:`\textbf{%}    |
-      |                      |                      | _{\textbf{Fr,Rail}}` |
+      | \%_{fr,rail,max}`    |                      | :math:`\textbf{%}_   |
+      |                      |                      | {\textbf{Fr,Rail}}`  |
       +----------------------+----------------------+----------------------+
       | :math:`\%_           | [-]                  | Lower and upper      |
       | {fr,boat,min},       |                      | limit to             |
-      | \%_{fr,boat,max}`    |                      | :math:`\textbf{%}    |
-      |                      |                      | _{\textbf{Fr,Boat}}` |
+      | \%_{fr,boat,max}`    |                      | :math:`\textbf{%}_   |
+      |                      |                      | {\textbf{Fr,Boat}}`  |
       +----------------------+----------------------+----------------------+
       | :math:`\%_           | [-]                  | Lower and upper      |
       | {fr,truck,min},      |                      | limit to             |
-      | \%_{fr,truck,max}`   |                      | :math:`\textbf{%}    |
-      |                      |                      | _{\textbf{Fr,Truck}}`|
+      | \%_{fr,truck,max}`   |                      | :math:`\textbf{%}_   |
+      |                      |                      | {\textbf{Fr,Truck}}` |
       +----------------------+----------------------+----------------------+
       | :math:`\%_           | [-]                  | Lower and upper      |
       | {dhn,min},           |                      | limit to             |
-      | \%_{dhn,max}`        |                      | :math:`\textbf{%}    |
-      |                      |                      | _{\textbf{Dhn}}`     |
+      | \%_{dhn,max}`        |                      | :math:`\textbf{%}_   |
+      |                      |                      | {\textbf{Dhn}}`      |
+      +----------------------+----------------------+----------------------+
+      | :math:`\%_           | [-]                  | Share of non-energy  |
+      | {ned}(EUT\_OF\_EUC(  |                      | demand per type      |
+      | NON\_ENERGY))`       |                      | of feedstocks        |
       +----------------------+----------------------+----------------------+
       | :math:`t_            | [h]                  | Time period duration |
       | {op}(h,td)`          |                      | (default 1h)         |
@@ -485,8 +487,12 @@ the independent and dependent variables, respectively.
       | :math:`ev_{b         | [GWh]                | Battery size per V2G |
       | att,size}(v2g)`      |                      | car technology       |
       +----------------------+----------------------+----------------------+
-      | :math:`c_            | [M€:math:`_2015`/GW] | Cost to reinforce    |
-      | {grid,extra}`        |                      | the grid per GW of   |
+      | :math:`soc_{min,ev}  | [GWh]                | Minimum state of     |
+      | (v2g,h)`             |                      | charge for electric  |
+      |                      |                      | vehicles             |
+      +----------------------+----------------------+----------------------+
+      | :math:`c_            | [M€\                 | Cost to reinforce    |
+      | {grid,extra}`        | :math:`_2015`/GW]    | the grid per GW of   |
       |                      |                      | intermittent         |
       |                      |                      | renewable            |
       +----------------------+----------------------+----------------------+
@@ -516,9 +522,9 @@ the independent and dependent variables, respectively.
 
 
 .. container::
-   :name: tab:variablesIndependent
 
    .. table:: Independent variables. All variables are continuous and non-negative, unless otherwise indicated.
+      :name: tab:variablesIndependent
    
       +---------------------------+------------+---------------------------+
       | Variable                  | Units      | Description               |
@@ -559,9 +565,13 @@ the independent and dependent variables, respectively.
       | :math:`\textbf{P}_{       | [GW]       | Constant load of nuclear  |
       | \textbf{Nuclear}}`        |            |                           |
       +---------------------------+------------+---------------------------+
+      | :math:`\textbf{Import}_   | [GW]       | Resources imported at     |
+      | \textbf{Constant}`        |            | a constant flow           |
+      | (RES_IMPORT_CONSTANT)     |            |                           | 
+      +---------------------------+------------+---------------------------+
       | :math:`\textbf{%}_{       | [-]        | Constant share of         |
-      | \textbf{PassMob}}(TECH OF |            | passenger mobility        |
-      | EUC(PassMob))`            |            |                           |
+      | \textbf{PassMob}}(TECH\   |            | passenger mobility        |
+      | OF\ EUC(PassMob))`        |            |                           |
       +---------------------------+------------+---------------------------+
       | :math:`\textbf{%}_{       | [-]        | Constant share of         |
       | \textbf{FreightMob}}      |            | freight mobility          |
@@ -593,9 +603,9 @@ the independent and dependent variables, respectively.
 
 
 .. container::
-   :name: tab:variablesDependent
 
    .. table:: Dependent variable. All variables are continuous and non-negative, unless otherwise indicated.
+      :name: tab:variablesDependent
 
       +----------------------+----------------------+----------------------+
       | **Variable**         | **Units**            | **Description**      |
@@ -624,12 +634,12 @@ the independent and dependent variables, respectively.
       | {\textbf{tot}}`      | :math:`_2`-eq./y]    | emissions of the     |
       |                      |                      | energy system        |
       +----------------------+----------------------+----------------------+
-      | :math:`\textbf{GWP}_ | [k                   | Technology           |
+      | :math:`\textbf{GWP}_ | [k\                  | Technology           |
       | {\textbf{constr}}(   | tCO\ :math:`_2`-eq.] | construction GHG     |
       | tech)`               |                      | emissions            |
       |                      |                      |                      |
       +----------------------+----------------------+----------------------+
-      | :math:`\textbf{GWP}_ | [ktC                 | Total GHG emissions  |
+      | :math:`\textbf{GWP}_ | [ktC\                | Total GHG emissions  |
       | {\textbf{po}}(       | O\ :math:`_2`-eq./y] | of resources         |
       | res)`                |                      |                      |
       +----------------------+----------------------+----------------------+
@@ -648,8 +658,8 @@ the independent and dependent variables, respectively.
 
 .. _ssec_lp_formulation:
 
-Linear Programming model formulation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Energy model formulation
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the following, the overall LP formulation is proposed through :numref:`Figure %s <fig:EndUseDemand>` and equations
  (`[eq:obj_func] <#eq:obj_func>`)-(`[eq:efficiency] <#eq:efficiency>`)
@@ -680,13 +690,13 @@ transportation.
 
    Hourly **EndUses** demands calculation starting from yearly demand
    inputs (*endUsesInput*). Adapted from
-   :raw-latex:`\cite{Moret2017PhDThesis}`. Abbreviations: space heating
-   (sh), district heating network (DHN), hot water (HW), passenger
-   (pass) and freight (fr).
+   :cite:`Moret2017PhDThesis`. Abbreviations: space heating
+   (sh), district heating network (DHN), high value chemicals (HVC), hot water (HW), passenger
+   (pass), freight (fr) and non-energy demand (NED).
 
 The hourly end-use demands (**EndUses**) are computed based on the
 yearly end-use demand (*endUsesInput*), distributed according to its
-time series (listed in `Table time series <tab:paramsDistributions>`). 
+time series (listed in :numref:`Table %s <tab:paramsDistributions>`). 
 :numref:`Figure %s <fig:EndUseDemand>` graphically presents the constraints
 associated to the hourly end use demand (**EndUses**), e.g. the public
 mobility demand at time :math:`t` is equal to the hourly passenger
@@ -728,7 +738,7 @@ Cost, emissions and objective function
     :label: eq:c_maint
 
 .. math::
-    \textbf{C}_{\textbf{op}}(i) = \sum_{t \in T | \{h,td\} \in T\_H\_TD(t)} c_{\text{{op}}}(i) \textbf{F}_{\textbf{t}}(i,h,td) t_{op} (h,td)  
+    \textbf{C}_{\textbf{op}}(i) = \sum_{t \in T | \{h,td\} \in T\_H\_TD(t)} c_{\text{op}}(i) \textbf{F}_{\textbf{t}}(i,h,td) t_{op} (h,td)  
     ~~~~~~ \forall i \in \text{RES}
     :label: eq:c_op
 
@@ -843,7 +853,7 @@ Eq. :eq:`eq:res_avail`.
     :label: eq:layer_balance
 
     - \textbf{EndUses}(l,h,td) = 0
-    - 
+     
     \forall l \in L, \forall h \in H, \forall td \in TD
   
 The matrix :math:`f` defines for all technologies and resources outputs to
@@ -857,12 +867,12 @@ Storage
 ^^^^^^^
 
 .. math::
-    \textbf{Sto}_\textbf{level} (j,t) =    \textbf{Sto}_\textbf{level} (j,t-1)\cdot\left(1 - \%_{\text{sto_\textbf{loss}}}(j) \right)  
+    \textbf{Sto}_\textbf{level} (j,t) =    \textbf{Sto}_\textbf{level} (j,t-1)\cdot\left(1 - \%_{sto_{loss}}(j) \right)  
    :label: eq:sto_level
 
     + t_{op} (h,td)\cdot \Big(\sum_{l \in L | \eta_{\text{sto,in} (j,l) > 0}} \textbf{Sto}_\textbf{in} 	(j,l,h,td) \eta_{\text{sto,in}} (j,l) 
     
-    - \sum_{l \in L | \eta_{\text{sto,out} (j,l) > 0}} \textbf{Sto}_\textbf{out} (j,l,h,td) /  \eta_{\text{sto,out}} (j,l)\Big)
+    ~~~~~~ - \sum_{l \in L | \eta_{\text{sto,out} (j,l) > 0}} \textbf{Sto}_\textbf{out} (j,l,h,td) /  \eta_{\text{sto,out}} (j,l)\Big)
     
     \forall j \in \text{STO}, \forall t \in \text{T}| \{h,td\} \in T\_H\_TD(t)
 
@@ -903,10 +913,10 @@ the storage behaviour is thus optimized over 8760h.
     \Big(\textbf{Sto}_\textbf{in} (j,l,h,td)t_{sto_{in}}(\text{j}) + \textbf{Sto}_\textbf{out}(j,l,h,td)t_{sto_{out}}(\text{j})\Big) \leq \textbf{F} (j)\%_{sto_{avail}}(j)
     :label: eq:LimitChargeAndDischarge
 
-    \forall j \in STO , \forall l \in L, \forall h \in H, \forall td \in TD
+    \forall j \in STO \setminus {V2G} , \forall l \in L, \forall h \in H, \forall td \in TD
 
 
-Eqs. :eq:`eq:StoInCeil` -:eq:`eq:StoOutCeil`
+Eqs. :eq:`eq:StoInCeil` - :eq:`eq:StoOutCeil`
 force the power input and output to zero if the layer is
 incompatible [6]_. As an example, a PHS will only be linked to the
 electricity layer (input/output efficiencies :math:`>` 0). All other
@@ -915,7 +925,7 @@ incompatible layers (e.g. mobility, heat, etc).
 Eq. :eq:`eq:LimitChargeAndDischarge`
 limits the power input/output of a storage technology based on its
 installed capacity (**F**) and three specific characteristics. First,
-storage availability (:math:`%_{sto_{avail}}`) is defined as the ratio between
+storage availability (:math:`\%_{sto_{avail}}`) is defined as the ratio between
 the available storage capacity and the total installed capacity (default
 value is 100%). This parameter is only used to realistically represent
 V2G, for which we assume that only a fraction of the fleet (i.e. 20% in
@@ -926,7 +936,8 @@ storage [7]_. As an example, a daily thermal storage needs at least 4
 hours to discharge
 (:math:`t_{sto_{out}}=4`\ [h]), and
 another 4 hours to charge
-(:math:`t_{sto_{in}}=4`\ [h]).
+(:math:`t_{sto_{in}}=4`\ [h]). Eq. :eq:`eq:LimitChargeAndDischarge` applies for 
+all storage except electric vehicles which are limited by another constraint Eq. :eq:`eq:LimitChargeAndDischarge_ev`, presented later.
 
 Networks
 ^^^^^^^^
@@ -949,20 +960,20 @@ Networks
     \Big)
 
 .. math::
-    \textbf{F} (DHN) = \sum_{j \in \text{TECH OF EUT} (\text{HeatLowTDHN})} \textbf{F} (j) 
+    \textbf{F} (DHN) = \sum_{j \in \text{TECH} \setminus {STO} | f(j,\text{HeatLowTDHN}) >0} f(j,\text{HeatLowTDHN}) \cdot \textbf{F} (j) 
     :label: eq:DHNCost
 
 Eq. :eq:`eq:loss` calculates network losses as a share
 (:math:`%_{net_{loss}}`) of the total energy transferred through the network. As
-an example, losses in the electricity grid are estimated to be 4.5% of
+an example, losses in the electricity grid are estimated to be 4.5\% of
 the energy transferred in 2015 [8]_.
-Eqs. :eq:`eq:mult_grid` -:eq:`eq:DHNCost`
+Eqs. :eq:`eq:mult_grid` - :eq:`eq:DHNCost`
 define the extra investment for networks. Integration of intermittent RE
 implies additional investment costs for the electricity grid
 (:math:`c_{grid,ewtra}`). As an example, the reinforcement of the electricity
 grid is estimated to be 358 millions €\ :sub:`2015` per Gigawatt of
-intermittent renewable capacity installed (see Appendix
-`[ssec_app1_grid] <#ssec_app1_grid>`__ for details).
+intermittent renewable capacity installed (see 
+`Data for the grid <#ssec:app1_grid:>`__ for details).
 Eq. :eq:`eq:DHNCost` links the size of DHN to the total
 size of the installed centralized energy conversion technologies.
 
@@ -995,7 +1006,7 @@ over the year is desired.
     :label: eq:freight_share_constant
 
 
-Eqs. :eq:`eq:mob_share_fix` -:eq:`eq:freight_share_fix`
+Eqs. :eq:`eq:mob_share_fix` - :eq:`eq:freight_share_fix`
 impose that the share of the different technologies for mobility
 (:math:`\textbf{%}_{\textbf{PassMob}}`) and (:math:`\textbf{%}_{\textbf{Freight}}`) be the same at each time
 step [9]_. In other words, if 20% of the mobility is supplied by train,
@@ -1009,14 +1020,14 @@ Decentralised heat production
 
 
 .. math::
-    \textbf{F} (Dec_{Solar}) = \sum_{j \in \text{TECH OF EUT} (\text{HeatLowTDec}) \setminus \{ \text{Dec_{Solar}} \}} \textbf{F}_\textbf{sol} (j)  
+    \textbf{F} (Dec_{Solar}) = \sum_{j \in \text{TECH OF EUT} (\text{HeatLowTDec}) \setminus \{ 'Dec_{Solar}' \}} \textbf{F}_\textbf{sol} (j)  
     :label: eq:de_strategy_dec_total_ST
 
 .. math::
-    \textbf{F}_{\textbf{t}_\textbf{sol}} (j,h,td) \leq  \textbf{F}_\textbf{sol} (j)  c_{p,t}(\text{Dec_{Solar}},h,td)
+    \textbf{F}_{\textbf{t}_\textbf{sol}} (j,h,td) \leq  \textbf{F}_\textbf{sol} (j)  c_{p,t}('Dec_{Solar}',h,td)
     :label: eq:op_strategy_dec_total_ST
 
-    \forall j \in \text{TECH OF EUT} (\text{HeatLowTDec}) \setminus \{ \text{Dec_{Solar}} \}, \forall h\in H, \forall td \in TD
+    \forall j \in \text{TECH OF EUT} (\text{HeatLowTDec}) \setminus \{ 'Dec_{Solar}' \}, \forall h\in H, \forall td \in TD
 
 
 \endgroup  
@@ -1024,7 +1035,7 @@ Thermal solar is implemented as a decentralized technology. It is always
 installed together with another decentralized technology, which serves
 as backup to compensate for the intermittency of solar thermal. Thus, we
 define the total installed capacity of solar thermal
-**F**\ (:math:`Dec_{solar}`) as the sum of **F\ sol**\ (:math:`j`),
+**F**\ ('':math:`Dec_{solar}`'') as the sum of **F\ sol**\ (:math:`j`),
 Eq. :eq:`eq:de_strategy_dec_total_ST`,
 where :math:`\textbf{F}_{\textbf{sol}}(j)` is the solar thermal
 capacity associated to the backup technology :math:`j`.
@@ -1032,7 +1043,7 @@ Eq. :eq:`eq:op_strategy_dec_total_ST`
 links the installed size of each solar thermal capacity
 :math:`\textbf{F}_{\textbf{sol}}(j)` to its actual production
 ::math:`\textbf{F}_{\textbf{t}_\textbf{sol}}(j,h,td))` via the
-solar capacity factor (:math:`c_{p,t}(Dec_{solar})`).
+solar capacity factor (:math:`c_{p,t}('Dec_{solar}')`).
 
 .. math::
     \textbf{F}_\textbf{t} (j,h,td) + \textbf{F}_{\textbf{t}_\textbf{sol}} (j,h,td)  
@@ -1042,7 +1053,7 @@ solar capacity factor (:math:`c_{p,t}(Dec_{solar})`).
 
     = \textbf{%}_\textbf{HeatDec}(\text{j}) \textbf{EndUses}(HeatLowT,h,td) 
 
-    \forall j \in \text{TECH OF EUT} (\text{HeatLowTDec}) \setminus \{ \text{Dec_{Solar}} \}, 
+    \forall j \in \text{TECH OF EUT} (\text{HeatLowTDec}) \setminus \{ 'Dec_{Solar}' \}, 
 
     i \in \text{TS OF DEC TECH}(j)  , \forall h\in H, \forall td \in TD
 
@@ -1099,9 +1110,12 @@ Vehicle-to-grid
    :width: 7cm
 
    Illustrative example of a V2G implementation. The battery can
-   interact with the electricity layer. The V2G takes the electricity
-   from the battery to provide a constant share (**%\ PassMob**) of the
-   passenger mobility layer (*Mob. Pass.*).
+   interact with the electricity layer. 
+   The size of the battery is directly related to the number of cars (see Eq. :eq:`eq:SizeOfBEV`). 
+   The V2G takes the electricity from the battery to provide a constant share (:math:`\textbf{%}_{\textbf{PassMob}}`) of the
+   passenger mobility layer (*Mob. Pass.*). Thus, it imposes the amount of electricity that electric car must deserve (see Eq. :eq:`eq:BtoBEV`).
+   The remaining capacity of battery available can be used to provide V2G services (see :eq:`eq:LimitChargeAndDischarge_ev`). 
+   
 
 .. math::
     \textbf{F} (i) = \frac{\textbf{F} (j)}{ veh_{capa} (j)} ev_{batt,size} (j)  ~~~~~~ \forall  j \in  V2G, i \in \text{EVs_BATT OF V2G}(j)
@@ -1109,8 +1123,8 @@ Vehicle-to-grid
 
 Vehicle-to-grid dynamics are included in the model via the *V2G* set.
 For each vehicle :math:`j \in V2G`, a battery :math:`i` (:math:`i`
-:math:`\in` *EVs_BATT*) is associated using the set *EVs_BATT OF V2G*
-(:math:`i \in \text{EVs_BATT OF V2G}(j)`). Each type :math:`j`
+:math:`\in` *EVs_BATT*) is associated using the set EVs_BATT_OF_V2G
+(:math:`i \in \text{EVs_BATT_OF_V2G}(j)`). Each type :math:`j`
 of *V2G* has a different size of battery per car
 (:math:`ev_{batt,size}(j)`), e.g. the first generation battery of the
 Nissan Leaf (ZE0) has a capacity of 24 kWh [10]_. The number of vehicles
@@ -1126,17 +1140,15 @@ pass-km/car/h (which represents an average speed of 40km/h and occupancy
 of 1.26 passenger per car); thus, the amount of BEV cars are 0.198
 million cars. And if a BEV has a 24kWh of battery, such as the Nissan
 Leaf (ZE0), thus, the equivalent battery has a capacity of 4.76 GWh.
-However, the full capacity of electric vehicles cannot be used to
-support the grid, as all the cars won’t be connected at the same time.
-This is constrained by the storage availability (:math:`%_{sto,avail}`) and
-has a typical value of 20% for BEV, see
-Eq. :eq:`eq:LimitChargeAndDischarge`.
+
 
 .. math::
-    \textbf{Sto}_\textbf{out} (i,Elec,h,td) \geq - f(j,Elec) \textbf{F}_\textbf{t} (j,h,td) 
+    \textbf{Sto}_\textbf{out} (j,Elec,h,td) \geq - f(i,Elec) \textbf{F}_\textbf{t} (i,h,td) 
     :label: eq:BtoBEV
 
-    \forall j \in V2G , \forall i \in \text{EVs_BATT OF V2G}(j), \forall h \in H, td \in TD 
+    \forall i \in V2G , \forall j \in \text{EVs_BATT OF V2G}(j), \forall h \in H, td \in TD 
+
+
 
 
 Eq. :eq:`eq:BtoBEV` forces batteries of electric vehicles
@@ -1149,6 +1161,32 @@ implementation of V2G. In this illustration, a battery technology is
 associated to a BEV. The battery can either supply the BEV needs or
 sends electricity back to the grid.
 
+.. math::
+    \textbf{Sto}_\textbf{in} (j,l,h,td)t_{sto_{in}}(\text{j}) + \Big(\textbf{Sto}_\textbf{out}(j,l,h,td) + f(i,Elec) \textbf{F}_\textbf{t} (i,h,td) \Big) \cdot t_{sto_{out}}(\text{j})
+    :label: eq:LimitChargeAndDischarge_ev
+
+    \leq \Big( \textbf{F} (j) - \frac{\textbf{F} (j)}{ veh_{capa} (j)} ev_{batt,size} (j) \Big) \cdot \%_{sto_{avail}}(j)
+
+    \forall i \in V2G , \forall j \in \text{EVs_BATT OF V2G}(j) , \forall l \in L, \forall h \in H, \forall td \in TD
+
+Eq. :eq:`eq:LimitChargeAndDischarge_ev` limits the availability of batteries to the number of vehicle connected to the grid.
+This equation is similar to the one for other type of storage (see Eq. :eq:`eq:LimitChargeAndDischarge`); 
+except that a part of the batteries are not accounted, i.e. the one running (see Eq. :eq:`eq:BtoBEV`). 
+Therefore, the available output is corrected by removing the electricity powering the running car (here, :math:`f(i,Elec) \leq 0`) 
+and the available batteries is corrected by removing the numbers of electric cars running (:math:`\frac{\textbf{F} (j)}{ veh_{capa} (j)} ev_{batt,size} (j)`).
+
+.. math::
+    \textbf{Sto}_\textbf{level} (j,t) \geq \textbf{F}[i] soc_{ev}(i,h)
+    :label: eq:EV_min_state_of_charge
+
+    \forall i \in V2G , \forall j \in \text{EVs_BATT OF V2G}(j) , \forall t \in T| \{h,td\} \in T\_H\_TD
+
+For each electric vehicle (:math:`ev`), a minimum state of charge is imposed for each hour of the day \big(:math:`soc_{ev}(i,h)`\big). 
+As an example, we can impose that the state of charge of EV is 60% in the morning, to ensure that cars can be used to go for work. 
+Eq. :eq:`eq:EV_min_state_of_charge` imposes, for each type of `V2G`, 
+that the level of charge of the EV batteries is greater than the minimum state of charge times the storage capacity.
+
+
 Peak demand
 ^^^^^^^^^^^
 
@@ -1158,7 +1196,7 @@ Peak demand
     \%_{Peak_{sh}}\max_{h\in H,td\in TD}\left\{\textbf{F}_\textbf{t}(j,h,td)\right\}
     :label: eq:dec_peak
 
-    \forall j \in \text{TECH OF  EUT} (HeatLowTDEC)   \setminus \{ \text{Dec_{Solar}}\}
+    \forall j \in \text{TECH OF  EUT} (HeatLowTDEC)   \setminus \{ 'Dec_{Solar}'\}
 
 .. math::
     \sum_{\hspace{3cm}j \in \text{TECH OF EUT} (HeatLowTDHN), i \in \text{STO OF EUT}(HeatLowTDHN)}
@@ -1171,10 +1209,10 @@ Peak demand
     \%_{Peak_{sh}} \max_{h\in H,td\in TD}  \big\{ \textbf{EndUses}(HeatLowTDHN,h,td) \big\}
   
 Finally,
-Eqs. :eq:`eq:dec_peak` -:eq:`eq:dhn_peak`
+Eqs. :eq:`eq:dec_peak` - :eq:`eq:dhn_peak`
 constrain the installed capacity of low temperature heat supply. Based
 on the selected TDs, the ratio between the yearly peak demand and the
-TDs peak demand is defined for space heating (:math:`%_{Peak_{sh}}`).
+TDs peak demand is defined for space heating (:math:`\%_{Peak_{sh}}`).
 Eq. :eq:`eq:dec_peak` imposes that the installed
 capacity for decentralised technologies covers the real peak over the
 year. Similarly, Eq. :eq:`eq:dhn_peak` forces the
@@ -1190,7 +1228,7 @@ Adaptations for the case study
 
 Additional constraints are required to implement scenarios. Scenarios
 require six additional constraints
-(Eqs. :eq:`eq:LimitGWP` -:eq:`eq:solarAreaLimited`)
+(Eqs. :eq:`eq:LimitGWP` - :eq:`eq:solarAreaLimited`)
 to impose a limit on the GWP emissions, the minimum share of RE primary
 energy, the relative shares of technologies, such as gasoline cars in
 the private mobility, the cost of energy efficiency measures, the
@@ -1214,7 +1252,7 @@ To force the Belgian energy system to decrease its emissions, two lever
 can constraint the annual emissions:
 Eq. :eq:`eq:LimitGWP` imposes a maximum yearly
 emissions threshold on the GWP (:math:`gwp_{limit}`); and
-Eq. :eq:`eq:LimitRE`) fixes the minimum renewable primary
+Eq. :eq:`eq:LimitRE` fixes the minimum renewable primary
 energy share.
 
 .. math::
@@ -1249,8 +1287,8 @@ indicated.
 
 To account for efficiency measures from today to the target year,
 Eq. :eq:`eq:efficiency` imposes their cost. The EUD
-is based on a scenario detailed in Section
-`[ssec_be_demand] <#ssec_be_demand>`__ and has a lower energy demand
+is based on a scenario detailed in 
+`Data for end use demand <#sec:app1_end_uses>`__ and has a lower energy demand
 than the “business as usual” scenario, which has the highest energy
 demand. Hence, the energy efficiency cost accounts for all the
 investment required to decrease the demand from the “business as usual”
@@ -1262,13 +1300,21 @@ deployed to :math:`1/ (1+i_{rate})` rather than 1. The investment is
 already expressed in €\ :sub:`2015`.
 
 .. math::
-    \textbf{F}_{\textbf{t}}(Electricity,h,td)) \leq  elec_{import,max} ~~~~~~ \forall h \in H, \forall td \in TD
+    \textbf{F}_{\textbf{t}}(Electricity,h,td) \leq  elec_{import,max} ~~~~~~ \forall h \in H, \forall td \in TD
     :label: eq:elecImpLimited
+
+.. math::
+    \textbf{F}_{\textbf{t}}(i,h,td) \cdot t_{op} (h,td) =  \textbf{Import}_{\textbf{constant}}(i) ~~~~~~ \forall i \in \text{RES_IMPORT_CONSTANT}, h \in H, \forall td \in TD
+    :label: eq:import_resources_constant
+
 
 
 Eq. :eq:`eq:elecImpLimited` limits the power grid
 import capacity from neighbouring countries based on a net transfer
-capacity (:math:`elec_{import,max}`).
+capacity (:math:`elec_{import,max}`). Eq. :eq:`eq:import_resources_constant` imposes that some resources are imported at a constant power. 
+As an example, gas or electro-fuels are supposed to be imported at a constant flow during the year. 
+In addition to offering a more realistic representation, this implementation makes it possible to visualise the level of storage within the region (i.e. gas, petrol ...).
+
 
 .. math::
     \textbf{F}(PV)/power\_density_{pv} 
@@ -1283,7 +1329,7 @@ densities of both PV (:math:`power\_density_{pv}`) and solar thermal
 Eq. :eq:`eq:solarAreaLimited`. The equivalence
 between an install capacity (in watt peaks Wp) and the land use (in
 :math:`km^2`) is calculated based on the power peak density
-([Wp/m\ :math:`^2`]). In other words, it represents the peak power of a
+(in [Wp/m\ :math:`^2`]). In other words, it represents the peak power of a
 one square meter of solar panel. We evaluate that PV and solar thermal
 have a power peak density of :math:`power\_density_{pv}` =0.2367 and
 :math:`power\_density_{solar~thermal}` =0.2857 [GW/km\ :math:`^2`] [12]_. Thus,
@@ -1296,7 +1342,7 @@ consequence, a space is required to avoid shadow between rows of panels.
 In the literature, the *ground cover ratio* is defined as the total
 spatial requirements of large scale solar PV relative to the area of the
 solar panels. This ratio is estimated around five
-:raw-latex:`\cite{dupont2020global}`, which means that for each square
+:cite:`dupont2020global`, which means that for each square
 meter of PV panel installed, four additional square meters are needed.
 
 .. _ssec_estd_implementation:
@@ -1314,8 +1360,7 @@ commercial ones, such as CPLEX or Gurobi. In the code, each of the
 equations defined above is found as it is with the corresponding
 numbering. SETS, Variables and parameters have the same names (unless
 explicitly stated in the definition of the term). :numref:`Figure %s <fig:ch2_LP_formulation_implementation_colored>` illustrates -
-for the balance constraint
-(Eq. (`[eq:layer_balance] <#eq:layer_balance>`__)) - the mathematical
+for the balance constraint :eq:`eq:layer_balance` - the mathematical
 formulation presented in this work and its implementation in the code.
 Colors highlight the same elements. In the implementation, each
 constraint has a comment (starting with #) and has a name (colored in
@@ -1337,7 +1382,7 @@ implementation; or as another example, the input efficiency who is named
    :eq:`eq:layer_balance`.
 
 The entire implementation is available on the directory
-:raw-latex:`\cite{ESTD_v2_1_repo}` and its architecture is illustrated
+:cite:`ESTD_v2_1_repo` and its architecture is illustrated
 in :numref:`Figure %s <fig:ch2_estd_repo_structure>`. Four folders compose
 the repository and contain the documentation (``Documentation``), the
 data used (``Data_management``), the MILP implementation
@@ -1359,10 +1404,10 @@ documentation to support the modeler in her/his first steps.
    :name: fig:ch2_estd_repo_structure
 
    EnergyScope TD repository structure available at
-   :raw-latex:`\cite{ESTD_v2_1_repo}`.
+   :cite:`ESTD_v2_1_repo`.
 
 .. [1]
-    Passenger transport activity from aviation is accounted in passenger mobility (excluding international extra-\gls{EU} travels).
+    Passenger transport activity from aviation is accounted in passenger mobility (excluding international extra EU travels).
 
 .. [2]
     Hydrogen can be produced based on many feed-stocks, among them electricity used for electrolysers.
@@ -1385,7 +1430,7 @@ documentation to support the modeler in her/his first steps.
 
 .. [5]
    In most cases, the activation of the constraint stated in
-   Eq. (`[eq:sto_level] <#eq:sto_level>`__) will have as a consequence
+   Eq. :eq:`eq:sto_level` will have as a consequence
    that the level of storage be the same at the beginning and at the end
    of each day — hence the use of the terminology ‘*daily storage*’.
    Note, however, that such daily storage behaviour is not always
@@ -1411,21 +1456,19 @@ documentation to support the modeler in her/his first steps.
 .. [8]
    This is the ratio between the losses in the grid and the total annual
    electricity production in Belgium in 2015
-   :raw-latex:`\cite{Eurostat2017}`.
+   :cite:`Eurostat2017`.
 
 .. [9]
    [foot:nonLinear]All equations expressed in a compact non-linear form
-   in this section Eqs. (`[eq:mob_share_fix] <#eq:mob_share_fix>`__),
-   (`[eq:freight_share_fix] <#eq:freight_share_fix>`__),
-   (`[eq:heat_decen_share] <#eq:heat_decen_share>`__) and
-   (`[eq:dhn_peak] <#eq:dhn_peak>`__)) can be linearised. For these
+   in this section Eqs. :eq:`eq:mob_share_fix`, :eq:`eq:freight_share_fix`, 
+   :eq:`eq:heat_decen_share` and :eq:`eq:dhn_peak` can be linearised. For these
    cases, the **EndUses** is defined with parameters and a variable
-   representing a constant share over the year (e.g. **%\ public**). As
+   representing a constant share over the year (e.g.  :math:`\textbf{%}_\textbf{public}`). As
    an example, **EndUses** in
-   Eq. (`[eq:mob_share_fix] <#eq:mob_share_fix>`__) is equal to
-   :math:`\textbf{EndUsesInput}(PassMb) \cdot \%pass (h, td) / t_op (h, td)`.
-   The term **%\ public**, is missing in the equation, but is implicitly
-   implemented in **%\ PassMob**.
+   Eq. :eq:`eq:mob_share_fix` is equal to
+   :math:`\textbf{EndUsesInput}(PassMb) \cdot %pass (h, td) / t_op (h, td)`.
+   The term :math:`\textbf{%}_{\textbf{public}}`, is missing in the equation, but is implicitly
+   implemented in :math:`\textbf{%}_{\textbf{PassMob}}`.
 
 .. [10]
    This generation (ZE0) was marketed from 2010 to 2017 with a battery
@@ -1438,9 +1481,9 @@ documentation to support the modeler in her/his first steps.
    the adequacy. As one model cannot address all the issues, another
    approach has been preferred: couple the model to a dispatch one, and
    iterate between them. Percy and Coates
-   :raw-latex:`\cite{percy_coates_coupling_2020}` demonstrated the
+   :cite:`percy_coates_coupling_2020` demonstrated the
    feasibility of coupling a design model (ESTD) with a dispatch one
-   (Dispa-SET :raw-latex:`\cite{Quoilin2017}`). Based on a feedback
+   (Dispa-SET :cite:`Quoilin2017`). Based on a feedback
    loop, they iterated on the design to verify the power grid adequacy
    and the strategic reserves. Results show that the backup capacities
    and storage needed to be slightly increased compared to the results
@@ -1450,10 +1493,10 @@ documentation to support the modeler in her/his first steps.
    The calculation is based on the annual capacity factor, the
    conversion efficiency and the average yearly irradiation. As an
    example, for PV, the efficiency in 2035 is estimated at
-   23% :raw-latex:`\cite{DanishEnergyAgency2019}` with an average daily
+   23% :cite:`DanishEnergyAgency2019` with an average daily
    irradiation - similar to historical values - of
    2820 Wh/m\ \ :math:`^2` in
-   Belgium :raw-latex:`\cite{IRM_Atlas_Irradiation}`. The capacity
+   Belgium :cite:`IRM_Atlas_Irradiation`. The capacity
    factor of solar is around 11.4%, hence specific area for 1 kilowatt
    peak (:math:`kW_p`) is
    :math:`2820/24\cdot0.23/0.114\approx236.7`\ \ [:math:`MW_p`/km\ \ :math:`^2`]=\ \ :math:`0.2367`

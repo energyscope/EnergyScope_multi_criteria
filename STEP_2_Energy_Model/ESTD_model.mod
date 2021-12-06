@@ -143,6 +143,7 @@ var F_t {RESOURCES union TECHNOLOGIES, HOURS, TYPICAL_DAYS} >= 0; # F_t: Operati
 var Storage_in {i in STORAGE_TECH, LAYERS, HOURS, TYPICAL_DAYS} >= 0; # Sto_in [GW]: Power input to the storage in a certain period
 var Storage_out {i in STORAGE_TECH, LAYERS, HOURS, TYPICAL_DAYS} >= 0; # Sto_out [GW]: Power output from the storage in a certain period
 var Power_nuclear  >=0; # [GW] P_Nuc: Constant load of nuclear
+var Import_Constant {RES_IMPORT_CONSTANT} >= 0; # [GW] Resources imported at a constant flow (such as gas, electrofuels, ...)
 var Shares_mobility_passenger {TECHNOLOGIES_OF_END_USES_CATEGORY["MOBILITY_PASSENGER"]} >=0; # %_PassMob [-]: Constant share of passenger mobility
 var Shares_mobility_freight {TECHNOLOGIES_OF_END_USES_CATEGORY["MOBILITY_FREIGHT"]} >=0; # %_FreightMob [-]: Constant share of passenger mobility
 var Shares_lowT_dec {TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DECEN"] diff {"DEC_SOLAR"}}>=0 ; # %_HeatDec [-]: Constant share of heat Low T decentralised + its specific thermal solar
@@ -259,9 +260,8 @@ subject to resource_availability {i in RESOURCES}:
 	sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [i, h, td] * t_op [h, td]) <= avail [i];
 
 # [Eq. 2.12-bis] Constant flow of import for resources listed in SET RES_IMPORT_CONSTANT
-var Import_constant {RES_IMPORT_CONSTANT} >= 0;
 subject to resource_constant_import { i in RES_IMPORT_CONSTANT, h in HOURS, td in TYPICAL_DAYS}:
-	F_t [i, h, td] * t_op [h, td] = Import_constant [i];
+	F_t [i, h, td] * t_op [h, td] = Import_Constant [i];
 
 ## Layers
 #--------

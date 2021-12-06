@@ -87,5 +87,7 @@ Exercices:
 Exercice 1 - analyse the system
 -------------------------------
 
-TO BE DONE
+
+.. caution ::
+   TO BE DONE
 

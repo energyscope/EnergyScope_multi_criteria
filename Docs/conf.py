@@ -30,10 +30,12 @@ release = '2.2'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [# DOES NOT WORK :'( sphinxcontrib.bibtex
+extensions = [ 'sphinxcontrib.bibtex'
 ]
 # Bibliography:
-# DOES NOT WORK :'() bibtex_bibfiles = ['biblio_1.bib']
+bibtex_bibfiles = ['refs.bib']
+bibtex_default_style = 'unsrt'
+bibtex_reference_style = 'super'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -57,3 +59,8 @@ numtab = True # Add table numbering
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = []
+
+
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+html_logo = 'images/estd_graphical_abstract.png'

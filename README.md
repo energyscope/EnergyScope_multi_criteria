@@ -1,3 +1,22 @@
+![energyScope logo](./Docs/images/estd_graphical_abstract.png)
+===================
+
+ 
+# Content and documentation #
+This folder contains the fourth release (v2_2, hourly LP) of the EnergyScope model adapted to the Belgian case.  
+This version of the model is an extension of the one in [4].  
+The data and formulation are available here:
+	(link to come, temporary link to other repo: https://energyscope-td.readthedocs.io/en/limpens_belgian_2020 )
+
+Do refer to the documentation for:
+- Model overview
+- Releases and publications
+- Model formulation
+- Data used and sources
+- License
+- Get started and exercices
+
+
 # Acknowledging authorship #
 In the academic spirit of collaboration, the source code should be appropriately acknowledged in the resulting scientific disseminations.  
 You may cite it as follows: 
@@ -8,20 +27,6 @@ You may cite it as follows:
 
 You are welcome to report any bugs related to the code to the following:    
  moret.stefano@gmail.com or gauthierLimpens@gmail.com  
- 
-# Content and documentation#
-This folder contains the thrid release (v2_1, hourly LP) of the EnergyScope model adapted to the Belgian case.  
-More recent releases are available @ the EnergyScope project repository: https://github.com/energyscope/EnergyScope   
-This version of the model is an extension of the one in [4].  
-The data and formulation are available here:
-	(link to come, temporary link to other repo: https://energyscope-docs.readthedocs.io )
-
-Do refer to the documentation for:
-- Model formulation
-- Data used and sources
-- License
-- Get started and exercices
-- Previous versions
 
 
 # References:  #  

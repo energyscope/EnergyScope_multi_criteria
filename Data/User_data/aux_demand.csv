@@ -1,0 +1,9 @@
+parameter name,Category,Subcategory,Units
+ELECTRICITY,Electricity,baseload,[GWh]
+LIGHTING,Electricity,variable,[GWh]
+HEAT_HIGH_T,Heat,high temperature,[GWh]
+HEAT_LOW_T_SH,Heat,space heating,[GWh]
+HEAT_LOW_T_HW,Heat,hot water,[GWh]
+MOBILITY_PASSENGER,Mobility,passenger,[Mpkm]
+MOBILITY_FREIGHT,Mobility,freight,[Mtkm]
+NON_ENERGY,Non energy,Non energy,[GWh]

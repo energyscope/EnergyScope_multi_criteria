@@ -1,0 +1,268 @@
+################################################################################
+################################################################################
+##																			  ##
+##                     			SAVING RESULTS								  ##
+##																			  ##
+################################################################################
+################################################################################
+
+## Print cost breakdown to file.
+print "--------------SAVING COSTS -----------";
+printf "%s,%s,%s,%s\n", "Name", "C_inv", "C_maint", "C_op" > (PathName & "/cost_breakdown.csv");
+for {i in TECHNOLOGIES union RESOURCES}{
+    printf "%s,%.6f,%.6f,%.6f\n",
+        i,
+        if i in TECHNOLOGIES then (tau[i] * C_inv[i]) else 0,
+        if i in TECHNOLOGIES then C_maint [i] else 0,
+        if i in RESOURCES then C_op [i] else 0
+    >> (PathName & "/cost_breakdown.csv");
+}
+
+## Print GWP tech breakdown
+print "--------------SAVING GWP_TECH -----------";
+printf "Tech," > (PathName & "/cost_op_tech.csv");
+for {i in RESOURCES diff BIOFUELS diff EXPORT}{
+    printf "%s,",i >> (PathName & "/cost_op_tech.csv");
+}
+for {j in TECHNOLOGIES diff STORAGE_TECH}{
+    printf "\n%s,", j >> (PathName & "/cost_op_tech.csv");
+    for {i in RESOURCES diff BIOFUELS diff EXPORT}{
+        printf "%f,",
+            if layers_in_out[j, i] == 0 then 0
+            else
+                sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]}
+                    ((c_op [i] * F_t [i, h, td] * t_op [h, td]) * (layers_in_out[j, i] * F_t [j, h, td]) # The specific resources emissions times the share of the technology
+                        /(min(-0.000001,
+                              sum{j2 in TECHNOLOGIES diff STORAGE_TECH} (layers_in_out[j2, i] * F_t [j2, h, td])
+                              + sum {j2 in STORAGE_TECH} (Storage_out [j2, i, h, td] - Storage_in [j2, i, h, td])
+                              ) # The total share of technologies
+                        )
+                    )
+        >> (PathName & "/cost_op_tech.csv");
+    }
+}
+
+## Print resources breakdown to txt file.
+print "--------------SAVING RESOURCES -----------";
+printf "%s,%s,%s\n", "Name", "Used", "Potential" > (PathName & "/resources_breakdown.csv");
+for {i in RESOURCES}{
+    printf "%s,%.6f,%.6f\n",
+        i,
+        sum {t in PERIODS, h in HOUR_OF_PERIOD[t],
+             td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [i, h, td] * t_op [h, td]),
+        avail [i]
+    >> (PathName & "/resources_breakdown.csv");
+}
+
+
+## Print GWP breakdown
+print "--------------SAVING GWP -----------";
+printf "%s,%s,%s\n", "Name", "GWP_constr", "GWP_op" > (PathName & "/gwp_breakdown.csv");
+for {i in TECHNOLOGIES union RESOURCES}{
+    printf "%s,%.6f,%.6f\n",
+        i,
+        if i in TECHNOLOGIES then GWP_constr [i] / lifetime [i] else 0,
+        if i in RESOURCES then GWP_op [i] else 0
+    >> (PathName & "/gwp_breakdown.csv");
+}
+
+## Print Einv breakdown
+print "--------------SAVING Einv -----------";
+printf "%s,%s,%s\n", "Name", "einv_constr", "einv_op" > (PathName & "/einv_breakdown.csv");
+for {i in TECHNOLOGIES union RESOURCES}{
+    printf "%s,%.6f,%.6f\n",
+        i,
+        if i in TECHNOLOGIES then (Einv_constr [i] / lifetime [i]) else 0,
+        if i in RESOURCES then Einv_op [i] else 0
+    >> (PathName & "/einv_breakdown.csv");
+}
+
+## Print GWP tech breakdown
+print "--------------SAVING GWP_TECH -----------";
+printf "Tech," > (PathName & "/gwp_tech.csv");
+for {i in RESOURCES diff BIOFUELS diff EXPORT}{
+    printf "%s,", i >> (PathName & "/gwp_tech.csv");
+}
+for {j in TECHNOLOGIES diff STORAGE_TECH}{
+    printf "\n%s,", j >> (PathName & "/gwp_tech.csv");
+    for {i in RESOURCES diff BIOFUELS diff EXPORT}{
+        printf "%f,",
+            if layers_in_out[j, i] == 0 then 0
+            else
+                sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]}
+                    ((gwp_op [i] * F_t [i, h, td] * t_op [h, td]) * (layers_in_out[j, i] * F_t [j, h, td]) # The specific resources emissions times the share of the technology
+                     /(min(-0.000001,
+                           sum{j2 in TECHNOLOGIES diff STORAGE_TECH } (layers_in_out[j2, i] * F_t [j2, h, td])
+                           + sum {j2 in STORAGE_TECH} (Storage_out [j2, i, h, td] - Storage_in [j2, i, h, td])
+                           ) #The total share of technologies
+                      )
+                     )
+        >> (PathName & "/gwp_tech.csv");
+    }
+}
+
+
+## Print losses to txt file
+print "--------------SAVING Losses -----------";
+printf "%s,%s\n", "End use", "Losses" > (PathName & "/losses.csv");
+for {i in END_USES_TYPES}{
+        printf "%s,%.3f\n",
+            i,
+            sum{t in PERIODS, h in HOUR_OF_PERIOD[t],
+            td in TYPICAL_DAY_OF_PERIOD[t] }(Network_losses [i,h,td] * t_op [h,td])
+        >> (PathName & "/losses.csv");
+}
+
+## Print ASSETS to txt file
+print "--------------SAVING ASSETS -----------";
+printf "TECHNOLOGIES,c_inv,c_maint,lifetime,f_min,f,f_max,fmin_perc," > (PathName & "/assets.csv");
+printf "f_perc,fmax_perc,c_p,c_p_max,tau,gwp_constr" > (PathName & "/assets.csv"); # Must be split in 2 parts, otherwise too long for GLPK
+printf "\nUNITS,[MCHCapitalf/GW],[MCHCapitalf/GW],[y],[GW or GWh]," >> (PathName & "/assets.csv");
+printf "[GW or GWh],[GW or GWh],[0-1],[0-1],[0-1],[0-1],[0-1],[-],[ktCO2-eq./GW or GWh]" >> (PathName & "/assets.csv");
+
+for {i in END_USES_TYPES, tech in TECHNOLOGIES_OF_END_USES_TYPE[i]}{
+    printf "\n%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+        tech, C_inv[tech], C_maint[tech], lifetime[tech], f_min[tech], F[tech], f_max[tech], fmin_perc[tech],
+        sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+            (F_t [tech,h,td]) / max(sum {j2 in TECHNOLOGIES_OF_END_USES_TYPE[i], t2 in PERIODS,
+                                         h2 in HOUR_OF_PERIOD[t2], td2 in TYPICAL_DAY_OF_PERIOD[t2]}
+                                    (F_t [j2, h2, td2]) , 0.00001),
+        fmax_perc[tech],
+        sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+            (F_t [tech,h,td] * t_op[h,td]) / 8760 / max(F[tech],0.0001),
+        c_p[tech], tau[tech], GWP_constr[tech]
+    >> (PathName & "/assets.csv");
+}
+
+for {tech in STORAGE_TECH}{
+    printf "\n%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+        tech, C_inv[tech], C_maint[tech], lifetime[tech], f_min[tech], F[tech], f_max[tech],
+        fmin_perc[tech], -1, fmax_perc[tech],
+        sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t],
+             l in LAYERS: storage_eff_out [tech,l] > 0}
+            - min(0, Storage_out [tech, l, h, td] / storage_eff_out [tech, l]
+                     - Storage_in [tech, l, h, td] * storage_eff_in [tech, l]) / 8760 / max(F[tech], 0.0001),
+        c_p[tech], tau[tech], GWP_constr[tech]
+    >> (PathName & "/assets.csv");
+}
+
+for {tech in INFRASTRUCTURE}{
+    printf "\n%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+        tech, C_inv[tech], C_maint[tech], lifetime[tech], f_min[tech], F[tech], f_max[tech],
+        fmin_perc[tech], -1, fmax_perc[tech],
+        sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+            (F_t [tech,h,td] * t_op[h,td]) / 8760 / max(F[tech], 0.0001),
+        c_p[tech], tau[tech], GWP_constr[tech]
+    >> (PathName & "/assets.csv");
+}
+
+# To save time remove until end of 'LAYERS FLUXES'
+
+#    STORAGE distribution CURVES
+print "--------------SAVING STORAGE -----------";
+printf "Time," > (PathName & "/hourly_data/energy_stored.csv");
+for {i in STORAGE_TECH }{
+    printf "%s,", i >> (PathName & "/hourly_data/energy_stored.csv");
+}
+for {i in STORAGE_TECH }{
+    printf "%s_in," , i >> (PathName & "/hourly_data/energy_stored.csv");
+    printf "%s_out,", i >> (PathName & "/hourly_data/energy_stored.csv");
+}
+for {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}{
+    printf "\n%d", t  >> (PathName & "/hourly_data/energy_stored.csv");
+    for {i in STORAGE_TECH}{
+        if F[i]=0 then
+            printf "," >> (PathName & "/hourly_data/energy_stored.csv");
+        else
+            printf "%f,", Storage_level[i, t] >> (PathName & "/hourly_data/energy_stored.csv");
+    }
+    for {i in STORAGE_TECH}{
+        if F[i]=0 then
+            printf ",," >> (PathName & "/hourly_data/energy_stored.csv");
+        else {
+            printf "%f,",
+                (sum {l in LAYERS: storage_eff_in [i,l] > 0} -(Storage_in [i, l, h, td] * storage_eff_in [i, l]))
+            >> (PathName & "/hourly_data/energy_stored.csv");
+            printf "%f,",
+                (sum {l in LAYERS: storage_eff_in [i,l] > 0} (Storage_out [i, l, h, td] / storage_eff_out [i, l]))
+            >> (PathName & "/hourly_data/energy_stored.csv");
+        }
+    }
+}
+
+# LAYERS FLUXES
+print "--------------SAVING LAYERS -----------";
+    for {l in LAYERS}{
+    printf "Td,Time," > (PathName & "/hourly_data/layer_" & l &".csv");
+    for {i in RESOURCES union TECHNOLOGIES diff STORAGE_TECH }{
+        printf "%s,", i >> (PathName & "/hourly_data/layer_" & l &".csv");
+    }
+    for {j in STORAGE_TECH }{
+        printf "%s_Pin,", j >> (PathName & "/hourly_data/layer_" & l &".csv");
+        printf "%s_Pout,", j >> (PathName & "/hourly_data/layer_" & l &".csv");
+    }
+    printf "END_USE" >> (PathName & "/hourly_data/layer_" & l &".csv");
+
+    for {td in TYPICAL_DAYS, h in HOURS}{
+        printf "\n%d,%d,", td, h   >> (PathName & "/hourly_data/layer_" & l &".csv");
+        for {i in RESOURCES}{
+            if layers_in_out[i, l] = 0 then # Incompatible
+                printf "," >> (PathName & "/hourly_data/layer_" & l &".csv");
+            else
+                printf "%f,", (layers_in_out[i, l] * F_t [i, h, td]) >> (PathName & "/hourly_data/layer_" & l &".csv");
+        }
+        for {i in TECHNOLOGIES diff STORAGE_TECH}{
+            if layers_in_out[i, l] = 0 then # Incompatible
+                printf "," >> (PathName & "/hourly_data/layer_" & l &".csv");
+            else{
+                if F[i] = 0 then # No technology installed
+                    printf "," >> (PathName & "/hourly_data/layer_" & l &".csv");
+                else {
+                    printf "%f,", (layers_in_out[i, l] * F_t [i, h, td])
+                    >> (PathName & "/hourly_data/layer_" & l &".csv");
+            }}
+        }
+        for {j in STORAGE_TECH}{
+            if storage_eff_in[j, l] = 0 then # Incompatible
+                printf ",," >> (PathName & "/hourly_data/layer_" & l &".csv");
+            else {
+                if F[j] = 0 then #No storage
+                    printf ",," >> (PathName & "/hourly_data/layer_" & l &".csv");
+                else {
+                    printf "%f,", (-Storage_in [j, l, h, td]) >> (PathName & "/hourly_data/layer_" & l &".csv");
+                    printf "%f,", (Storage_out [j, l, h, td]) >> (PathName & "/hourly_data/layer_" & l &".csv");
+            }}
+        }
+        printf "%f", -End_uses [l, h, td]  >> (PathName & "/hourly_data/layer_" & l & ".csv");
+    }
+}
+
+## Energy yearly balance
+printf "Tech," > (PathName & "/year_balance.csv");
+for {l in LAYERS}{
+    printf "%s,", l >> (PathName & "/year_balance.csv");
+}
+for {i in RESOURCES union TECHNOLOGIES diff STORAGE_TECH}{
+    printf "\n%s,", i >> (PathName & "/year_balance.csv");
+    for {l in LAYERS}{
+        printf "%f,",
+            sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+             layers_in_out[i, l] * F_t [i, h, td]
+        >> (PathName & "/year_balance.csv");
+    }
+}
+for {j in STORAGE_TECH}{
+    printf "\n%s,", j >> (PathName & "/year_balance.csv");
+    for {l in LAYERS}{
+        printf "%f,",
+            sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+             (Storage_out [j, l, h, td] - Storage_in [j, l, h, td])
+        >> (PathName & "/year_balance.csv");
+    }
+}
+printf "\nEND_USES_DEMAND," >> (PathName & "/year_balance.csv");
+for {l in LAYERS}{
+    printf "%f,",
+        sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} End_uses [l, h, td]
+    >> (PathName & "/year_balance.csv");
+}

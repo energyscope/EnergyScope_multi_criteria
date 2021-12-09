@@ -1,0 +1,38 @@
+# Main directory
+energyscope_dir: '/home/duboisa1/Global_Grid/code/EnergyScope'
+
+# Path from main directory to energyscope sub-directories and files
+# Case studies directory and name of case study
+case_studies_dir: 'case_studies/pareto'
+case_study_name: 'run4'
+# Folders containing the csv data files
+user_data: 'Data/User_data'
+developer_data: 'Data/Developer_data'
+# Directory to save temporary output files
+temp_dir: 'temp'
+# Path to the energy model (.mod and .run files)
+ES_path: 'STEP_2_pareto/ampl'
+# Output of the step 1 selection of typical days
+step1_output: 'STEP_1_TD_selection/TD_of_days.out'
+
+# PATH to AMPL licence (to adapt by the user)
+AMPL_path: '/home/duboisa1/ampl_linux-intel64/ampl'
+
+# Printing
+# printing the data in ETSD_data.dat file for the optimisation problem
+printing: True
+# printing the time related data in ESTD_12TD.dat for the optimisation problem
+printing_td: True
+
+# Parameters
+# [ktCO2-eq./year]	# Minimum GWP reduction
+GWP_limit: 1e+7
+# [GW] Electrical interconnections with neighbouring countries
+import_capacity: 9.72
+
+# Run options
+options:
+  solver: "/home/duboisa1/ampl_linux-intel64/cplex"
+  show_stats: 1
+  log_file: "log.txt"
+  cplex_options: ["mipdisplay 5", "mipinterval 1000", "mipgap 0.01", "timelimit 3600"]

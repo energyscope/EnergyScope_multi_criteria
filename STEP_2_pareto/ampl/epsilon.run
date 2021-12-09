@@ -1,0 +1,10 @@
+# Load standard model
+model ../STEP_2_pareto/ampl/main.mod;
+model ../STEP_2_pareto/ampl/epsilon.mod;
+
+# Load standard data
+data ../temp/ESTD_data_epsilon.dat    # not TDs depending data
+data ../temp/ESTD_12TD.dat; # TDs depending data
+
+# Load main run
+include ../STEP_2_pareto/ampl/main.run;

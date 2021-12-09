@@ -1,0 +1,113 @@
+Technologies param,Category,Subcategory,Technologies name
+NUCLEAR,Electricity,Electricity,Nuclear
+CCGT,Electricity,Electricity,Combined cycle gas turbine
+CCGT_AMMONIA,Electricity,Electricity,Amonia combined cycle gas turbine
+COAL_US,Electricity,Electricity,Ultra-supercritical coal power plant
+COAL_IGCC,Electricity,Electricity,Intagrated gasification combined cycle with coal
+PV,Electricity,Electricity,Photovoltaic
+WIND_ONSHORE,Electricity,Electricity,Wind onshore
+WIND_OFFSHORE,Electricity,Electricity,Wind offshore
+HYDRO_RIVER,Electricity,Electricity,Hydro river
+GEOTHERMAL,Electricity,Electricity,Geothermal power plant
+IND_COGEN_GAS,Heat,Heat high temperature,Cogeneration gas (industry)
+IND_COGEN_WOOD,Heat,Heat high temperature,Cogeneration wood (industry)
+IND_COGEN_WASTE,Heat,Heat high temperature,Cogeneration waste (industry)
+IND_BOILER_GAS,Heat,Heat high temperature,Boiler gas (industry)
+IND_BOILER_WOOD,Heat,Heat high temperature,Boiler wood (industry)
+IND_BOILER_OIL,Heat,Heat high temperature,Boiler oil (industry)
+IND_BOILER_COAL,Heat,Heat high temperature,Boiler coal (industry)
+IND_BOILER_WASTE,Heat,Heat high temperature,Boiler waste (industry)
+IND_DIRECT_ELEC,Heat,Heat high temperature,Electrical resistors (industry)
+DHN_HP_ELEC,Heat,Heat low temperature centralised,Heat pump (DHN)
+DHN_COGEN_GAS,Heat,Heat low temperature centralised,Cogeneration gas (DHN)
+DHN_COGEN_WOOD,Heat,Heat low temperature centralised,Cogeneration wood (DHN)
+DHN_COGEN_WASTE,Heat,Heat low temperature centralised,Cogeneration waste (DHN)
+DHN_COGEN_WET_BIOMASS,Heat,Heat low temperature centralised,Cogeneration wet biomass (DHN)
+DHN_COGEN_BIO_HYDROLYSIS,Heat,Heat low temperature centralised,Cogeneration hydrolysis (DHN)
+DHN_BOILER_GAS,Heat,Heat low temperature centralised,Boiler gas (DHN)
+DHN_BOILER_WOOD,Heat,Heat low temperature centralised,Boiler wood (DHN)
+DHN_BOILER_OIL,Heat,Heat low temperature centralised,Boiler oil (DHN)
+DHN_DEEP_GEO,Heat,Heat low temperature centralised,Geothermal (DHN)
+DHN_SOLAR,Heat,Heat low temperature centralised,Solar thermal (DHN)
+DEC_HP_ELEC,Heat,Heat low temperature decentralised,Electrical heat pump (decentralised)
+DEC_THHP_GAS,Heat,Heat low temperature decentralised,Thermal heat pump gas (decentralised)
+DEC_COGEN_GAS,Heat,Heat low temperature decentralised,Cogeneration gas (decentralised)
+DEC_COGEN_OIL,Heat,Heat low temperature decentralised,Cogeneration oil (decentralised)
+DEC_ADVCOGEN_GAS,Heat,Heat low temperature decentralised,Advanced cogeneration (Fuel cell) gas (decentralised)
+DEC_ADVCOGEN_H2,Heat,Heat low temperature decentralised,Advanced cogeneration (Fuel cell) gas (decentralised)
+DEC_BOILER_GAS,Heat,Heat low temperature decentralised,Bioler gas (decentralised)
+DEC_BOILER_WOOD,Heat,Heat low temperature decentralised,Boiler wood (decentralised)
+DEC_BOILER_OIL,Heat,Heat low temperature decentralised,Boiler oil (decentralised)
+DEC_SOLAR,Heat,Heat low temperature decentralised,Solar thermal (decentralised)
+DEC_DIRECT_ELEC,Heat,Heat low temperature decentralised,Direct electrical heaters (decentralised)
+TRAMWAY_TROLLEY,Mobility,Passenger public,Tram or metro
+BUS_COACH_DIESEL,Mobility,Passenger public,Bus diesel
+BUS_COACH_HYDIESEL,Mobility,Passenger public,Bus diesel hybrid
+BUS_COACH_CNG_STOICH,Mobility,Passenger public,Bus gas
+BUS_COACH_FC_HYBRIDH2,Mobility,Passenger public,Bus fuel cell (H2)
+TRAIN_PUB,Mobility,Passenger public,Train (passenger)
+CAR_GASOLINE,Mobility,Passenger private,Car gasoline
+CAR_DIESEL,Mobility,Passenger private,Car diesel
+CAR_NG,Mobility,Passenger private,Car gas
+CAR_METHANOL,Mobility,Passenger private,Car methanol
+CAR_HEV,Mobility,Passenger private,Car hybrid (gasoline)
+CAR_PHEV,Mobility,Passenger private,Car plug-in hybrid
+CAR_BEV,Mobility,Passenger private,Car electric
+CAR_FUEL_CELL,Mobility,Passenger private,Car fuel cell (H2)
+TRAIN_FREIGHT,Mobility,Freight,Train (freight)
+BOAT_FREIGHT_DIESEL,Mobility,Freight,Boat diesel
+BOAT_FREIGHT_NG,Mobility,Freight,Boat gas
+BOAT_FREIGHT_METHANOL,Mobility,Freight,Boat methanol
+TRUCK_DIESEL,Mobility,Freight,Trucks diesel
+TRUCK_METHANOL,Mobility,Freight,Truck methanol
+TRUCK_FUEL_CELL,Mobility,Freight,Truck fuel cell (hydrogen)
+TRUCK_ELEC,Mobility,Freight,Truck electric
+TRUCK_NG,Mobility,Freight,Truck gas
+EFFICIENCY,Infrastructure,Infrastructure,Efficiency mesures in energy system
+DHN,Infrastructure,Infrastructure,Distric heating network
+GRID,Infrastructure,Infrastructure,Electrical grid cost
+H2_ELECTROLYSIS,Synthetic fuels,Synthetic fuels,Electrolysers
+SMR,Synthetic fuels,Synthetic fuels,Steam methane reforming
+H2_BIOMASS,Synthetic fuels,Synthetic fuels,Biomass to hydrogen
+GASIFICATION_SNG,Synthetic fuels,Synthetic fuels,Wood gasification
+SYN_METHANATION,Synthetic fuels,Synthetic fuels,Hydrogen methanation
+BIOMETHANATION,Synthetic fuels,Synthetic fuels,Biomass methanation
+BIO_HYDROLYSIS,Synthetic fuels,Synthetic fuels,Biomass hydrolysis
+PYROLYSIS_TO_LFO,Synthetic fuels,Synthetic fuels,Wood pyrolysis to gasoline and diesel
+PYROLYSIS_TO_FUELS,Synthetic fuels,Synthetic fuels,Wood pyrolysis to LFO
+ATM_CCS,Synthetic fuels,Synthetic fuels,Carbon capture atmospheric
+INDUSTRY_CCS,Synthetic fuels,Synthetic fuels,Carbon capture from industry
+SYN_METHANOLATION,Synthetic fuels,Synthetic fuels,Hydrogen methanolation
+METHANE_TO_METHANOL,Synthetic fuels,Synthetic fuels,Methane to methanol
+BIOMASS_TO_METHANOL,Synthetic fuels,Synthetic fuels,Biomass methanolation
+HABER_BOSCH,Synthetic fuels,Synthetic fuels,Haber bosch (H2 to amonia)
+AMMONIA_TO_H2,Synthetic fuels,Synthetic fuels,Amonia to H2
+OIL_TO_HVC,Synthetic fuels,Synthetic fuels,Oil to HVC
+GAS_TO_HVC,Synthetic fuels,Synthetic fuels,Gas to HVC
+BIOMASS_TO_HVC,Synthetic fuels,Synthetic fuels,Biomass to HVC
+METHANOL_TO_HVC,Synthetic fuels,Synthetic fuels,Methanol to HVC
+BATT_LI,Storage,Electricity storage,Batteries
+BEV_BATT,Storage,Electricity storage,Batteries of electric cars
+PHEV_BATT,Storage,Electricity storage,Batteries of plug-in hybrid cars
+PHS,Storage,Electricity storage,Pumped hydro storage
+TS_DEC_DIRECT_ELEC,Storage,Thermal storage,Decentralised direct elec
+TS_DEC_HP_ELEC,Storage,Thermal storage,Decentralised electrical heat pumps
+TS_DEC_THHP_GAS,Storage,Thermal storage,Decentralised thermal heat pumps gas
+TS_DEC_COGEN_GAS,Storage,Thermal storage,Decentralised cogeneration gas
+TS_DEC_COGEN_OIL,Storage,Thermal storage,Decentralised cogenration oil
+TS_DEC_ADVCOGEN_GAS,Storage,Thermal storage,Decentralised fuel cell cogeneration gas
+TS_DEC_ADVCOGEN_H2,Storage,Thermal storage,Decentralised fuel cell cogenration H2
+TS_DEC_BOILER_GAS,Storage,Thermal storage,Decentralised boiler gas
+TS_DEC_BOILER_WOOD,Storage,Thermal storage,Decentralised boiler wood
+TS_DEC_BOILER_OIL,Storage,Thermal storage,Decentralised boiler oil
+TS_DHN_DAILY,Storage,Thermal storage,Centralised daily
+TS_DHN_SEASONAL,Storage,Thermal storage,Centralised seasonal
+TS_HIGH_TEMP,Storage,Thermal storage,Thermal storage industries
+GAS_STORAGE,Storage,Other storage,Gas storage
+H2_STORAGE,Storage,Other storage,Hydrogen storage
+DIESEL_STORAGE,Storage,Other storage,Diesel storage
+GASOLINE_STORAGE,Storage,Other storage,Gasoline storage
+LFO_STORAGE,Storage,Other storage,LFO storage
+AMMONIA_STORAGE,Storage,Other storage,Ammonia storage
+METHANOL_STORAGE,Storage,Other storage,Methanol storage
+CO2_STORAGE,Storage,Other storage,CO2 storage

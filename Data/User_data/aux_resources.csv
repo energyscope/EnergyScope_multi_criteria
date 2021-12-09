@@ -1,0 +1,29 @@
+parameter name,Category,Subcategory
+ELECTRICITY,Non-renewable,Other non-renewable
+GASOLINE,Non-renewable,Fossil fuel
+DIESEL,Non-renewable,Fossil fuel
+BIOETHANOL,Renewable,Biofuel
+BIODIESEL,Renewable,Biofuel
+LFO,Non-renewable,Fossil fuel
+GAS,Non-renewable,Fossil fuel
+GAS_RE,Renewable,Biofuel
+WOOD,Renewable,Biomass
+WET_BIOMASS,Renewable,Biomass
+COAL,Non-renewable,Fossil fuel
+URANIUM,Non-renewable,Other non-renewable
+WASTE,Non-renewable,Other non-renewable
+H2,Non-renewable,Other non-renewable
+H2_RE,Renewable,Biofuel
+AMMONIA,Non-renewable,Other non-renewable
+METHANOL,Non-renewable,Other non-renewable
+AMMONIA_RE,Renewable,Biofuel
+METHANOL_RE,Renewable,Biofuel
+ELEC_EXPORT,Export,Export
+CO2_EMISSIONS,Export,Export
+RES_WIND,Renewable,Non-biomass
+RES_SOLAR,Renewable,Non-biomass
+RES_HYDRO,Renewable,Non-biomass
+RES_GEO,Renewable,Non-biomass
+CO2_ATM,Others,Others
+CO2_INDUSTRY,Others,Others
+CO2_CAPTURED,Others,Others

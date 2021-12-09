@@ -1,0 +1,18 @@
+################################################################################
+##																			  ##
+##                     			MASTER RUN								      ##
+##																			  ##
+################################################################################
+## WARNING: when executed from a working directory, it is required to specify  #
+## the path of the .mod, .dat, and .run files from the working directory.      #
+################################################################################
+#
+# 1. Load standard model
+model ampl_model/ESTD_model.mod;
+#
+# 2. Load standard data
+data ../temp/ESTD_data.dat;     # not TDs depending data
+data ../temp/ESTD_12TD.dat;    # TDs depending data
+#
+# 3. Load main run
+include ampl_model/ESTD_main.run;

@@ -1,0 +1,5 @@
+yaml
+pandas
+numpy
+matplotlib
+plotly

@@ -1,0 +1,30 @@
+Category,Subcategory,parameter name,avail,gwp_op,c_op,einv_op
+,,units,[GWh/y],[ktCO2-eq./GWh],[Meuro/GWh],[GWh/y]
+Non-renewable,Other non-renewable,ELECTRICITY,27567.31134,0.206485714,0.08433,0.122694142
+Non-renewable,Fossil fuel,GASOLINE,1000000.0,0.3448,0.082366044,0.280927631
+Non-renewable,Fossil fuel,DIESEL,1000000.0,0.3148,0.079743788,0.20978621
+Renewable,Biofuel,BIOETHANOL,1000000.0,0.0,0.111323944,0.31599
+Renewable,Biofuel,BIODIESEL,1000000.0,0.0,0.120074962,0.43172
+Non-renewable,Fossil fuel,LFO,1000000.0,0.3115,0.06015058,0.203894589
+Non-renewable,Fossil fuel,GAS,1000000.0,0.2666,0.04425306,0.060823333
+Renewable,Biofuel,GAS_RE,1000000.0,0.0,0.118326,0.26872
+Renewable,Biomass,WOOD,23400.0,0.0118,0.032815086,0.049118
+Renewable,Biomass,WET_BIOMASS,38900.0,0.0118,0.00575743,0.055865922
+Non-renewable,Fossil fuel,COAL,33354.99944,0.4014,0.017657892,0.120808433
+Non-renewable,Other non-renewable,URANIUM,1000000.0,0.0039,0.003876456,0.04337
+Non-renewable,Other non-renewable,WASTE,17800.0,0.1501,0.023080857,0.057725948
+Non-renewable,Other non-renewable,H2,1000000.0,0.364,0.08750742,0.083044611
+Renewable,Biofuel,H2_RE,1000000.0,0.0,0.119242396,0.578834353
+Non-renewable,Other non-renewable,AMMONIA,1000000.0,0.285,0.076,0.065021192
+Non-renewable,Other non-renewable,METHANOL,1000000.0,0.3499,0.082,0.079827773
+Renewable,Biofuel,AMMONIA_RE,1000000.0,0.0,0.081823311,0.578834353
+Renewable,Biofuel,METHANOL_RE,1000000.0,0.0,0.111323944,0.578834353
+Export,Export,ELEC_EXPORT,1000000.0,0.0,0.0,0.0
+Export,Export,CO2_EMISSIONS,1000000.0,0.0,0.0,0.0
+Renewable,Non-biomass,RES_WIND,1000000.0,0.0,0.0,0.0
+Renewable,Non-biomass,RES_SOLAR,1000000.0,0.0,0.0,0.0
+Renewable,Non-biomass,RES_HYDRO,1000000.0,0.0,0.0,0.0
+Renewable,Non-biomass,RES_GEO,1000000.0,0.0,0.0,0.0
+Others,Others,CO2_ATM,1000000.0,0.0,0.0,0.0
+Others,Others,CO2_INDUSTRY,0.0,0.0,0.0,0.0
+Others,Others,CO2_CAPTURED,0.0,0.0,0.0,0.0

@@ -1,0 +1,89 @@
+################################################################################
+################################################################################
+##																			  ##
+##                      	SOLVER OPTIONS       							  ##
+##																			  ##
+################################################################################
+################################################################################
+
+# TODO: where should the path to cplex be declared ?
+option solver "/home/duboisa1/ampl_linux-intel64/cplex";
+
+option show_stats 1; # show statistics
+
+option cplex_options  'mipdisplay 5 mipinterval 1000';
+option log_file 'log.txt';   #write the log in a .txt file. Create the file before running.
+# option cplex_options $cplex_options 'startbasis ../temp/output/solution.bas '; # to read previously existing path
+option cplex_options $cplex_options 'endbasis ../temp/output/solution.bas '; # to write how to solve
+# Saving and starting from last solution. Starting from last solution is not very efficient.
+# option cplex_options $cplex_options 'startsol ../temp/output/solution.sol '; # to read previously existing file
+# option cplex_options $cplex_options 'endsol ../temp/output/solution.sol '; # to write file
+
+option cplex_options $cplex_options 'mipgap 0.01 ';
+option cplex_options $cplex_options 'timelimit 3600 ';
+
+
+/*
+# Save pool of solutions
+option cplex_options "poolstub=PoolSol poolcapacity=10 \
+populate=1 poolintensity=4 poolreplace=2";
+*/
+
+################################################################################
+################################################################################
+##																			  ##
+##                      	RUN & SAVE PATH      							  ##
+##																			  ##
+################################################################################
+################################################################################
+
+
+param PathName symbolic default "../temp/output";
+
+# TODO: where should these actually be added --> to print_data ?
+let f_min["PV"] := 3.846;
+let f_min["WIND_ONSHORE"] := 1.177;
+let f_min["WIND_OFFSHORE"] := 0.692;
+let f_min["HYDRO_RIVER"] := 0.11;
+let re_share_primary := 0.0;
+
+let gwp_limit := Infinity;
+let cost_limit := Infinity;
+let einv_limit := Infinity;
+
+print PathName;
+
+option times 1; # show time
+option gentimes 1; # show time
+
+solve;
+
+display solve_result_num;
+display _solve_elapsed_time;
+
+## Saving sets and parameters to output file
+
+option times 0; # show time
+option gentimes 0; # show time
+
+if solve_result = "limit" then { # To avoid post treatment error
+    print "TIME OUT";
+    exit 1;
+}
+else {
+    if solve_result = "infeasible" then {
+        print "INFEASIBLE";
+        exit 1
+    }
+    else {
+        if solve_result = "failure" then {
+        print "FAILURE";
+        exit 1
+        }
+        else {
+            include ../STEP_2_pareto/ampl/utils/print.run
+            include ../STEP_2_pareto/ampl/utils/sankey.run
+            exit 0
+        }
+    }
+}# END SAVING

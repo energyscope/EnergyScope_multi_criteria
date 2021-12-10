@@ -1,7 +1,7 @@
 # Path from main directory to energyscope sub-directories and files
 # Case studies directory and name of case study
 case_studies_dir: 'case_studies'
-case_study_name: 'run100'
+case_study_name: 'run_100'
 # Folders containing the csv data files
 user_data: 'Data/User_data'
 developer_data: 'Data/Developer_data'

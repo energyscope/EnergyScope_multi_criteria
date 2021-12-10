@@ -11,6 +11,7 @@ import os
 import pandas as pd
 import energyscope as es
 import numpy as np
+import matplotlib.pyplot as plt
 
 from sys import platform
 from energyscope.misc.utils import make_dir
@@ -41,6 +42,21 @@ def load_config(config_fn: str):
 
     return cfg
 
+
+def energy_final(case_study_dir: str, col:str):
+    """
+    Run ES using Python.
+    :param case_study_dir: path to the case study directory.
+    Return the final energy demand (TWh) by use sector: 'Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand', 'Freight', 'Mob priv', 'Heat HT'
+    """
+    df_sankey = pd.read_csv(f"{case_study_dir}/output/sankey/input2sankey.csv", index_col=0, sep=',')
+    ef_list = ['Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand',
+               'Freight', 'Mob priv', 'Heat HT']
+    ef_final_val = []
+    for final_demand in ef_list:
+        ef_final_val.append(df_sankey[df_sankey['target'] == final_demand]['realValue'].sum())
+
+    return pd.DataFrame(index=ef_list, data=ef_final_val, columns=[col])
 
 if __name__ == '__main__':
 
@@ -75,6 +91,10 @@ if __name__ == '__main__':
     mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
     es.print_run(run_fn, mod_fns, [estd_out_path, td12_out_path], config['options'], f"{config['temp_dir']}/output")
 
+    # --------------------------------------------------
+    # Minimize the Einv with the GWP that is not constrained
+    # -------------------------------------------------
+
     # Running EnergyScope
     cs = f"{config['case_studies_dir']}/{config['case_study_name']}"
     run_fn = f"{config['ES_path']}/master.run"
@@ -84,45 +104,94 @@ if __name__ == '__main__':
     output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}/output/"
     es.drawSankey(path=f"{output_dir}/sankey")
 
-    # TODO: check if it is ok to use the GWP_op as limit
-    # Get the GWP op
-    cs = f"{config['case_studies_dir']}/{'run100'}"
+    # GWP op
+    cs = f"{config['case_studies_dir']}/{'run_100'}"
     gwp = pd.read_csv(f"{cs}/output/gwp_breakdown.csv", index_col=0, sep=',')
     gwp_op_tot = gwp.sum()['GWP_op']
 
-    # Get the EROI
-    total_demand = 388 # TWh
-    # TODO: check if total demand is 388 TWh
-    einv_tot = get_total_einv(cs)/1000 # TWh
-    eroi_ini = total_demand/einv_tot
-    print('EROI %.2f GWP op MtC02eq %.2f' %(eroi_ini, gwp_op_tot))
-
-    # LOOP on several GWP maximum values and compute the related EROI
-    eroi_list = []
-    eroi_list.append(eroi_ini)
-    for gwp_limit, cs_name in zip(np.asarray([i for i in range(5, 100, 5)]) * gwp_op_tot,['run_'+str(i) for i in range(5, 100, 5)]):
-        print('RUN in progess %s' %(cs_name))
+    # -----------------------------------------------
+    # Minimize the Einv for several GWP maximum values
+    # -----------------------------------------------
+    for gwp_limit, cs_name in zip(np.asarray([i for i in range(95, 0, -5)]) * gwp_op_tot/100,['run_'+str(i) for i in range(95, 0, -5)]):
+        print('Case in progess %s' %(cs_name))
+        cs = f"{config['case_studies_dir']}/{cs_name}"
         # Update the GWP limit
         config["system_limits"]['GWP_limit'] = gwp_limit
         # Saving data to .dat files into the config['temp_dir'] directory
-        out_path = f"{config['temp_dir']}/ESTD_data.dat"
-        es.print_estd(out_path=out_path, data=all_data, import_capacity=config["import_capacity"],  system_limits=config["system_limits"])
-        out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
-        es.print_12td(out_path=out_path, time_series=all_data['Time_series'], step1_output_path=config["step1_output"])
+        estd_out_path = f"{config['temp_dir']}/ESTD_data.dat"
+        es.print_estd(out_path=estd_out_path, data=all_data, import_capacity=config["import_capacity"],  system_limits=config["system_limits"])
+        td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
+        es.print_12td(out_path=td12_out_path, time_series=all_data['Time_series'], step1_output_path=config["step1_output"])
 
         # Running EnergyScope
-        cs = f"{config['case_studies_dir']}/{cs_name}"
         run_fn = f"{config['ES_path']}/master.run"
         es.run_energyscope(cs, run_fn, config['AMPL_path'], config['temp_dir'])
 
         # Example to print the sankey from this script
-        output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}/output/"
+        output_dir = f"{config['case_studies_dir']}/{cs_name}/output/"
         es.drawSankey(path=f"{output_dir}/sankey")
 
-        # Compute the EROI
-        einv_temp = get_total_einv(cs) / 1000  # TWh
-        eroi_temp = total_demand / einv_temp
-        print('EROI %.2f GWP op MtC02eq %.2f' % (eroi_temp, gwp_limit))
-        eroi_list.append(eroi_temp)
+    # -----------------------------------------------
+    # Post treatment
+    # -----------------------------------------------
+    eroi_list = []
+    einv_list = []
+    df_ef_list = []
+    for gwp_limit, cs_name in zip(np.asarray([i for i in range(100, 0, -5)]) * gwp_op_tot/100,['run_'+str(i) for i in range(100, 0, -5)]):
+        cs = f"{config['case_studies_dir']}/{cs_name}"
 
-    # TODO: plot with EROI vs GWP and save plot
+        # Compute the energy final demand
+        ef_temp = energy_final(case_study_dir=cs, col=cs_name)
+        df_ef_list.append(ef_temp)
+
+        # Compute the EROI
+        ef_temp_tot = ef_temp.sum()
+        einv_temp = get_total_einv(cs) / 1000  # TWh
+        einv_list.append(einv_temp)
+        eroi_temp = ef_temp_tot / einv_temp
+        eroi_list.append(eroi_temp.values[0])
+        print('case %s Einv %.1f Energy demand %.1f EROI %.2f GWP op MtC02eq %.2f' %(cs_name, einv_temp, ef_temp_tot, eroi_temp, gwp_limit))
+
+    df_ef = pd.concat(df_ef_list, axis=1)
+    df_eroi = pd.DataFrame(index=[i for i in range(100, 0, -5)], data=eroi_list, columns=['EROI'])
+    df_inv = pd.DataFrame(index=[i for i in range(100, 0, -5)], data=einv_list, columns=['Einv'])
+
+    # -----------------------------------------------
+    # PLOT
+    # -----------------------------------------------
+    make_dir(cwd+'/export/')
+
+    # Plot EROI vs GWP
+    plt.figure()
+    plt.plot([i for i in range(100, 0, -5)], df_eroi.values, '-Dk', linewidth=3, markersize=10, label='EROI=Ef/Einv')
+    plt.gca().invert_xaxis()
+    plt.xticks([i for i in range(100, 0, -5)])
+    plt.ylabel('(-)')
+    plt.xlabel('GWP op (%)')
+    plt.tight_layout()
+    plt.savefig(cwd+'/export/eroi.pdf')
+    plt.show()
+
+    # Plot Total final energy demand vs GWP
+    plt.figure()
+    plt.plot([i for i in range(100, 0, -5)], df_ef.sum().values, '-Db', linewidth=3, markersize=10, label='Ef')
+    plt.plot([i for i in range(100, 0, -5)], df_inv.values, '-Dr', linewidth=3, markersize=10, label='Einv')
+    plt.gca().invert_xaxis()
+    plt.xticks([i for i in range(100, 0, -5)])
+    plt.ylabel('(TWh)')
+    plt.xlabel('GWP op (%)')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(cwd+'/export/final-energy-demand.pdf')
+    plt.show()
+
+    # Bar plot of the final energy demand
+    df_ef.columns = [str(i) for i in range(100, 0, -5)]
+    plt.figure()
+    df_ef[['100', '50', '25', '5']].transpose().plot.bar()
+    plt.ylabel('(TWh)')
+    plt.xlabel('GWP op (%)')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(cwd+'/export/final-energy-demand-share.pdf')
+    plt.show()

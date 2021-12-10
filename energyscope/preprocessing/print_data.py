@@ -98,13 +98,13 @@ def import_data(user_data_dir:str, developer_data_dir:str):
 
 
 # Function to print the ESTD_data.dat file
-def print_estd(out_path:str, data:dict, import_capacity:float, gwp_limit:float):
+def print_estd(out_path:str, data:dict, import_capacity:float, system_limits:dict):
     """
     Prints the data into .dat file (out_path) with the right syntax for AMPL.
     :param out_path: path to the directory to save the .dat file
     :param data: dict composed of DataFrames with the data to export.
     :param import_capacity: [GW] Maximum power of electrical interconnections
-    :param gwp_limit: [ktCO2-eq./year] Global Warming Potential (GWP) limit .
+    :param system_limits: dict with the GWP [ktCO2-eq./year], cost [GWh/year], and Einv [bEUR/year] system limits.
     """
 
     logging.info('Printing ESTD_data.dat')
@@ -346,24 +346,15 @@ def print_estd(out_path:str, data:dict, import_capacity:float, gwp_limit:float):
         writer.writerow(['## PARAMETERS presented in Table 2.	'])
     # printing i_rate, re_share_primary,gwp_limit,solar_area
     print_param('i_rate', i_rate, 'part [2.7.4]', out_path)
-    # TODO: need to pass a dict of parameters for which we want to set the value dynamically
-    # expl:
-    #               'let f_min["PV"] := 3.846;',
-    #               'let f_min["WIND_ONSHORE"] := 1.177;',
-    #               'let f_min["WIND_OFFSHORE"] := 0.692;',
-    #               'let f_min["HYDRO_RIVER"] := 0.11;',
-    #               'let re_share_primary := 0.0;',
-    #               ' ',
-    #               'let gwp_limit := Infinity;',
-    #               'let cost_limit := Infinity;',
-    #               'let einv_limit := Infinity;',
+
+    #FIXME: check if cost_limit is in bEUR/year and einv_limit is in GWh/year
+    print_param('gwp_limit', system_limits['GWP_limit'], 'gwp_limit [ktCO2-eq./year]: maximum GWP emissions', out_path)
+    print_param('cost_limit', system_limits['COST_limit'], 'cost_limit [bEUR/year]: maximum system cost', out_path)
+    print_param('einv_limit', system_limits['EINV_limit'], 'einv_limit [GWh/year]: maximum system energy invested', out_path)
     print_param('re_share_primary', re_share_primary, 'Minimum RE share in primary consumption', out_path)
-    print_param('gwp_limit', gwp_limit, 'gwp_limit [ktCO2-eq./year]: maximum GWP emissions', out_path)
     print_param('solar_area', solar_area, '', out_path)
-    print_param('power_density_pv', power_density_pv, 'PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2',
-                out_path)
-    print_param('power_density_solar_thermal', power_density_solar_thermal,
-                'Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2', out_path)
+    print_param('power_density_pv', power_density_pv, 'PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2', out_path)
+    print_param('power_density_solar_thermal', power_density_solar_thermal, 'Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2', out_path)
     newline(out_path)
     with open(out_path, mode='a', newline='') as file:
         writer = csv.writer(file, delimiter='\t', quotechar=' ', quoting=csv.QUOTE_MINIMAL)

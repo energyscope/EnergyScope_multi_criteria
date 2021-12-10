@@ -30,6 +30,9 @@ if __name__ == '__main__':
 
     # config['all_data'] = es.import_data(config['data_folders'])
     all_data = es.import_data(config['user_data'], config['developer_data'])
+    # Modify the minimum capacities of some technologies
+    for tech in config['Technologies']['f_min']:
+        all_data['Technologies']['f_min'].loc[tech] = config['Technologies']['f_min'][tech]
 
     # Optimal solution
     if 1:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):

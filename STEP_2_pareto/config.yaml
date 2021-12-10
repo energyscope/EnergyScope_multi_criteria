@@ -25,10 +25,19 @@ printing: True
 printing_td: True
 
 # Parameters
-# [ktCO2-eq./year]	# Minimum GWP reduction
-GWP_limit: 1e+7
+system_limits:
+  GWP_limit: 'Infinity'  # [ktCO2-eq./year]	# Minimum GWP reduction
+  COST_limit: 'Infinity'
+  EINV_limit: 'Infinity'
 # [GW] Electrical interconnections with neighbouring countries
 import_capacity: 9.72
+# minimum capacities of some technologies
+Technologies:
+  f_min:
+    PV: 3.846
+    WIND_ONSHORE: 1.177
+    WIND_OFFSHORE: 0.692
+    HYDRO_RIVER: 0.11
 
 # Run options
 options:

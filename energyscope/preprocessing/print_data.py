@@ -98,13 +98,12 @@ def import_data(user_data_dir:str, developer_data_dir:str):
 
 
 # Function to print the ESTD_data.dat file
-def print_estd(out_path:str, data:dict, import_capacity:float, system_limits:dict):
+def print_estd(out_path:str, data:dict, system_limits:dict):
     """
     Prints the data into .dat file (out_path) with the right syntax for AMPL.
     :param out_path: path to the directory to save the .dat file
     :param data: dict composed of DataFrames with the data to export.
-    :param import_capacity: [GW] Maximum power of electrical interconnections
-    :param system_limits: dict with the GWP [ktCO2-eq./year], cost [GWh/year], and Einv [bEUR/year] system limits.
+    :param system_limits: dict with values for system limits: GWP, ... cf configuration file.
     """
 
     logging.info('Printing ESTD_data.dat')
@@ -135,28 +134,26 @@ def print_estd(out_path:str, data:dict, import_capacity:float, system_limits:dic
 
     # Developer defined parameters #
     # Economical inputs
-
-    # TODO put everything into a config file so that we can modify it from outside the function
-    i_rate = 0.015  # [-]
+    i_rate = system_limits['i_rate']  # [-]
     # Political inputs
-    re_share_primary = 0  # [-] Minimum RE share in primary consumption
-    solar_area = 250  # [km^2]
-    power_density_pv = 0.2367  # PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2
-    power_density_solar_thermal = 0.2857  # Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2
+    re_share_primary = system_limits['re_share_primary'] # [-] Minimum RE share in primary consumption
+    re_be_share_primary = system_limits['re_be_share_primary'] # [-] Minimum domestic RE share (non-biomass and biomass RE such as SOLAR, WIND, HYDRO)
+    solar_area = system_limits['solar_area']  # [km^2]
+    power_density_pv = system_limits['power_density_pv']  # PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2
+    power_density_solar_thermal = system_limits['power_density_solar_thermal']  # Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2
 
     # Technologies shares
-    share_mobility_public_min = 0.199
-    share_mobility_public_max = 0.5
-    share_freight_train_min = 0.109
-    share_freight_train_max = 0.25
-    share_freight_road_min = 0
-    share_freight_road_max = 1
-    share_freight_boat_min = 0.156
-    share_freight_boat_max = 0.3
-    share_heat_dhn_min = 0.02
-    share_heat_dhn_max = 0.37
-
-    share_ned = pd.DataFrame([0.779, 0.029, 0.192], index=['HVC', 'METHANOL', 'AMMONIA'], columns=['share_ned'])
+    share_mobility_public_min = system_limits['technologie_shares']['share_mobility_public_min']
+    share_mobility_public_max = system_limits['technologie_shares']['share_mobility_public_max']
+    share_freight_train_min = system_limits['technologie_shares']['share_freight_train_min']
+    share_freight_train_max =system_limits['technologie_shares']['share_freight_train_max']
+    share_freight_road_min = system_limits['technologie_shares']['share_freight_road_min']
+    share_freight_road_max = system_limits['technologie_shares']['share_freight_road_max']
+    share_freight_boat_min = system_limits['technologie_shares']['share_freight_boat_min']
+    share_freight_boat_max = system_limits['technologie_shares']['share_freight_boat_max']
+    share_heat_dhn_min = system_limits['technologie_shares']['share_heat_dhn_min']
+    share_heat_dhn_max = system_limits['technologie_shares']['share_heat_dhn_max']
+    share_ned = pd.DataFrame(system_limits['share_ned'], index=['HVC', 'METHANOL', 'AMMONIA'], columns=['share_ned'])
 
     # Electric vehicles :
     # km-pass/h/veh. : Gives the equivalence between capacity and number of vehicles.
@@ -168,8 +165,8 @@ def print_estd(out_path:str, data:dict, import_capacity:float, system_limits:dic
     a[1, 6] = 0.6
     state_of_charge_ev = pd.DataFrame(a, columns=np.arange(1, 25), index=['PHEV_BATT', 'BEV_BATT'])
     # Network
-    loss_network = {'ELECTRICITY': 4.7E-02, 'HEAT_LOW_T_DHN': 5.0E-02}
-    c_grid_extra = 367.8  # cost to reinforce the grid due to intermittent renewable energy penetration. See 2.2.2
+    loss_network = {'ELECTRICITY': system_limits['loss_network']['ELECTRICITY'], 'HEAT_LOW_T_DHN': system_limits['loss_network']['HEAT_LOW_T_DHN']}
+    c_grid_extra = system_limits['c_grid_extra']  # cost to reinforce the grid due to intermittent renewable energy penetration. See 2.2.2
 
     # Storage daily
     # TODO automatise
@@ -184,8 +181,11 @@ def print_estd(out_path:str, data:dict, import_capacity:float, system_limits:dic
     RESOURCES = list(resources_simple.index)
     RES_IMPORT_CONSTANT = ['GAS', 'GAS_RE', 'H2_RE', 'H2']  # TODO automatise
     BIOFUELS = list(resources[resources.loc[:, 'Subcategory'] == 'Biofuel'].index)
-    RE_RESOURCES = list(
-        resources.loc[(resources['Category'] == 'Renewable'), :].index)
+    re_ressources = resources.loc[(resources['Category'] == 'Renewable'), :]
+    RE_RESOURCES = list(re_ressources.index)
+    re_be_non_biomass = re_ressources.loc[(re_ressources['Subcategory'] == 'Non-biomass'), :]
+    re_be_biomass = re_ressources.loc[(re_ressources['Subcategory'] == 'Biomass'), :]
+    RE_BE_RESOURCES = list(re_be_non_biomass.index) + list(re_be_biomass.index)
     EXPORT = list(resources.loc[resources['Category'] == 'Export', :].index)
 
     END_USES_TYPES_OF_CATEGORY = []
@@ -285,6 +285,7 @@ def print_estd(out_path:str, data:dict, import_capacity:float, system_limits:dic
     print_set(RES_IMPORT_CONSTANT, 'RES_IMPORT_CONSTANT', out_path)
     print_set(BIOFUELS, 'BIOFUELS', out_path)
     print_set(RE_RESOURCES, 'RE_RESOURCES', out_path)
+    print_set(RE_BE_RESOURCES, 'RE_BE_RESOURCES', out_path)
     print_set(EXPORT, 'EXPORT', out_path)
     newline(out_path)
     n = 0
@@ -344,7 +345,6 @@ def print_estd(out_path:str, data:dict, import_capacity:float, system_limits:dic
         writer.writerow(['# -----------------------------	'])
         writer.writerow([''])
         writer.writerow(['## PARAMETERS presented in Table 2.	'])
-    # printing i_rate, re_share_primary,gwp_limit,solar_area
     print_param('i_rate', i_rate, 'part [2.7.4]', out_path)
 
     #FIXME: check if cost_limit is in bEUR/year and einv_limit is in GWh/year
@@ -352,6 +352,7 @@ def print_estd(out_path:str, data:dict, import_capacity:float, system_limits:dic
     print_param('cost_limit', system_limits['COST_limit'], 'cost_limit [bEUR/year]: maximum system cost', out_path)
     print_param('einv_limit', system_limits['EINV_limit'], 'einv_limit [GWh/year]: maximum system energy invested', out_path)
     print_param('re_share_primary', re_share_primary, 'Minimum RE share in primary consumption', out_path)
+    print_param('re_be_share_primary', re_be_share_primary, 'Minimum BE RE share in primary consumption', out_path)
     print_param('solar_area', solar_area, '', out_path)
     print_param('power_density_pv', power_density_pv, 'PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2', out_path)
     print_param('power_density_solar_thermal', power_density_solar_thermal, 'Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2', out_path)
@@ -369,7 +370,7 @@ def print_estd(out_path:str, data:dict, import_capacity:float, system_limits:dic
     # printing c_grid_extra and import_capacity
     print_param('c_grid_extra', c_grid_extra,
                 'cost to reinforce the grid due to intermittent renewable energy penetration. See 2.2.2', out_path)
-    print_param('import_capacity', import_capacity, '', out_path)
+    print_param('import_capacity', system_limits['import_capacity'], '', out_path)
     newline(out_path)
     with open(out_path, mode='a', newline='') as file:
         writer = csv.writer(file, delimiter='\t', quotechar=' ', quoting=csv.QUOTE_MINIMAL)

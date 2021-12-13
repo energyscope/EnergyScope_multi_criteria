@@ -23,6 +23,30 @@ system_limits:
   GWP_limit: 'Infinity'  # [ktCO2-eq./year]	# Minimum GWP reduction
   COST_limit: 'Infinity'
   EINV_limit: 'Infinity'
+  import_capacity: 9.72  # [GW] Maximum power of electrical interconnections
+  i_rate : 0.015  # [-]
+  re_share_primary: 0  # [-] by default 0 Minimum RE share in primary consumption (all RE technologies including imported RE such as synthetic fuels)
+  re_be_share_primary: 0  # by default 0 [-] Minimum domestic RE share (non-biomass and biomass RE such as SOLAR, WIND, HYDRO)
+  solar_area: 250 # [km^2]
+  power_density_pv : 0.2367  # PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2
+  power_density_solar_thermal : 0.2857  # Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2
+  technologie_shares:
+    share_mobility_public_min : 0.199
+    share_mobility_public_max : 0.5
+    share_freight_train_min : 0.109
+    share_freight_train_max : 0.25
+    share_freight_road_min : 0
+    share_freight_road_max : 1
+    share_freight_boat_min : 0.156
+    share_freight_boat_max : 0.3
+    share_heat_dhn_min : 0.02
+    share_heat_dhn_max : 0.37
+  share_ned: [0.779, 0.029, 0.192]
+  loss_network:
+    ELECTRICITY: 4.7E-02
+    HEAT_LOW_T_DHN: 5.0E-02
+  c_grid_extra: 367.8  # cost to reinforce the grid due to intermittent renewable energy penetration. See 2.2.2
+
 # [GW] Electrical interconnections with neighbouring countries
 import_capacity: 9.72
 # minimum capacities of some technologies

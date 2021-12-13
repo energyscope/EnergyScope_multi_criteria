@@ -48,6 +48,7 @@ set LAYERS := (RESOURCES diff BIOFUELS diff EXPORT) union END_USES_TYPES; # Laye
 set TECHNOLOGIES := (setof {i in END_USES_TYPES, j in TECHNOLOGIES_OF_END_USES_TYPE [i]} j) union STORAGE_TECH union INFRASTRUCTURE; 
 set TECHNOLOGIES_OF_END_USES_CATEGORY {i in END_USES_CATEGORIES} within TECHNOLOGIES := setof {j in END_USES_TYPES_OF_CATEGORY[i], k in TECHNOLOGIES_OF_END_USES_TYPE [j]} k;
 set RE_RESOURCES within RESOURCES; # List of RE resources (including wind hydro solar), used to compute the RE share
+set RE_BE_RESOURCES within RESOURCES; # List of BE RE resources (including wind hydro solar), used to compute the BE RE share -> RE that are generated in Belgium (do not take into account imported RE such as synthetic fuels)
 set V2G within TECHNOLOGIES;   # EVs which can be used for vehicle-to-grid (V2G).
 set EVs_BATT   within STORAGE_TECH; # specific battery of EVs
 set EVs_BATT_OF_V2G {V2G}; # Makes the link between batteries of EVs and the V2G technology
@@ -83,6 +84,7 @@ param end_uses_demand_year {END_USES_INPUT, SECTORS} >= 0 default 0; # end_uses_
 param end_uses_input {i in END_USES_INPUT} := sum {s in SECTORS} (end_uses_demand_year [i,s]); # end_uses_input (Figure 1.4) [GWh]: total demand for each type of end-uses across sectors (yearly energy) as input from the demand-side model. [Mpkm] or [Mtkm] for passenger or freight mobility.
 param i_rate > 0; # discount rate [-]: real discount rate
 param re_share_primary >= 0; # re_share [-]: minimum share of primary energy coming from RE
+param re_be_share_primary >= 0; # re_be_share [-]: minimum share of primary energy coming from Belgium RE (solar, wind, ...) -> RE that are generated in Belgium (do not take into account imported RE such as synthetic fuels)
 param gwp_limit >= 0, default 'Infinity';    # [ktCO2-eq./year] maximum gwp emissions allowed.
 param einv_limit >= 0, default 'Infinity'; # [GWh/year] maximum system energy invested allowed
 param cost_limit >= 0, default 'Infinity'; # [Meuros/year] maximum system cost allowed
@@ -440,8 +442,6 @@ subject to Minimum_GWP_reduction :
 # [Eq. XX]  constraint to reduce the GWP subject to Minimum_gwp_reduction :
 subject to Minimum_einv_reduction :
 	TotalEinv <= einv_limit;
-	
-	
 
 # [Eq. 2.35] Minimum share of RE in primary energy supply
 subject to Minimum_RE_share :
@@ -467,6 +467,12 @@ subject to max_elec_import {h in HOURS, td in TYPICAL_DAYS}:
 subject to solar_area_limited :
 	F["PV"] / power_density_pv + ( F ["DEC_SOLAR"] + F ["DHN_SOLAR"] ) / power_density_solar_thermal <= solar_area;
 
+######## NEW CONSTRAINT: to take into account a minimum of domestic RE: SOLAR, WIND, ...
+# [Eq. 2.40]
+subject to Minimum_BE_RE_share :
+	sum {j in RE_BE_RESOURCES, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} F_t [j, h, td] * t_op [h, td]
+	>=	re_be_share_primary *
+	sum {j in RESOURCES, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} F_t [j, h, td] * t_op [h, td]	;
 
 ##########################
 ### OBJECTIVE FUNCTION ###

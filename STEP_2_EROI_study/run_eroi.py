@@ -43,11 +43,11 @@ def load_config(config_fn: str):
     return cfg
 
 
-def energy_final(case_study_dir: str, col:str):
+def get_FEC_from_sankey(case_study_dir: str, col:str):
     """
-    Run ES using Python.
+    Compute the FEC from the Sankey.
     :param case_study_dir: path to the case study directory.
-    Return the final energy demand (TWh) by use sector: 'Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand', 'Freight', 'Mob priv', 'Heat HT'
+    Return the final energy consumption (FEC) (TWh) by use sector: 'Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand', 'Freight', 'Mob priv', 'Heat HT'
     """
     df_sankey = pd.read_csv(f"{case_study_dir}/output/sankey/input2sankey.csv", index_col=0, sep=',')
     ef_list = ['Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand',
@@ -57,6 +57,82 @@ def energy_final(case_study_dir: str, col:str):
         ef_final_val.append(df_sankey[df_sankey['target'] == final_demand]['realValue'].sum())
 
     return pd.DataFrame(index=ef_list, data=ef_final_val, columns=[col])
+
+
+def get_GWP_op_ini(dir_name: str):
+    """
+    Get the GWP_op initial.
+    :param dir_name: directory name.
+    :return GWP_op initial into a pd.DataFrames.
+    """
+    cs = f"{config['case_studies_dir']}/{dir_name + '/run_100'}"
+    gwp = pd.read_csv(f"{cs}/output/gwp_breakdown.csv", index_col=0, sep=',')
+
+    # FIXME # sum only of the GWP operation -> maybe to adapt to take into account the GWP construction
+    return gwp.sum()['GWP_op']
+
+def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict):
+    """
+    Minimize the Einv for several GWP_tot <= p*GWP_op_ini with p a percentage.
+    :param range_val: range of GWP constrained values.
+    :param dir_name: directory name.
+    :param GWP_op_ini: GWP_op value computed by minimizing the energy invested without contraint on the GWP_tot.
+    :param config: configuration file.
+    """
+    for gwp_tot_max, cs_name in zip(np.asarray([i for i in range_val]) * GWP_op_ini / 100,
+                                    ['run_' + str(i) for i in range_val]):
+        print('Case in progress %s' % (cs_name))
+        cs = f"{config['case_studies_dir']}/{dir_name + '/' + cs_name}"
+        # Update the GWP limit
+        config["system_limits"]['GWP_limit'] = gwp_tot_max
+        # Saving data to .dat files into the config['temp_dir'] directory
+        estd_out_path = f"{config['temp_dir']}/ESTD_data.dat"
+        es.print_estd(out_path=estd_out_path, data=all_data,
+                      system_limits=config["system_limits"])
+        td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
+        es.print_12td(out_path=td12_out_path, time_series=all_data['Time_series'],
+                      step1_output_path=config["step1_output"])
+
+        # Running EnergyScope
+        run_fn = f"{config['ES_path']}/master.run"
+        es.run_energyscope(cs, run_fn, config['AMPL_path'], config['temp_dir'])
+
+        # Example to print the sankey from this script
+        output_dir = f"{config['case_studies_dir']}/{dir_name + '/' + cs_name}/output/"
+        es.drawSankey(path=f"{output_dir}/sankey")
+
+def post_treatment(range_val, dir_name: str, GWP_op_ini: float):
+    """
+    Postreat data to get the EROI, FEC, and Einv.
+    :param range_val: range of GWP constrained values.
+    :param dir_name: directory name.
+    :param GWP_op_ini: GWP_op value computed by minimizing the energy invested without contraint on the GWP_tot.
+    :return: EROI, FEC, and Einv in pd.DataFrames.
+    """
+    eroi_list = []
+    einv_list = []
+    df_ef_list = []
+    for gwp_limit, cs_name in zip(np.asarray([i for i in range_val]) * GWP_op_ini / 100, ['run_' + str(i) for i in range_val]):
+        cs = f"{config['case_studies_dir']}/{dir_name + '/' + cs_name}"
+
+        # Compute FEC: final energy consumption (TWh)
+        ef_temp = get_FEC_from_sankey(case_study_dir=cs, col=cs_name)
+        df_ef_list.append(ef_temp)
+
+        # Compute the EROI
+        ef_temp_tot = ef_temp.sum()
+        einv_temp = get_total_einv(cs) / 1000  # TWh
+        einv_list.append(einv_temp)
+        eroi_temp = ef_temp_tot / einv_temp
+        eroi_list.append(eroi_temp.values[0])
+        print('case %s Einv %.1f Energy demand %.1f EROI %.2f GWP op MtC02eq %.2f' % (
+        cs_name, einv_temp, ef_temp_tot, eroi_temp, gwp_limit))
+
+    df_ef = pd.concat(df_ef_list, axis=1)
+    df_eroi = pd.DataFrame(index=[i for i in range_val], data=eroi_list, columns=['EROI'])
+    df_inv = pd.DataFrame(index=[i for i in range_val], data=einv_list, columns=['Einv'])
+
+    return df_ef, df_eroi, df_inv
 
 if __name__ == '__main__':
 
@@ -79,7 +155,7 @@ if __name__ == '__main__':
 
     # Saving data to .dat files into the config['temp_dir'] directory
     estd_out_path = f"{config['temp_dir']}/ESTD_data.dat"
-    es.print_estd(out_path=estd_out_path, data=all_data, import_capacity=config["import_capacity"], system_limits=config["system_limits"])
+    es.print_estd(out_path=estd_out_path, data=all_data, system_limits=config["system_limits"])
     td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
     # WARNING
     if not os.path.isfile(config["step1_output"]):
@@ -95,103 +171,102 @@ if __name__ == '__main__':
     # Minimize the Einv with the GWP that is not constrained
     # -------------------------------------------------
 
+    dir_name = 'test'
+
     # Running EnergyScope
-    cs = f"{config['case_studies_dir']}/{config['case_study_name']}"
+    cs = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}"
     run_fn = f"{config['ES_path']}/master.run"
     es.run_energyscope(cs, run_fn, config['AMPL_path'], config['temp_dir'])
 
-    # Example to print the sankey from this script
-    output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}/output/"
+    # Print the Sankey (html)
+    output_dir = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}/output/"
     es.drawSankey(path=f"{output_dir}/sankey")
 
-    # GWP op
-    cs = f"{config['case_studies_dir']}/{'run_100'}"
-    gwp = pd.read_csv(f"{cs}/output/gwp_breakdown.csv", index_col=0, sep=',')
-    gwp_op_tot = gwp.sum()['GWP_op']
+    # Compute the FEC: final energy consumption (TWh)
+    ef = get_FEC_from_sankey(case_study_dir=cs, col=config['case_study_name'])
+    # Compute the EROI
+    ef_tot = ef.sum()
+    einv = get_total_einv(cs) / 1000  # TWh
+    eroi = ef_tot / einv
+    print('EROI %.2f' % (eroi))
 
     # -----------------------------------------------
     # Minimize the Einv for several GWP maximum values
     # -----------------------------------------------
-    for gwp_limit, cs_name in zip(np.asarray([i for i in range(95, 0, -5)]) * gwp_op_tot/100,['run_'+str(i) for i in range(95, 0, -5)]):
-        print('Case in progess %s' %(cs_name))
-        cs = f"{config['case_studies_dir']}/{cs_name}"
-        # Update the GWP limit
-        config["system_limits"]['GWP_limit'] = gwp_limit
-        # Saving data to .dat files into the config['temp_dir'] directory
-        estd_out_path = f"{config['temp_dir']}/ESTD_data.dat"
-        es.print_estd(out_path=estd_out_path, data=all_data, import_capacity=config["import_capacity"],  system_limits=config["system_limits"])
-        td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
-        es.print_12td(out_path=td12_out_path, time_series=all_data['Time_series'], step1_output_path=config["step1_output"])
 
-        # Running EnergyScope
-        run_fn = f"{config['ES_path']}/master.run"
-        es.run_energyscope(cs, run_fn, config['AMPL_path'], config['temp_dir'])
-
-        # Example to print the sankey from this script
-        output_dir = f"{config['case_studies_dir']}/{cs_name}/output/"
-        es.drawSankey(path=f"{output_dir}/sankey")
+    GWP_op_ini = get_GWP_op_ini(dir_name=dir_name)
+    range_val = range(95, 0, -5)
+    loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config)
 
     # -----------------------------------------------
-    # Post treatment
+    # Post treatment: compare two case studies
     # -----------------------------------------------
-    eroi_list = []
-    einv_list = []
-    df_ef_list = []
-    for gwp_limit, cs_name in zip(np.asarray([i for i in range(100, 0, -5)]) * gwp_op_tot/100,['run_'+str(i) for i in range(100, 0, -5)]):
-        cs = f"{config['case_studies_dir']}/{cs_name}"
 
-        # Compute the energy final demand
-        ef_temp = energy_final(case_study_dir=cs, col=cs_name)
-        df_ef_list.append(ef_temp)
+    # GWP op
+    dir_name_0 = 're_be_0'
+    dir_name_30 = 're_be_30'
+    GWP_op_ini_0 = get_GWP_op_ini(dir_name=dir_name_0)
+    GWP_op_ini_30 = get_GWP_op_ini(dir_name=dir_name_30)
 
-        # Compute the EROI
-        ef_temp_tot = ef_temp.sum()
-        einv_temp = get_total_einv(cs) / 1000  # TWh
-        einv_list.append(einv_temp)
-        eroi_temp = ef_temp_tot / einv_temp
-        eroi_list.append(eroi_temp.values[0])
-        print('case %s Einv %.1f Energy demand %.1f EROI %.2f GWP op MtC02eq %.2f' %(cs_name, einv_temp, ef_temp_tot, eroi_temp, gwp_limit))
 
-    df_ef = pd.concat(df_ef_list, axis=1)
-    df_eroi = pd.DataFrame(index=[i for i in range(100, 0, -5)], data=eroi_list, columns=['EROI'])
-    df_inv = pd.DataFrame(index=[i for i in range(100, 0, -5)], data=einv_list, columns=['Einv'])
+    range_val_0 = range(100, 0, -5)
+    range_val_30 = range(100, 5, -5)
+    df_ef_0, df_eroi_0, df_inv_0, = post_treatment(range_val=range_val_0, dir_name=dir_name_0, GWP_op_ini=GWP_op_ini_0)
+    df_ef_30, df_eroi_30, df_inv_30, = post_treatment(range_val=range_val_30, dir_name=dir_name_30, GWP_op_ini=GWP_op_ini_30)
 
     # -----------------------------------------------
     # PLOT
     # -----------------------------------------------
-    make_dir(cwd+'/export/')
+    dir_name = 'comparison'
+    make_dir(cwd+'/export/'+dir_name+'/')
+
+    range_val = range_val_0
 
     # Plot EROI vs GWP
     plt.figure()
-    plt.plot([i for i in range(100, 0, -5)], df_eroi.values, '-Dk', linewidth=3, markersize=10, label='EROI=Ef/Einv')
+    plt.plot([i for i in range_val_0], df_eroi_0.values, '-Dk', linewidth=3, markersize=10, label='EROI BE RE share 0%')
+    plt.plot([i for i in range_val_30], df_eroi_30.values, '-Db', linewidth=3, markersize=10, label='EROI BE RE share 30%')
     plt.gca().invert_xaxis()
-    plt.xticks([i for i in range(100, 0, -5)])
+    plt.xticks([i for i in range_val])
     plt.ylabel('(-)')
     plt.xlabel('GWP op (%)')
+    plt.legend()
     plt.tight_layout()
-    plt.savefig(cwd+'/export/eroi.pdf')
+    plt.savefig(cwd+'/export/'+dir_name+'/eroi.pdf')
     plt.show()
 
     # Plot Total final energy demand vs GWP
     plt.figure()
-    plt.plot([i for i in range(100, 0, -5)], df_ef.sum().values, '-Db', linewidth=3, markersize=10, label='Ef')
-    plt.plot([i for i in range(100, 0, -5)], df_inv.values, '-Dr', linewidth=3, markersize=10, label='Einv')
+    plt.plot([i for i in range_val_0], df_ef_0.sum().values, '-Db', linewidth=3, markersize=10, label='Ef BE RE share 0%')
+    plt.plot([i for i in range_val_0], df_inv_0.values, '-Dr', linewidth=3, markersize=10, label='Einv BE RE share 0%')
+    plt.plot([i for i in range_val_30], df_ef_30.sum().values, '-Dg', linewidth=3, markersize=10, label='Ef BE RE share 30%')
+    plt.plot([i for i in range_val_30], df_inv_30.values, '-Dy', linewidth=3, markersize=10, label='Einv BE RE share 30%')
     plt.gca().invert_xaxis()
-    plt.xticks([i for i in range(100, 0, -5)])
+    plt.xticks([i for i in range_val])
     plt.ylabel('(TWh)')
     plt.xlabel('GWP op (%)')
     plt.legend()
     plt.tight_layout()
-    plt.savefig(cwd+'/export/final-energy-demand.pdf')
+    plt.savefig(cwd+'/export/'+dir_name+'/final-energy-demand.pdf')
     plt.show()
 
     # Bar plot of the final energy demand
-    df_ef.columns = [str(i) for i in range(100, 0, -5)]
+    df_ef_0.columns = [str(i) for i in range_val_0]
     plt.figure()
-    df_ef[['100', '50', '25', '5']].transpose().plot.bar()
+    df_ef_0[['100', '50', '25', '10']].transpose().plot.bar()
     plt.ylabel('(TWh)')
     plt.xlabel('GWP op (%)')
     plt.legend()
     plt.tight_layout()
-    plt.savefig(cwd+'/export/final-energy-demand-share.pdf')
+    plt.savefig(cwd+'/export/'+dir_name+'/final-energy-demand-share-0.pdf')
+    plt.show()
+
+    df_ef_30.columns = [str(i) for i in range_val_30]
+    plt.figure()
+    df_ef_30[['100', '50', '25', '10']].transpose().plot.bar()
+    plt.ylabel('(TWh)')
+    plt.xlabel('GWP op (%)')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(cwd+'/export/'+dir_name+'/final-energy-demand-share-30.pdf')
     plt.show()

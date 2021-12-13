@@ -47,8 +47,6 @@ system_limits:
     HEAT_LOW_T_DHN: 5.0E-02
   c_grid_extra: 367.8  # cost to reinforce the grid due to intermittent renewable energy penetration. See 2.2.2
 
-# [GW] Electrical interconnections with neighbouring countries
-import_capacity: 9.72
 # minimum capacities of some technologies
 Technologies:
   f_min:

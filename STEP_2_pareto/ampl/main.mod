@@ -467,3 +467,10 @@ subject to max_elec_import {h in HOURS, td in TYPICAL_DAYS}:
 # [Eq. 2.39] Limit surface area for solar
 subject to solar_area_limited :
 	F["PV"] / power_density_pv + ( F ["DEC_SOLAR"] + F ["DHN_SOLAR"] ) / power_density_solar_thermal <= solar_area;
+
+######## NEW CONSTRAINT: to take into account a minimum of domestic RE: SOLAR, WIND, ...
+# [Eq. 2.40]
+subject to Minimum_BE_RE_share :
+	sum {j in RE_BE_RESOURCES, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} F_t [j, h, td] * t_op [h, td]
+	>=	re_be_share_primary *
+	sum {j in RESOURCES, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} F_t [j, h, td] * t_op [h, td]	;

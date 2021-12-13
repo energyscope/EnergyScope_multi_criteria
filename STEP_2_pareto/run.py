@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
         # Saving .dat files
         estd_out_path = f"{config['temp_dir']}/ESTD_data.dat"
-        es.print_estd(estd_out_path, all_data, config["import_capacity"], config["GWP_limit"])
+        es.print_estd(estd_out_path, all_data, config["system_limits"])
         td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
         es.print_12td(td12_out_path, all_data['Time_series'], config["step1_output"])
 
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         # Printing the .dat files for the optimisation problem
         td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
         estd_out_path = f"{config['temp_dir']}/ESTD_data_epsilon.dat"
-        es.print_estd(estd_out_path, all_data, config["import_capacity"], config["GWP_limit"])
+        es.print_estd(estd_out_path, all_data, config["system_limits"])
         # Add specific elements
         es.newline(estd_out_path)
         es.print_param("TOTAL_COST_OP", cost, "Optimal cost of the system", estd_out_path)
@@ -124,7 +124,7 @@ if __name__ == '__main__':
         # Printing the .dat files for the optimisation problem
         td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
         estd_out_path = f"{config['temp_dir']}/ESTD_data_wind.dat"
-        es.print_estd(estd_out_path, all_data, config["import_capacity"], config["GWP_limit"])
+        es.print_estd(estd_out_path, all_data, config["system_limits"])
         # Add specific elements
         es.newline(estd_out_path)
         es.print_param("TOTAL_COST_OP", cost, "Optimal cost of the system", estd_out_path)

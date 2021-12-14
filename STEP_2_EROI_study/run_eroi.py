@@ -134,6 +134,56 @@ def post_treatment(range_val, dir_name: str, GWP_op_ini: float):
 
     return df_ef, df_eroi, df_inv
 
+def compute_einv_details(cs: str, energyscope_dir: str, all_data: dict):
+    """
+    Compute the Einv by RESSOURCES and TECHNOLOGIES, it details the breakdown by subcategories of RESSOURCES and categories of TECHNOLOGIES.
+    :param cs: case study path
+    :param energyscope_dir: energy scopre directory
+    :param all_data: the data into a dict of pd.DataFrames.
+    :return: the data into pd.DataFrames
+    """
+    # Load Einv data
+    df_einv = pd.read_csv(f"{cs}/output/einv_breakdown.csv", index_col=0)
+    # Define the RESSOURCES and TECHNOLOGIES lists
+    RESSOURCES = list(all_data['Resources'].index)
+    TECHNOLOGIES = list(all_data['Technologies'].index)
+    df_inv_res = df_einv.loc[RESSOURCES].copy()
+    df_inv_tech = df_einv.loc[TECHNOLOGIES].copy()
+    # Get the category and subcategory indexes
+    df_aux_res = pd.read_csv(energyscope_dir + "/Data/User_data/aux_resources.csv", index_col=0)
+    df_aux_tech = pd.read_csv(energyscope_dir + "/Data/User_data/aux_technologies.csv", index_col=0)
+
+    # 1. Compute the Einv by subcategory of ressources
+    res_subcat = list(df_aux_res['Subcategory'].values)
+    res_subcat = list(dict.fromkeys(res_subcat))  # remove duplicate
+
+    res_by_subcat = dict()
+    for sub_cat in res_subcat:
+        res_by_subcat[sub_cat] = list(df_aux_res['Subcategory'][df_aux_res['Subcategory'] == sub_cat].index)
+
+    einv_res_by_subcat = dict()
+    for sub_cat in res_by_subcat.keys():
+        einv_res_by_subcat[sub_cat] = df_inv_res.loc[res_by_subcat[sub_cat]]
+    df_inv_res_by_subcat = pd.DataFrame(
+        data=[einv_res_by_subcat[sub_cat].sum().sum() for sub_cat in einv_res_by_subcat.keys()],
+        index=einv_res_by_subcat.keys(), columns=['RESSOURCES'])
+
+    # 2. Compute the Einv by category of technologies
+    tech_cat = list(df_aux_tech['Category'].values)
+    tech_cat = list(dict.fromkeys(tech_cat))  # remove duplicate
+
+    tech_by_cat = dict()
+    for cat in tech_cat:
+        tech_by_cat[cat] = list(df_aux_tech['Category'][df_aux_tech['Category'] == cat].index)
+
+    einv_tech_by_cat = dict()
+    for cat in tech_by_cat.keys():
+        einv_tech_by_cat[cat] = df_inv_tech.loc[tech_by_cat[cat]]
+    df_inv_tech_by_cat = pd.DataFrame(data=[einv_tech_by_cat[cat].sum().sum() for cat in einv_tech_by_cat.keys()],
+                                      index=einv_tech_by_cat.keys(), columns=['TECHNOLOGIES'])
+
+    return df_inv_res_by_subcat, df_inv_tech_by_cat
+
 if __name__ == '__main__':
 
     # Get the current working directory
@@ -171,7 +221,7 @@ if __name__ == '__main__':
     # Minimize the Einv with the GWP that is not constrained
     # -------------------------------------------------
 
-    dir_name = 'test'
+    dir_name = 're_be_0'
 
     # Running EnergyScope
     cs = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}"
@@ -189,6 +239,13 @@ if __name__ == '__main__':
     einv = get_total_einv(cs) / 1000  # TWh
     eroi = ef_tot / einv
     print('EROI %.2f' % (eroi))
+
+    # Compute Einv by ressources and technologies
+    df_inv_res_by_subcat, df_inv_tech_by_cat = compute_einv_details(cs=cs, energyscope_dir=config['energyscope_dir'], all_data=all_data)
+
+    # TODO: plot of df_inv_res_by_subcat and df_inv_tech_by_cat
+
+    # TODO: breakdown primary energy by ressource: natural gas, solar, wind, RE gas import
 
     # -----------------------------------------------
     # Minimize the Einv for several GWP maximum values

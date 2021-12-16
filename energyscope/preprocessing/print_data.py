@@ -15,7 +15,7 @@ import pandas as pd
 import csv
 
 
-def ampl_syntax(df, comment):
+def ampl_syntax(df, comment=''):
     # adds ampl syntax to df
     df2 = df.copy()
     df2.rename(columns={df2.columns[df2.shape[1] - 1]: str(df2.columns[df2.shape[1] - 1]) + ' ' + ':= ' + comment},

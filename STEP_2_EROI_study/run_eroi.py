@@ -101,52 +101,6 @@ def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict):
         output_dir = f"{config['case_studies_dir']}/{dir_name + '/' + cs_name}/output/"
         es.drawSankey(path=f"{output_dir}/sankey")
 
-def post_treatment(range_val, dir_name: str, GWP_op_ini: float, all_data: dict):
-    """
-    Postreat data to get the EROI, FEC, and Einv.
-    :param range_val: range of GWP constrained values.
-    :param dir_name: directory name.
-    :param GWP_op_ini: GWP_op value computed by minimizing the energy invested without contraint on the GWP_tot.
-    :param all_data: the data into a dict of pd.DataFrames.
-    :return: EROI, FEC, and Einv in pd.DataFrames.
-    """
-    eroi_list = []
-    einv_list = []
-    df_ef_list = []
-    einv_res_by_subcat_list = []
-    einv_tech_by_cat_list = []
-    for gwp_limit, cs_name in zip(np.asarray([i for i in range_val]) * GWP_op_ini / 100, ['run_' + str(i) for i in range_val]):
-        cs = f"{config['case_studies_dir']}/{dir_name + '/' + cs_name}"
-
-        # Compute FEC: final energy consumption (TWh)
-        ef_temp = get_FEC_from_sankey(case_study_dir=cs, col=cs_name)
-        df_ef_list.append(ef_temp)
-
-        # Compute the EROI
-        ef_temp_tot = ef_temp.sum()
-        einv_temp = get_total_einv(cs) / 1000  # TWh
-        einv_list.append(einv_temp)
-        eroi_temp = ef_temp_tot / einv_temp
-        eroi_list.append(eroi_temp.values[0])
-        print('case %s Einv %.1f Energy demand %.1f EROI %.2f GWP op MtC02eq %.2f' % (
-        cs_name, einv_temp, ef_temp_tot, eroi_temp, gwp_limit))
-
-        df_inv_res_by_subcat, df_inv_tech_by_cat = compute_einv_details(cs=cs,
-                                                                        energyscope_dir=config['energyscope_dir'],
-                                                                        all_data=all_data)
-        einv_res_by_subcat_list.append(df_inv_res_by_subcat)
-        einv_tech_by_cat_list.append(df_inv_tech_by_cat)
-
-
-    df_ef = pd.concat(df_ef_list, axis=1)
-    df_einv_res_by_subcat = pd.concat(einv_res_by_subcat_list, axis=1) / 1000 # TWh
-    df_einv_res_by_subcat.columns = [i for i in range_val]
-    df_einv_tech_by_cat = pd.concat(einv_tech_by_cat_list, axis=1) / 1000 # TWh
-    df_einv_tech_by_cat.columns = [i for i in range_val]
-    df_eroi = pd.DataFrame(index=[i for i in range_val], data=eroi_list, columns=['EROI'])
-    df_inv = pd.DataFrame(index=[i for i in range_val], data=einv_list, columns=['Einv'])
-
-    return df_ef, df_eroi, df_inv, df_einv_res_by_subcat, df_einv_tech_by_cat
 
 def compute_einv_details(cs: str, energyscope_dir: str, all_data: dict):
     """
@@ -232,205 +186,40 @@ if __name__ == '__main__':
     es.print_run(run_fn, mod_fns, [estd_out_path, td12_out_path], config['options'], f"{config['temp_dir']}/output")
 
     # --------------------------------------------------
-    # Minimize the Einv with the GWP that is not constrained
+    # Min Einv
+    # GWP_tot is not constrained
+    # -> allows to compute GWP_op^i
     # -------------------------------------------------
 
     dir_name = 're_be_0'
 
     # Running EnergyScope
     cs = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}"
-    # run_fn = f"{config['ES_path']}/master.run"
-    # es.run_energyscope(cs, run_fn, config['AMPL_path'], config['temp_dir'])
-    #
-    # # Print the Sankey (html)
-    # output_dir = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}/output/"
-    # es.drawSankey(path=f"{output_dir}/sankey")
+    run_fn = f"{config['ES_path']}/master.run"
+    es.run_energyscope(cs, run_fn, config['AMPL_path'], config['temp_dir'])
 
-    # Compute the FEC: final energy consumption (TWh)
+    # Print the Sankey (html)
+    output_dir = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}/output/"
+    es.drawSankey(path=f"{output_dir}/sankey")
+
+    ################################################
+    # Compute the EROI "final":
+    # -> compute the FEC=Eout from the SANKEY (TWh)
+    # -> get the Einv
+    # -> EROI "final" = Eout/Einv with Eout = FEC
+    # Note: Eout could be also defined as: Eout = EUD * conversion_factor
+    ################################################
     ef = get_FEC_from_sankey(case_study_dir=cs, col=config['case_study_name'])
-    # Compute the EROI
     ef_tot = ef.sum()
     einv = get_total_einv(cs) / 1000  # TWh
     eroi = ef_tot / einv
-    print('EROI %.2f' % (eroi))
-
-    # Compute Einv by ressources and technologies
-    df_inv_res_by_subcat, df_inv_tech_by_cat = compute_einv_details(cs=cs, energyscope_dir=config['energyscope_dir'], all_data=all_data)
-
-    # TODO: breakdown primary energy by ressource: natural gas, solar, wind, RE gas import
-    # Primary Energy = resource in the YEAR_BALANCE -> filter by resource in the index column
-    df_year_balance = pd.read_csv(f"{cs}/output/year_balance.csv", index_col=0).drop(['Unnamed: 30'], axis=1)
-    RESOURCES = list(all_data['Resources'].index)
-    df_primary_energy = df_year_balance.loc[RESOURCES].sum() / 1000 # TWh
-    # Remove CO2 ?
-    # Est ce que ça correspond forcément à la partie gauche du SANKEY ?
-
-    # TODO: Eout = FEC computation from YEAR_BALANCE.csv
-    df_year_balance_without_eud = df_year_balance.drop('END_USES_DEMAND', axis=0).copy()
-    df_eud = df_year_balance.loc['END_USES_DEMAND'].copy()
-    for layer in df_year_balance_without_eud.columns:
-        print('%s %.2f %.2f' %(layer, df_year_balance_without_eud[layer].sum(), df_eud.loc[layer]))
-
-
-    # # -----------------------------------------------
-    # # Minimize the Einv for several GWP maximum values
-    # # -----------------------------------------------
-    #
-    # GWP_op_ini = get_GWP_op_ini(dir_name=dir_name)
-    # range_val = range(95, 0, -5)
-    # loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config)
+    print('EROI "final" %.2f' % (eroi))
 
     # -----------------------------------------------
-    # Post treatment: compare two case studies
+    # Min Einv
+    # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i the value obtained by Min Einv without contraint on GWP_tot
     # -----------------------------------------------
 
-    # GWP op
-    dir_name_0 = 're_be_0'
-    dir_name_30 = 're_be_30'
-    GWP_op_ini_0 = get_GWP_op_ini(dir_name=dir_name_0)
-    GWP_op_ini_30 = get_GWP_op_ini(dir_name=dir_name_30)
-
-
-    range_val_0 = range(100, 0, -5)
-    range_val_30 = range(100, 5, -5)
-    df_Eout_0, df_eroi_0, df_inv_0, df_einv_res_by_subcat_0, df_einv_tech_by_cat_0 = post_treatment(range_val=range_val_0, dir_name=dir_name_0, GWP_op_ini=GWP_op_ini_0, all_data=all_data)
-    df_Eout_30, df_eroi_30, df_inv_30, df_einv_res_by_subcat_30, df_einv_tech_by_cat_30 = post_treatment(range_val=range_val_30, dir_name=dir_name_30, GWP_op_ini=GWP_op_ini_30, all_data=all_data)
-
-    ####################################################################################################################
-    # -----------------------------------------------
-    # PLOT
-    # -----------------------------------------------
-    ####################################################################################################################
-    dir_name = 'comparison'
-    make_dir(cwd+'/export/'+dir_name+'/')
-
-    range_val = range_val_0
-
-    ####################################################################################################################
-    # Plot EROI vs GWP
-    plt.figure()
-    plt.plot([i for i in range_val_0], df_eroi_0.values, '-Dk', linewidth=3, markersize=10, label='EROIf: RE share 0%')
-    plt.plot([i for i in range_val_30], df_eroi_30.values, '-Db', linewidth=3, markersize=10, label='EROIf: RE share 30%')
-    plt.gca().invert_xaxis()
-    plt.xticks([i for i in range_val])
-    plt.ylabel('(-)')
-    plt.xlabel('GWP op (%)')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/eroi.pdf')
-    plt.show()
-
-    ####################################################################################################################
-    # Plot Einv and Eout = Ef = FEC vs GWP
-    plt.figure()
-    plt.plot([i for i in range_val_0], df_Eout_0.sum().values, '-Db', linewidth=3, markersize=10, label='Eout: RE share 0%')
-    plt.plot([i for i in range_val_0], df_inv_0.values, '-Dr', linewidth=3, markersize=10, label='Einv: RE share 0%')
-    plt.plot([i for i in range_val_30], df_Eout_30.sum().values, '-Dg', linewidth=3, markersize=10, label='Eout: RE share 30%')
-    plt.plot([i for i in range_val_30], df_inv_30.values, '-Dy', linewidth=3, markersize=10, label='Einv: RE share 30%')
-    plt.gca().invert_xaxis()
-    plt.xticks([i for i in range_val])
-    plt.ylabel('(TWh)')
-    plt.xlabel('GWP op (%)')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/eout-einv.pdf')
-    plt.show()
-
-    ####################################################################################################################
-    # Bar plot of the final energy demand = Ef = Eout
-    df_Eout_0.columns = [str(i) for i in range_val_0]
-    plt.figure()
-    df_Eout_0[['100', '50', '25', '10']].transpose().plot.bar()
-    plt.ylabel('(TWh)')
-    plt.xlabel('GWP op (%)')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/eout-share-0.pdf')
-    plt.show()
-
-    df_Eout_30.columns = [str(i) for i in range_val_30]
-    plt.figure()
-    df_Eout_30[['100', '50', '25', '10']].transpose().plot.bar()
-    plt.ylabel('(TWh)')
-    plt.xlabel('GWP op (%)')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/eout-share-30.pdf')
-    plt.show()
-
-    ####################################################################################################################
-    # Plot Einv breakdown by subcategories and categories of ressources and technologies, respectively.
-    # Einv = Einv_operation + Einv_construction
-    # RESOURCES -> use Einv only for the operation (0 for construction)
-    # TECHNOLOGIES -> use Einv only for the construction (0 for operation)
-
-    # 1. RESOURCES subcategories: Other non-renewable, Fossil fuel, Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
-    # 1.1 Lines
-    plt.figure()
-    for subcat in df_einv_res_by_subcat_0.index:
-        plt.plot(list(df_einv_res_by_subcat_0.columns), df_einv_res_by_subcat_0.loc[subcat].values, 'D', linewidth=3, markersize=5, label=subcat)
-    plt.gca().invert_xaxis()
-    plt.xticks([i for i in range_val])
-    plt.ylabel('Einv operation (TWh)')
-    plt.xlabel('GWP op (%)')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-res-0.pdf')
-    plt.show()
-
-    # 1.2 Stacked bar
-    # RE share: 0%
-    plt.figure()
-    df_einv_res_by_subcat_0.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('GWP op (%)')
-    plt.ylim(0, 160)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-res-0-stacked-bar.pdf')
-    plt.show()
-    # RE share: 30%
-    plt.figure()
-    df_einv_res_by_subcat_30[5] = 0 # because no data for 5 % of GWP ini
-    df_einv_res_by_subcat_30.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('GWP op (%)')
-    plt.ylim(0, 160)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-res-30-stacked-bar.pdf')
-    plt.show()
-
-
-    # 2. TECHNOLOGIES categories: electricity, mobility, heat, ...
-    # WARNING: the energy invested for technologies is 0 for the operation part
-    plt.figure()
-    for subcat in df_einv_tech_by_cat_0.index:
-        plt.plot(list(df_einv_tech_by_cat_0.columns), df_einv_tech_by_cat_0.loc[subcat].values, 'D', linewidth=3, markersize=5, label=subcat)
-    plt.gca().invert_xaxis()
-    plt.xticks([i for i in range_val])
-    plt.ylabel('Einv construction (TWh)')
-    plt.xlabel('GWP op (%)')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-tech-0.pdf')
-    plt.show()
-
-    # 2. with stacked bar
-    # RE share: 0%
-    plt.figure()
-    df_einv_tech_by_cat_0.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('GWP op (%)')
-    plt.ylim(0, 35)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-tech-0-stacked-bar.pdf')
-    plt.show()
-    # RE share: 30%
-    plt.figure()
-    df_einv_tech_by_cat_30[5] = 0 # because no data for 5 % of GWP ini
-    df_einv_tech_by_cat_30.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('GWP op (%)')
-    plt.ylim(0, 35)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-tech-30-stacked-bar.pdf')
-    plt.show()
+    GWP_op_ini = get_GWP_op_ini(dir_name=dir_name)
+    range_val = range(95, 0, -5)
+    loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config)

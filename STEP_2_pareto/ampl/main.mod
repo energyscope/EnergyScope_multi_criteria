@@ -34,6 +34,7 @@ set END_USES_INPUT; # Types of demand (end-uses). Input to the model
 set END_USES_CATEGORIES; # Categories of demand (end-uses): electricity, heat, mobility
 set END_USES_TYPES_OF_CATEGORY {END_USES_CATEGORIES}; # Types of demand (end-uses).
 set RESOURCES; # Resources: fuels (renewables and fossils) and electricity imports
+set RE_BE_RESOURCES; # Belgian resources
 set RES_IMPORT_CONSTANT within RESOURCES; # resources imported at constant power (e.g. NG, diesel, ...)
 set BIOFUELS within RESOURCES; # imported biofuels.
 set EXPORT within RESOURCES; # exported resources
@@ -83,6 +84,7 @@ param end_uses_demand_year {END_USES_INPUT, SECTORS} >= 0 default 0; # end_uses_
 param end_uses_input {i in END_USES_INPUT} := sum {s in SECTORS} (end_uses_demand_year [i,s]); # end_uses_input (Figure 1.4) [GWh]: total demand for each type of end-uses across sectors (yearly energy) as input from the demand-side model. [Mpkm] or [Mtkm] for passenger or freight mobility.
 param i_rate > 0; # discount rate [-]: real discount rate
 param re_share_primary >= 0; # re_share [-]: minimum share of primary energy coming from RE
+param re_be_share_primary >= 0; # re_share [-]: minimum share of primary energy coming from Belgian RE
 param gwp_limit >= 0, default Infinity;    # [ktCO2-eq./year] maximum gwp emissions allowed.
 param einv_limit >= 0, default Infinity; # [GWh/year] maximum system energy invested allowed
 param cost_limit >= 0, default Infinity; # [Meuros/year] maximum system cost allowed

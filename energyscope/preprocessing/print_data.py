@@ -9,13 +9,14 @@ Contains functions to read data in csv files and print it with AMPL syntax in ES
 import logging
 from pathlib import Path
 import os
+from typing import List
 
 import numpy as np
 import pandas as pd
 import csv
 
 
-def ampl_syntax(df, comment=''):
+def ampl_syntax(df: pd.DataFrame, comment: str = '') -> pd.DataFrame:
     # adds ampl syntax to df
     df2 = df.copy()
     df2.rename(columns={df2.columns[df2.shape[1] - 1]: str(df2.columns[df2.shape[1] - 1]) + ' ' + ':= ' + comment},
@@ -23,13 +24,13 @@ def ampl_syntax(df, comment=''):
     return df2
 
 
-def print_set(my_set, name, out_path):
+def print_set(my_set: List[str], name: str, out_path: str) -> None:
     with open(out_path, mode='a', newline='') as file:
         writer = csv.writer(file, delimiter='\t', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(['set ' + name + ' := \t' + '\t'.join(my_set) + ';'])
 
 
-def print_df(name, df, out_path):
+def print_df(name: str, df: pd.DataFrame, out_path: str) -> None:
     df.to_csv(out_path, sep='\t', mode='a', header=True, index=True, index_label=name, quoting=csv.QUOTE_NONE)
 
     with open(out_path, mode='a', newline='') as file:
@@ -37,13 +38,13 @@ def print_df(name, df, out_path):
         writer.writerow([';'])
 
 
-def newline(out_path):
+def newline(out_path: str) -> None:
     with open(out_path, mode='a', newline='') as file:
         writer = csv.writer(file, delimiter='\t', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
         writer.writerow([''])
 
 
-def print_param(name, param, comment, out_path):
+def print_param(name: str, param: float, comment: str, out_path: str) -> None:
     with open(out_path, mode='a', newline='') as file:
         writer = csv.writer(file, delimiter='\t', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
         if comment == '':
@@ -53,7 +54,7 @@ def print_param(name, param, comment, out_path):
 
 
 # Function to import the data from the CSV data files #
-def import_data(user_data_dir:str, developer_data_dir:str):
+def import_data(user_data_dir: str, developer_data_dir: str):
     """
     Dictionary with the DataFrames containing all the data in the form :
     {'Demand': eud, 'Resources': resources, 'Technologies': technologies,
@@ -98,7 +99,7 @@ def import_data(user_data_dir:str, developer_data_dir:str):
 
 
 # Function to print the ESTD_data.dat file
-def print_estd(out_path:str, data:dict, system_limits:dict):
+def print_estd(out_path: str, data: dict, system_limits: dict):
     """
     Prints the data into .dat file (out_path) with the right syntax for AMPL.
     :param out_path: path to the directory to save the .dat file
@@ -136,17 +137,20 @@ def print_estd(out_path:str, data:dict, system_limits:dict):
     # Economical inputs
     i_rate = system_limits['i_rate']  # [-]
     # Political inputs
-    re_share_primary = system_limits['re_share_primary'] # [-] Minimum RE share in primary consumption
-    re_be_share_primary = system_limits['re_be_share_primary'] # [-] Minimum domestic RE share (non-biomass and biomass RE such as SOLAR, WIND, HYDRO)
+    re_share_primary = system_limits['re_share_primary']  # [-] Minimum RE share in primary consumption
+    # [-] Minimum domestic RE share (non-biomass and biomass RE such as SOLAR, WIND, HYDRO)
+    re_be_share_primary = system_limits['re_be_share_primary']
     solar_area = system_limits['solar_area']  # [km^2]
     power_density_pv = system_limits['power_density_pv']  # PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2
-    power_density_solar_thermal = system_limits['power_density_solar_thermal']  # Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2
+    # Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2
+    power_density_solar_thermal = system_limits['power_density_solar_thermal']
 
     # Technologies shares
+    # TODO: change to technologies or technology ?
     share_mobility_public_min = system_limits['technologie_shares']['share_mobility_public_min']
     share_mobility_public_max = system_limits['technologie_shares']['share_mobility_public_max']
     share_freight_train_min = system_limits['technologie_shares']['share_freight_train_min']
-    share_freight_train_max =system_limits['technologie_shares']['share_freight_train_max']
+    share_freight_train_max = system_limits['technologie_shares']['share_freight_train_max']
     share_freight_road_min = system_limits['technologie_shares']['share_freight_road_min']
     share_freight_road_max = system_limits['technologie_shares']['share_freight_road_max']
     share_freight_boat_min = system_limits['technologie_shares']['share_freight_boat_min']
@@ -165,8 +169,10 @@ def print_estd(out_path:str, data:dict, system_limits:dict):
     a[1, 6] = 0.6
     state_of_charge_ev = pd.DataFrame(a, columns=np.arange(1, 25), index=['PHEV_BATT', 'BEV_BATT'])
     # Network
-    loss_network = {'ELECTRICITY': system_limits['loss_network']['ELECTRICITY'], 'HEAT_LOW_T_DHN': system_limits['loss_network']['HEAT_LOW_T_DHN']}
-    c_grid_extra = system_limits['c_grid_extra']  # cost to reinforce the grid due to intermittent renewable energy penetration. See 2.2.2
+    loss_network = {'ELECTRICITY': system_limits['loss_network']['ELECTRICITY'],
+                    'HEAT_LOW_T_DHN': system_limits['loss_network']['HEAT_LOW_T_DHN']}
+    # cost to reinforce the grid due to intermittent renewable energy penetration. See 2.2.2
+    c_grid_extra = system_limits['c_grid_extra']
 
     # Storage daily
     # TODO automatise
@@ -181,6 +187,7 @@ def print_estd(out_path:str, data:dict, system_limits:dict):
     RESOURCES = list(resources_simple.index)
     RES_IMPORT_CONSTANT = ['GAS', 'GAS_RE', 'H2_RE', 'H2']  # TODO automatise
     BIOFUELS = list(resources[resources.loc[:, 'Subcategory'] == 'Biofuel'].index)
+    # TODO: change to resources ?
     re_ressources = resources.loc[(resources['Category'] == 'Renewable'), :]
     RE_RESOURCES = list(re_ressources.index)
     re_be_non_biomass = re_ressources.loc[(re_ressources['Subcategory'] == 'Non-biomass'), :]
@@ -250,6 +257,7 @@ def print_estd(out_path:str, data:dict, system_limits:dict):
     # Adding AMPL syntax #
     # creating Batt_per_Car_df for printing
     batt_per_car_df = evs[['batt_per_car']]
+    # TODO: change to vehicle ?
     vehicule_capacity_df = evs[['vehicule_capacity']]
     state_of_charge_ev = ampl_syntax(state_of_charge_ev, '')
     loss_network_df = pd.DataFrame(data=loss_network.values(), index=loss_network.keys(), columns=[' '])
@@ -347,15 +355,17 @@ def print_estd(out_path:str, data:dict, system_limits:dict):
         writer.writerow(['## PARAMETERS presented in Table 2.	'])
     print_param('i_rate', i_rate, 'part [2.7.4]', out_path)
 
-    #FIXME: check if cost_limit is in bEUR/year and einv_limit is in GWh/year
+    # FIXME: check if cost_limit is in bEUR/year and einv_limit is in GWh/year
     print_param('gwp_limit', system_limits['GWP_limit'], 'gwp_limit [ktCO2-eq./year]: maximum GWP emissions', out_path)
     print_param('cost_limit', system_limits['COST_limit'], 'cost_limit [bEUR/year]: maximum system cost', out_path)
-    print_param('einv_limit', system_limits['EINV_limit'], 'einv_limit [GWh/year]: maximum system energy invested', out_path)
+    print_param('einv_limit', system_limits['EINV_limit'],
+                'einv_limit [GWh/year]: maximum system energy invested', out_path)
     print_param('re_share_primary', re_share_primary, 'Minimum RE share in primary consumption', out_path)
     print_param('re_be_share_primary', re_be_share_primary, 'Minimum BE RE share in primary consumption', out_path)
     print_param('solar_area', solar_area, '', out_path)
     print_param('power_density_pv', power_density_pv, 'PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2', out_path)
-    print_param('power_density_solar_thermal', power_density_solar_thermal, 'Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2', out_path)
+    print_param('power_density_solar_thermal', power_density_solar_thermal,
+                'Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2', out_path)
     newline(out_path)
     with open(out_path, mode='a', newline='') as file:
         writer = csv.writer(file, delimiter='\t', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
@@ -430,9 +440,10 @@ def print_estd(out_path:str, data:dict, system_limits:dict):
 
 
 # Function to print the ESTD_12TD.dat file from timeseries and STEP1 results #
-def print_12td(out_path:str, time_series:pd.DataFrame, step1_output_path:str, nbr_td=12):
+def print_12td(out_path: str, time_series: pd.DataFrame, step1_output_path: str, nbr_td: int = 12):
     """
     Create the ESTD_12TD.dat file from timeseries and STEP1 results.
+
     :param out_path: path to the directory to create the .dat file.
     :param time_series: pd.DataFrame with the timeseries of interest (PV, Solar, Wind, ...).
     :param step1_output_path: path to the output of STEP1 (typical days selected).
@@ -445,7 +456,7 @@ def print_12td(out_path:str, time_series:pd.DataFrame, step1_output_path:str, nb
     # for EUD timeseries
     eud_params = {'Electricity (%_elec)': 'param electricity_time_series :',
                   'Space Heating (%_sh)': 'param heating_time_series :',
-                  'Passanger mobility (%_pass)': 'param mob_pass_time_series :',
+                  'Passanger mobility (%_pass)': 'param mob_pass_time_series :',  # TODO: change to 'Passenger' ?
                   'Freight mobility (%_freight)': 'param mob_freight_time_series :'}
     # for resources timeseries that have only 1 tech linked to it
     res_params = {'PV': 'PV', 'Wind_onshore': 'WIND_ONSHORE', 'Wind_offshore': 'WIND_OFFSHORE',
@@ -463,7 +474,7 @@ def print_12td(out_path:str, time_series:pd.DataFrame, step1_output_path:str, nb
     sorted_td.reset_index(inplace=True)
     sorted_td.set_index(np.arange(1, nbr_td + 1), inplace=True)  # adding number of TD as index
 
-    # BUILDING T_H_TD MATRICE #
+    # BUILDING T_H_TD MATRIX #
     # generate T_H_TD
     td_and_hour_array = np.ones((24 * 365, 2))
     for i in range(365):
@@ -577,7 +588,7 @@ def print_12td(out_path:str, time_series:pd.DataFrame, step1_output_path:str, nb
         ts.to_csv(out_path, sep='\t', mode='a', header=True, index=True, index_label=s, quoting=csv.QUOTE_NONE)
         newline(out_path)
 
-    # printing c_p_t part where 1 ts => more then 1 tech
+    # printing c_p_t part where 1 ts => more than 1 tech
     for k in res_mult_params.keys():
         for j in res_mult_params[k]:
             ts = all_td_ts[k]

@@ -1,17 +1,17 @@
 import pandas as pd
 
 
-def get_total_cost(output_path):
+def get_total_cost(output_path: str):
     costs = pd.read_csv(f"{output_path}/output/cost_breakdown.csv", index_col=0)
     return costs.sum().sum()
 
 
-def get_total_gwp(output_path):
+def get_total_gwp(output_path: str):
     gwp = pd.read_csv(f"{output_path}/output/gwp_breakdown.csv", index_col=0)
     return gwp.sum().sum()
 
 
-def get_total_einv(output_path):
+def get_total_einv(output_path: str):
     einv = pd.read_csv(f"{output_path}/output/einv_breakdown.csv", index_col=0)
     return einv.sum().sum()
 

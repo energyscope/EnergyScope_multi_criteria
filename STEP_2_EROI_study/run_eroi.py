@@ -14,8 +14,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sys import platform
-from energyscope.misc.utils import make_dir
-from energyscope.postprocessing.utils import get_total_einv
+from energyscope.utils import make_dir
+from energyscope.postprocessing import get_total_einv
 
 
 def load_config(config_fn: str):
@@ -95,11 +95,11 @@ def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict):
 
         # Running EnergyScope
         run_fn = f"{config['ES_path']}/master.run"
-        es.run_energyscope(cs, run_fn, config['AMPL_path'], config['temp_dir'])
+        es.run_step2(cs, run_fn, config['AMPL_path'], config['temp_dir'])
 
         # Example to print the sankey from this script
         output_dir = f"{config['case_studies_dir']}/{dir_name + '/' + cs_name}/output/"
-        es.drawSankey(path=f"{output_dir}/sankey")
+        es.draw_sankey(path=f"{output_dir}/sankey")
 
 
 def compute_einv_details(cs: str, energyscope_dir: str, all_data: dict):
@@ -196,11 +196,11 @@ if __name__ == '__main__':
     # Running EnergyScope
     cs = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}"
     run_fn = f"{config['ES_path']}/master.run"
-    es.run_energyscope(cs, run_fn, config['AMPL_path'], config['temp_dir'])
+    es.run_step2(cs, run_fn, config['AMPL_path'], config['temp_dir'])
 
     # Print the Sankey (html)
     output_dir = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}/output/"
-    es.drawSankey(path=f"{output_dir}/sankey")
+    es.draw_sankey(path=f"{output_dir}/sankey")
 
     ################################################
     # Compute the EROI "final":

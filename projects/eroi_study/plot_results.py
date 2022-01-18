@@ -11,13 +11,10 @@ import os
 import pandas as pd
 import energyscope as es
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sys import platform
 
-from STEP_2_EROI_study.run_eroi import get_GWP_op_ini
-from energyscope.misc.utils import make_dir
-from energyscope.postprocessing.utils import get_total_einv
+from energyscope.postprocessing import get_total_einv
 
 
 def load_config(config_fn: str):

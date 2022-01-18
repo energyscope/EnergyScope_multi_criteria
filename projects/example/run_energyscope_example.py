@@ -43,8 +43,8 @@ if __name__ == '__main__':
     # Running EnergyScope
     cs = f"{config['case_studies_dir']}/{config['case_study_name']}"
     mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
-    es.run_energyscope_new(cs, config['AMPL_path'], config["options"], mod_fns, data_fns, config['temp_dir'])
+    es.run_step2_new(cs, config['AMPL_path'], config["options"], mod_fns, data_fns, config['temp_dir'])
 
     # Example to print the sankey from this script
     # output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}/output/"
-    # es.drawSankey(path=f"{output_dir}/sankey")
+    # es.draw_sankey(path=f"{output_dir}/sankey")

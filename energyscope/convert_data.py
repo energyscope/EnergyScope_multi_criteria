@@ -120,8 +120,8 @@ def generate_time_series_csv(input_fn: str, dev_data_dir: str):
 
 def estd_excel_to_csv(input_fn: str):
 
-    user_data_dir = "../../Data/User_data"
-    dev_data_dir = "../../Data/Developer_data"
+    user_data_dir = "../Data/User_data"
+    dev_data_dir = "../Data/Developer_data"
 
     generate_demand_csv(input_fn, user_data_dir)
     generate_resources_csv(input_fn, user_data_dir)
@@ -179,5 +179,5 @@ if __name__ == '__main__':
     # estd_excel_to_csv(input_fn_)
 
     input_fn_ = "../../Data_management/STEP_1_in.xlsx"
-    dev_data_dir_ = "../../Data/Developer_data"
-    step1_excel_to_csv(input_fn_, dev_data_dir_, "../../Data")
+    dev_data_dir_ = "../Data/Developer_data"
+    step1_excel_to_csv(input_fn_, dev_data_dir_, "../Data")

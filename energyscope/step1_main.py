@@ -39,7 +39,7 @@ def print_step1_data(nbr_td: int, output_fn: str) -> None:
     data = data.loc[[str(i) for i in range(1, 366)]].astype(float)
 
     # Add header
-    header_fn = os.path.join(Path(__file__).parents[0], 'step1_header.txt')
+    header_fn = os.path.join(Path(__file__).parents[0], 'headers/step1_header.txt')
     with open(output_fn, mode='w', newline='') as file, open(header_fn, 'r') as header:
         for line in header:
             file.write(line)
@@ -103,11 +103,11 @@ def run_step1(nbr_td: int, ampl_path: str, solver_path: str) -> None:
     ampl_trans.setOption('solver', solver_path)
 
     # Read model
-    model_fn = os.path.join(Path(__file__).parents[0], 'TD_main.mod')
+    model_fn = os.path.join(Path(__file__).parents[0], 'models/step1.mod')
     ampl_trans.read(model_fn)
 
     # Convert data in appropriate format and add them to the environment
-    data_fn = os.path.join(Path(__file__).parents[0], f'data_td_{nbr_td}.dat')
+    data_fn = os.path.join(Path(__file__).parents[1], f'step1_io/data_td_{nbr_td}.dat')
     print_step1_data(nbr_td, data_fn)
     ampl_trans.readData(data_fn)
 
@@ -115,7 +115,8 @@ def run_step1(nbr_td: int, ampl_path: str, solver_path: str) -> None:
     ampl_trans.solve()
 
     # Print output
-    print_step1_out(ampl_trans, f"TD_of_days_{nbr_td}.out")
+    output_fn = os.path.join(Path(__file__).parents[1], f'step1_io/TD_of_days_{nbr_td}.out')
+    print_step1_out(ampl_trans, output_fn)
 
 
 if __name__ == '__main__':

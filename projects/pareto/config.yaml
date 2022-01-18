@@ -13,7 +13,7 @@ temp_dir: 'temp'
 # Path to the energy model (.mod files)
 model_path: 'projects/pareto/models'
 # Output of the step 1 selection of typical days
-step1_output: 'STEP_1_TD_selection/TD_of_days_12.out'
+step1_output: 'energyscope/step1_io/TD_of_days_12.out'
 
 # PATH to AMPL licence (to adapt by the user)
 AMPL_path: '/home/duboisa1/ampl_linux-intel64'

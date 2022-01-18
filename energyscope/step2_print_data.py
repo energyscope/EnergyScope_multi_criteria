@@ -53,7 +53,6 @@ def print_param(name: str, param: float, comment: str, out_path: str) -> None:
             writer.writerow(['param ' + str(name) + ' := ' + str(param) + '; # ' + str(comment)])
 
 
-# Function to import the data from the CSV data files #
 def import_data(user_data_dir: str, developer_data_dir: str):
     """
     Dictionary with the DataFrames containing all the data in the form :
@@ -98,10 +97,10 @@ def import_data(user_data_dir: str, developer_data_dir: str):
     return all_df
 
 
-# Function to print the ESTD_data.dat file
 def print_estd(out_path: str, data: dict, system_limits: dict):
     """
     Prints the data into .dat file (out_path) with the right syntax for AMPL.
+
     :param out_path: path to the directory to save the .dat file
     :param data: dict composed of DataFrames with the data to export.
     :param system_limits: dict with values for system limits: GWP, ... cf configuration file.
@@ -280,7 +279,7 @@ def print_estd(out_path: str, data: dict, system_limits: dict):
 
     # Printing data #
     # printing signature of data file
-    header_fn = os.path.join(Path(__file__).parents[0], 'header_estd.txt')
+    header_fn = os.path.join(Path(__file__).parents[0], 'headers/header_estd.txt')
     with open(out_path, mode='w', newline='') as file, open(header_fn, 'r') as header:
         for line in header:
             file.write(line)
@@ -439,7 +438,6 @@ def print_estd(out_path: str, data: dict, system_limits: dict):
     print_df('param loss_network ', loss_network_df, out_path)
 
 
-# Function to print the ESTD_12TD.dat file from timeseries and STEP1 results #
 def print_12td(out_path: str, time_series: pd.DataFrame, step1_output_path: str, nbr_td: int = 12):
     """
     Create the ESTD_12TD.dat file from timeseries and STEP1 results.
@@ -534,7 +532,7 @@ def print_12td(out_path: str, time_series: pd.DataFrame, step1_output_path: str,
 
     # PRINTING #
     # printing description of file
-    header_fn = os.path.join(Path(__file__).parents[0], 'header_12td.txt')
+    header_fn = os.path.join(Path(__file__).parents[0], 'headers/header_12td.txt')
     with open(out_path, mode='w', newline='') as td_file, open(header_fn, 'r') as header:
         for line in header:
             td_file.write(line)

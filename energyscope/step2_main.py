@@ -14,13 +14,13 @@ from typing import Dict, List
 
 import amplpy
 
-from energyscope.step2.output_generator import save_results
+from energyscope.step2_output_generator import save_results
 from energyscope.amplpy_aux import get_sets, get_parameters, get_results
 
-from energyscope.misc.utils import make_dir
+from energyscope.utils import make_dir
 
 
-def run_energyscope(case_study_dir: str, run_file_name: str, ampl_path: str, temp_dir: str):
+def run_step2(case_study_dir: str, run_file_name: str, ampl_path: str, temp_dir: str):
     """
     Run ESTD STEP 2 using Python.
 
@@ -50,8 +50,8 @@ def run_energyscope(case_study_dir: str, run_file_name: str, ampl_path: str, tem
     return
 
 
-def run_energyscope_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
-                        model_fns: List[str], data_fns: List[str], temp_dir: str) -> None:
+def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
+                  model_fns: List[str], data_fns: List[str], temp_dir: str) -> None:
     """
     Run ESTD STEP 2 using Python and amplpy.
 

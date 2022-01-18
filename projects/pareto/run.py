@@ -4,8 +4,6 @@ This script modifies the input data and runs the EnergyScope model
 
 @author: Paolo Thiran, Matija Pavičević, Antoine Dubois
 """
-
-
 import yaml
 import os
 
@@ -47,11 +45,11 @@ if __name__ == '__main__':
         # Running EnergyScope
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/optimal_cost.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}"
-        es.run_energyscope_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
         # Example to print the sankey from this script
         # output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}/output/"
-        # es.drawSankey(path=f"{output_dir}sankey")
+        # es.draw_sankey(path=f"{output_dir}sankey")
 
     exit()
 
@@ -60,11 +58,11 @@ if __name__ == '__main__':
         data_fns = [f"{config['temp_dir']}/ESTD_data.dat", f"{config['temp_dir']}/ESTD_12TD.dat"]
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/optimal_einv.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}_einv/"
-        es.run_energyscope_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
         # Example to print the sankey from this script
         # output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}_einv/output/"
-        # es.drawSankey(path=f"{output_dir}sankey")
+        # es.draw_sankey(path=f"{output_dir}sankey")
 
     # Get total cost
     cost = es.get_total_cost(f"{config['case_studies_dir']}/{config['case_study_name']}")
@@ -95,11 +93,11 @@ if __name__ == '__main__':
         # Run the model
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/epsilon.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}_epsilon_{epsilon}/"
-        es.run_energyscope_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
         # Example to print the sankey from this script
         # output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}_epsilon_{epsilon}/output/"
-        # es.drawSankey(path=f"{output_dir}sankey")
+        # es.draw_sankey(path=f"{output_dir}sankey")
 
     exit()
     # Get epsilon necessary condition
@@ -131,8 +129,8 @@ if __name__ == '__main__':
         # Run the model
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/wind.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}_wind_{epsilon_cost}_{epsilon_einv}/"
-        es.run_energyscope_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
         # Example to print the sankey from this script
         # output_dir = f"{cs}output"
-        # es.drawSankey(path=f"{cs}output/sankey")
+        # es.draw_sankey(path=f"{cs}output/sankey")

@@ -1,7 +1,6 @@
 import logging.config
 import logging
 import os
-import importlib
 
 from .common import commons
 
@@ -64,10 +63,12 @@ except Exception:
     logging.config.dictConfig(_LOGCONFIG)
 
 
-from .energyscope import run_energyscope, run_energyscope_new
-from .misc.utils import make_dir
-from .preprocessing.print_data import import_data, print_param, newline, print_df, print_set, ampl_syntax, \
+from .utils import make_dir
+
+from .step2_main import run_step2, run_step2_new
+from .step2_print_data import import_data, print_param, newline, print_df, print_set, ampl_syntax, \
     print_estd, print_12td
-from .preprocessing.print_run import print_run
-from .postprocessing.utils import get_total_cost, get_total_gwp, get_total_einv, get_asset_value
-from .postprocessing.draw_sankey.ESSankey import drawSankey
+from .step2_print_run import print_run
+
+from energyscope.postprocessing import get_total_cost, get_total_gwp, get_total_einv, get_asset_value
+from energyscope.sankey import draw_sankey

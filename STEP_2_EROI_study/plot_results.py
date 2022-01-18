@@ -212,6 +212,28 @@ if __name__ == '__main__':
     df_eud = df_year_balance.loc['END_USES_DEMAND'].copy()
     for layer in df_year_balance_without_eud.columns:
         print('%s %.2f %.2f' %(layer, df_year_balance_without_eud[layer].sum(), df_eud.loc[layer]))
+
+    TECH_MOB = list(all_data['Technologies'][all_data['Technologies']['Category'] == 'Mobility'].index)
+    # FIXME: why these ressources are not in the columns of the year_balance.csv?
+    # There is no technology that can use BIODIESEL for instance?
+    unwanted_RES = ['BIOETHANOL', 'BIODIESEL', 'GAS_RE', 'H2_RE', 'AMMONIA_RE', 'METHANOL_RE', 'ELEC_EXPORT', 'CO2_EMISSIONS']
+    RESOURCES_bis = [res for res in RESOURCES if res not in unwanted_RES]
+    non_mobility_RES = ['URANIUM', 'RES_WIND', 'RES_SOLAR', 'RES_HYDRO', 'RES_GEO', 'CO2_ATM', 'CO2_INDUSTRY', 'CO2_CAPTURED', 'CO2_EMISSIONS']
+    RESOURCES_final = [res for res in RESOURCES_bis if res not in non_mobility_RES]
+    FEC_MOB = df_year_balance.loc[TECH_MOB][RESOURCES_final].sum().sum()
+
+    # END_USES_DEMAND ELECTRICITY takes into account the electricity network losses idem for HEAT_LOW_T_DHN
+    FEC_HEAT = df_eud['HEAT_HIGH_T']+ df_eud['HEAT_LOW_T_DHN']+ df_eud['HEAT_LOW_T_DECEN']
+    FEC_NON_ENERGY = df_eud['AMMONIA'] + df_eud['METHANOL'] + df_eud['HVC']
+    FEC_ELECTRICITY = df_eud['ELECTRICITY']  # GWhe -> convert in thermal GWh? -> compute the ratio of RE ressources and fuel ressources to the get the efficiency (100% for SOLAR, WIND, ...; NUC 1/2.7027 etc)
+    #FIXME: compute a conversion factor for the electricity FEC to convert GWhe to GWh
+    elec_conv = 1
+    FEC_system = elec_conv * FEC_ELECTRICITY + FEC_HEAT + FEC_NON_ENERGY + FEC_MOB # GWh
+
+    print('FEC system %.2f TWh' %(FEC_system/1000))
+
+
+
     #
     # # -----------------------------------------------
     # # Compare two case studies with a RE minimal share of 0% and 30%.

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+# TODO: to be deleted
 This script allows to print the .run files.
 
 @author: Jonathan Dumas, Antoine Dubois

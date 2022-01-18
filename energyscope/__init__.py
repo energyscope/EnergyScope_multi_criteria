@@ -64,7 +64,7 @@ except Exception:
     logging.config.dictConfig(_LOGCONFIG)
 
 
-from .energyscope import run_energyscope
+from .energyscope import run_energyscope, run_energyscope_new
 from .misc.utils import make_dir
 from .preprocessing.print_data import import_data, print_param, newline, print_df, print_set, ampl_syntax, \
     print_estd, print_12td

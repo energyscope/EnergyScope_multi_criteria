@@ -18,7 +18,7 @@ def load_config(config_fn: str):
     cfg = yaml.load(open(config_fn, 'r'), Loader=yaml.FullLoader)
 
     # Extend path
-    for param in ['case_studies_dir', 'user_data', 'developer_data', 'temp_dir', 'ES_path', 'step1_output']:
+    for param in ['case_studies_dir', 'user_data', 'developer_data', 'temp_dir', 'model_path', 'step1_output']:
         cfg[param] = os.path.join(cfg['energyscope_dir'], cfg[param])
     return cfg
 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
         all_data['Technologies']['f_min'].loc[tech] = config['Technologies']['f_min'][tech]
 
     # New optimal solution run
-    if 0:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
+    if 1:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
 
         # Saving .dat files
         estd_out_path = f"{config['temp_dir']}/ESTD_data.dat"
@@ -45,7 +45,7 @@ if __name__ == '__main__':
         data_fns = [estd_out_path, td12_out_path]
 
         # Running EnergyScope
-        mod_fns = [f"{config['ES_path']}/main.mod", f"{config['ES_path']}/optimal_cost.mod"]
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/optimal_cost.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}"
         es.run_energyscope_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
@@ -53,10 +53,12 @@ if __name__ == '__main__':
         # output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}/output/"
         # es.drawSankey(path=f"{output_dir}sankey")
 
+    exit()
+
     if 0:
         # Optimal solution in terms of EINV
         data_fns = [f"{config['temp_dir']}/ESTD_data.dat", f"{config['temp_dir']}/ESTD_12TD.dat"]
-        mod_fns = [f"{config['ES_path']}/main.mod", f"{config['ES_path']}/optimal_einv.mod"]
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/optimal_einv.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}_einv/"
         es.run_energyscope_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
@@ -91,7 +93,7 @@ if __name__ == '__main__':
         # print_set(technologies_to_minimize, "TECHNOLOGIES_TO_MINIMIZE", out_path)
 
         # Run the model
-        mod_fns = [f"{config['ES_path']}/main.mod", f"{config['ES_path']}/epsilon.mod"]
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/epsilon.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}_epsilon_{epsilon}/"
         es.run_energyscope_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
@@ -127,7 +129,7 @@ if __name__ == '__main__':
         data_fns = [estd_out_path, td12_out_path]
 
         # Run the model
-        mod_fns = [f"{config['ES_path']}/main.mod", f"{config['ES_path']}/wind.mod"]
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/wind.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}_wind_{epsilon_cost}_{epsilon_einv}/"
         es.run_energyscope_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 

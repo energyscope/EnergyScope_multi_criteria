@@ -7,6 +7,7 @@ Contains functions to generate appropriate output files from an ESTD STEP 2 run
 @author: Antoine Dubois
 """
 import itertools
+import logging
 from typing import Dict
 
 import pandas as pd
@@ -407,10 +408,17 @@ def save_results(results: Dict[str, pd.DataFrame], parameters: Dict[str, pd.Data
         Path to the directory where output files ought to be saved
     """
 
+    logging.info('Saving breakdowns')
     save_breakdowns(results, parameters, sets, output_dir)
+    logging.info('Saving technology-resource matrices')
     save_tech_res_matrices(results, parameters, sets, output_dir)
+    logging.info('Saving losses')
     save_losses(results, parameters, sets, output_dir)
+    logging.info('Saving assets')
     save_assets(results, parameters, sets, output_dir)
+    logging.info('Saving year balance')
     save_year_balance(results, parameters, sets, output_dir)
+    logging.info('Saving layers')
     save_layers(results, parameters, sets, f"{output_dir}hourly_data/")
+    logging.info('Saving energy stored')
     save_energy_stored(results, parameters, sets, f"{output_dir}hourly_data/")

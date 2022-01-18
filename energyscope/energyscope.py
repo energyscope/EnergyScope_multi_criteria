@@ -14,7 +14,7 @@ from typing import Dict, List
 
 import amplpy
 
-from energyscope.step2_output_generator import save_results
+from energyscope.step2.output_generator import save_results
 from energyscope.amplpy_aux import get_sets, get_parameters, get_results
 
 from energyscope.misc.utils import make_dir

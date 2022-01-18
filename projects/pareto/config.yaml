@@ -1,22 +1,22 @@
 # Main directory
-energyscope_dir: '/home/duboisa1/Global_Grid/code/EnergyScope'
+energyscope_dir: '/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria'
 
-# Path from main directory to energyscope sub-directories and files
+# Path from main directory to energyscope subdirectories and files
 # Case studies directory and name of case study
 case_studies_dir: 'case_studies/pareto'
-case_study_name: 'run4'
+case_study_name: 'run_test2'
 # Folders containing the csv data files
 user_data: 'Data/User_data'
 developer_data: 'Data/Developer_data'
 # Directory to save temporary output files
 temp_dir: 'temp'
-# Path to the energy model (.mod and .run files)
-ES_path: 'STEP_2_pareto/ampl'
+# Path to the energy model (.mod files)
+model_path: 'projects/pareto/models'
 # Output of the step 1 selection of typical days
-step1_output: 'STEP_1_TD_selection/TD_of_days.out'
+step1_output: 'STEP_1_TD_selection/TD_of_days_12.out'
 
 # PATH to AMPL licence (to adapt by the user)
-AMPL_path: '/home/duboisa1/ampl_linux-intel64/ampl'
+AMPL_path: '/home/duboisa1/ampl_linux-intel64'
 
 # Printing
 # printing the data in ETSD_data.dat file for the optimisation problem

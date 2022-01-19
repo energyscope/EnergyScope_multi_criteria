@@ -71,4 +71,4 @@ from .step2_print_data import import_data, print_param, newline, print_df, print
 from .step2_print_run import print_run
 
 from energyscope.postprocessing import get_total_cost, get_total_gwp, get_total_einv, get_asset_value
-from energyscope.sankey import draw_sankey
+from energyscope.sankey_diagram import draw_sankey

@@ -18,7 +18,7 @@ from energyscope.step2_output_generator import save_results
 from energyscope.amplpy_aux import get_sets, get_parameters, get_results
 
 from energyscope.utils import make_dir
-from energyscope.sankey_generator import generate_sankey_file
+from energyscope.sankey_input import generate_sankey_file
 
 
 def run_step2(case_study_dir: str, run_file_name: str, ampl_path: str, temp_dir: str):

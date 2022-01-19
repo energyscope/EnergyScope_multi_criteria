@@ -82,7 +82,7 @@ def print_save(run_fn: str, output_dir: str) -> None:
             for line in header:
                 file.write(line)
 
-        ampl_utils_dir = os.path.join(Path(__file__).parents[2], "AMPL_utils")
+        ampl_utils_dir = os.path.join(Path(__file__).parents[1], "AMPL_utils")
         file.write(f'\t\t\tinclude {ampl_utils_dir}/print.run;\n')
         file.write(f'\t\t\tinclude {ampl_utils_dir}/sankey.run;\n')
         file.write("\t\t\texit 0;\n\t\t}\n\t}\n}")

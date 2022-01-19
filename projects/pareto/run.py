@@ -47,9 +47,8 @@ if __name__ == '__main__':
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}"
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
-        # Example to print the sankey from this script
-        # output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}/output/"
-        # es.draw_sankey(path=f"{output_dir}sankey")
+        # Display sankey
+        es.draw_sankey(some_path=f"{cs}/output/sankey")
 
     exit()
 

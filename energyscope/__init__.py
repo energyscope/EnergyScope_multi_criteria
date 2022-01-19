@@ -53,7 +53,7 @@ _LOGCONFIG = {
 # Setting logging configuration:
 try:
     logging.config.dictConfig(_LOGCONFIG)
-except Exception:
+except ValueError as e:
     # if it didn't work, it might be due to ipython messing with the output
     # typical error: Unable to configure handler 'console': IOStream has no fileno
     # try without console output:

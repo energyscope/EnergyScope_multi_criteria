@@ -18,6 +18,7 @@ from energyscope.step2_output_generator import save_results
 from energyscope.amplpy_aux import get_sets, get_parameters, get_results
 
 from energyscope.utils import make_dir
+from energyscope.sankey_generator import generate_sankey_file
 
 
 def run_step2(case_study_dir: str, run_file_name: str, ampl_path: str, temp_dir: str):
@@ -33,6 +34,9 @@ def run_step2(case_study_dir: str, run_file_name: str, ampl_path: str, temp_dir:
     make_dir(f"{temp_dir}/output")
     make_dir(f"{temp_dir}/output/hourly_data")
     make_dir(f"{temp_dir}/output/sankey")
+    make_dir(f"{temp_dir}/output/sets")
+    make_dir(f"{temp_dir}/output/parameters")
+    make_dir(f"{temp_dir}/output/results")
 
     # running ES
     logging.info('Running EnergyScope')
@@ -66,6 +70,9 @@ def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
     make_dir(f"{temp_dir}/output")
     make_dir(f"{temp_dir}/output/hourly_data")
     make_dir(f"{temp_dir}/output/sankey")
+    # make_dir(f"{temp_dir}/output/sets")
+    # make_dir(f"{temp_dir}/output/parameters")
+    # make_dir(f"{temp_dir}/output/results")
 
     # running ES
     logging.info('Running EnergyScope')
@@ -101,11 +108,15 @@ def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
     # for ix, (key, val) in enumerate(parameters.items()):
     #     val.to_csv(f"{temp_dir}/output/parameters/{key}.csv")
     sets = get_sets(ampl_trans)
+    # import json
     # with open(f"{temp_dir}/output/sets/sets.json", "w") as outfile:
     #     json.dump(sets, outfile, indent=2)
 
     logging.info("Saving results")
     save_results(results, parameters, sets, f"{temp_dir}/output/")
+
+    logging.info("Creating Sankey diagram input file")
+    generate_sankey_file(results, parameters, sets, f"{temp_dir}/output/sankey/")
 
     # Copy temporary results to case studies directory
     shutil.copytree(temp_dir, case_study_dir)

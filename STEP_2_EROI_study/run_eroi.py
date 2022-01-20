@@ -59,13 +59,12 @@ def get_FEC_from_sankey(case_study_dir: str, col:str):
     return pd.DataFrame(index=ef_list, data=ef_final_val, columns=[col])
 
 
-def get_GWP_op_ini(dir_name: str):
+def get_GWP_op_ini(cs:str):
     """
     Get the GWP_op initial.
-    :param dir_name: directory name.
+    :param cs: case study path and name.
     :return GWP_op initial into a pd.DataFrames.
     """
-    cs = f"{config['case_studies_dir']}/{dir_name + '/run_100'}"
     gwp = pd.read_csv(f"{cs}/output/gwp_breakdown.csv", index_col=0, sep=',')
 
     # FIXME # sum only of the GWP operation -> maybe to adapt to take into account the GWP construction
@@ -220,6 +219,6 @@ if __name__ == '__main__':
     # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i the value obtained by Min Einv without contraint on GWP_tot
     # -----------------------------------------------
 
-    GWP_op_ini = get_GWP_op_ini(dir_name=dir_name)
+    GWP_op_ini = get_GWP_op_ini(cs=cs)
     range_val = range(95, 0, -5)
     loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config)

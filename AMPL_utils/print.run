@@ -18,7 +18,7 @@ for {i in TECHNOLOGIES union RESOURCES}{
     >> (PathName & "/cost_breakdown.csv");
 }
 
-## Print GWP tech breakdown
+## Print Cost Op Tech
 print "--------------SAVING GWP_TECH -----------";
 printf "Tech," > (PathName & "/cost_op_tech.csv");
 for {i in RESOURCES diff BIOFUELS diff EXPORT}{
@@ -123,10 +123,9 @@ printf "[GW or GWh],[GW or GWh],[0-1],[0-1],[0-1],[0-1],[0-1],[-],[ktCO2-eq./GW 
 for {i in END_USES_TYPES, tech in TECHNOLOGIES_OF_END_USES_TYPE[i]}{
     printf "\n%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
         tech, C_inv[tech], C_maint[tech], lifetime[tech], f_min[tech], F[tech], f_max[tech], fmin_perc[tech],
-        sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
-            (F_t [tech,h,td]) / max(sum {j2 in TECHNOLOGIES_OF_END_USES_TYPE[i], t2 in PERIODS,
-                                         h2 in HOUR_OF_PERIOD[t2], td2 in TYPICAL_DAY_OF_PERIOD[t2]}
-                                    (F_t [j2, h2, td2]) , 0.00001),
+        sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [tech,h,td])
+          / max(sum {j2 in TECHNOLOGIES_OF_END_USES_TYPE[i], t2 in PERIODS, h2 in HOUR_OF_PERIOD[t2],
+                   td2 in TYPICAL_DAY_OF_PERIOD[t2]} (F_t [j2, h2, td2]) , 0.00001),
         fmax_perc[tech],
         sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
             (F_t [tech,h,td] * t_op[h,td]) / 8760 / max(F[tech],0.0001),
@@ -135,7 +134,7 @@ for {i in END_USES_TYPES, tech in TECHNOLOGIES_OF_END_USES_TYPE[i]}{
 }
 
 for {tech in STORAGE_TECH}{
-    printf "\n%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+    printf "\n%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
         tech, C_inv[tech], C_maint[tech], lifetime[tech], f_min[tech], F[tech], f_max[tech],
         fmin_perc[tech], -1, fmax_perc[tech],
         sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t],

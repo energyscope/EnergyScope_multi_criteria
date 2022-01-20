@@ -1,16 +1,22 @@
+# Main directory
+energyscope_dir: 'PATH_TO_EnergyScope'
+
 # Path from main directory to energyscope sub-directories and files
 # Case studies directory and name of case study
 case_studies_dir: 'case_studies'
-case_study_name: 'run_100'
+case_study_name: 'run1'
 # Folders containing the csv data files
 user_data: 'Data/User_data'
 developer_data: 'Data/Developer_data'
 # Directory to save temporary output files
 temp_dir: 'temp'
 # Path to the energy model (.mod and .run files)
-ES_path: 'STEP_2_EROI_study/ampl_model'
+ES_path: 'STEP_2_example/ampl'
 # Output of the step 1 selection of typical days
-step1_output: 'energyscope/step1_io/TD_of_days_12.out'
+step1_output: 'STEP_1_TD_selection/TD_of_days_12.out'
+
+# PATH to AMPL licence (to adapt by the user)
+AMPL_path: 'PATH_TO_AMPL'
 
 # Printing
 # printing the data in ETSD_data.dat file for the optimisation problem
@@ -57,7 +63,7 @@ Technologies:
 
 # Run options
 options:
-  solver: "/home/jdumas/PycharmProjects/ampl_linux-intel64/cplex"
+  solver: "/home/duboisa1/ampl_linux-intel64/cplex"
   show_stats: 1
   log_file: "log.txt"
   cplex_options: ["mipdisplay 5", "mipinterval 1000", "mipgap 0.01", "timelimit 3600"]

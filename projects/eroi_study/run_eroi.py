@@ -11,7 +11,6 @@ import os
 import pandas as pd
 import energyscope as es
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sys import platform
 from energyscope.utils import make_dir
@@ -47,7 +46,8 @@ def get_FEC_from_sankey(case_study_dir: str, col:str):
     """
     Compute the FEC from the Sankey.
     :param case_study_dir: path to the case study directory.
-    Return the final energy consumption (FEC) (TWh) by use sector: 'Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand', 'Freight', 'Mob priv', 'Heat HT'
+    Return the final energy consumption (FEC) (TWh) by use sector: 'Non-energy demand', 'Loss DHN', 'Heat LT DHN',
+    'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand', 'Freight', 'Mob priv', 'Heat HT'
     """
     df_sankey = pd.read_csv(f"{case_study_dir}/output/sankey/input2sankey.csv", index_col=0, sep=',')
     ef_list = ['Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand',
@@ -59,16 +59,18 @@ def get_FEC_from_sankey(case_study_dir: str, col:str):
     return pd.DataFrame(index=ef_list, data=ef_final_val, columns=[col])
 
 
-def get_GWP_op_ini(cs:str):
+def get_GWP_op_ini(dir_name: str):
     """
     Get the GWP_op initial.
-    :param cs: case study path and name.
+    :param dir_name: directory name.
     :return GWP_op initial into a pd.DataFrames.
     """
+    cs = f"{config['case_studies_dir']}/{dir_name + '/run_100'}"
     gwp = pd.read_csv(f"{cs}/output/gwp_breakdown.csv", index_col=0, sep=',')
 
     # FIXME # sum only of the GWP operation -> maybe to adapt to take into account the GWP construction
     return gwp.sum()['GWP_op']
+
 
 def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict):
     """
@@ -80,7 +82,7 @@ def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict):
     """
     for gwp_tot_max, cs_name in zip(np.asarray([i for i in range_val]) * GWP_op_ini / 100,
                                     ['run_' + str(i) for i in range_val]):
-        print('Case in progress %s' % (cs_name))
+        print('Case in progress %s' % cs_name)
         cs = f"{config['case_studies_dir']}/{dir_name + '/' + cs_name}"
         # Update the GWP limit
         config["system_limits"]['GWP_limit'] = gwp_tot_max
@@ -151,6 +153,7 @@ def compute_einv_details(cs: str, energyscope_dir: str, all_data: dict):
 
     return df_inv_res_by_subcat, df_inv_tech_by_cat
 
+
 if __name__ == '__main__':
 
     # Get the current working directory
@@ -176,7 +179,8 @@ if __name__ == '__main__':
     td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
     # WARNING
     if not os.path.isfile(config["step1_output"]):
-        print('WARNING: the STEP1 that consists of generating the 12 typical days must be conducted before to compute the TD_of_days.out file located in %s' %(config["step1_output"]))
+        print('WARNING: the STEP1 that consists of generating the 12 typical days must be conducted'
+              ' before to compute the TD_of_days.out file located in %s' % (config["step1_output"]))
     es.print_12td(out_path=td12_out_path, time_series=all_data['Time_series'], step1_output_path=config["step1_output"])
 
     # Print run file
@@ -212,13 +216,14 @@ if __name__ == '__main__':
     ef_tot = ef.sum()
     einv = get_total_einv(cs) / 1000  # TWh
     eroi = ef_tot / einv
-    print('EROI "final" %.2f' % (eroi))
+    print('EROI "final" %.2f' % eroi)
 
     # -----------------------------------------------
     # Min Einv
-    # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i the value obtained by Min Einv without contraint on GWP_tot
+    # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i the value
+    # obtained by Min Einv without contraint on GWP_tot
     # -----------------------------------------------
 
-    GWP_op_ini = get_GWP_op_ini(cs=cs)
+    GWP_op_ini = get_GWP_op_ini(dir_name=dir_name)
     range_val = range(95, 0, -5)
     loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config)

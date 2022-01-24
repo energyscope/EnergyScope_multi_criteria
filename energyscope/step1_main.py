@@ -8,6 +8,7 @@ Contains functions to perform step1 of EnergyScope
 """
 
 import os
+import platform
 from pathlib import Path
 import csv
 import logging
@@ -107,7 +108,7 @@ def run_step1(nbr_td: int, ampl_path: str, solver_path: str) -> None:
     ampl_trans.read(model_fn)
 
     # Convert data in appropriate format and add them to the environment
-    data_fn = os.path.join(Path(__file__).parents[1], f'step1_io/data_td_{nbr_td}.dat')
+    data_fn = os.path.join(Path(__file__).parents[0], f'step1_io/data_td_{nbr_td}.dat')
     print_step1_data(nbr_td, data_fn)
     ampl_trans.readData(data_fn)
 
@@ -115,14 +116,28 @@ def run_step1(nbr_td: int, ampl_path: str, solver_path: str) -> None:
     ampl_trans.solve()
 
     # Print output
-    output_fn = os.path.join(Path(__file__).parents[1], f'step1_io/TD_of_days_{nbr_td}.out')
+    output_fn = os.path.join(Path(__file__).parents[0], f'step1_io/TD_of_days_{nbr_td}.out')
     print_step1_out(ampl_trans, output_fn)
 
 
+def config_path():
+    """
+    Define the user CPLEX and AMPL path.
+    :return: CPLEX and AMPL path.
+    """
+
+    if platform == "linux":
+        cplex_path_ = "/home/jdumas/PycharmProjects/ampl_linux-intel64/cplex"
+        ampl_path_ = '/home/jdumas/PycharmProjects/ampl_linux-intel64'
+    else:
+        ampl_path_ = '/Users/dumas/PycharmProjects/ampl_macos64'
+        cplex_path_ = "cplex"
+
+    return ampl_path_, cplex_path_
+
 if __name__ == '__main__':
 
-    # TODO: update to make more generic
-    ampl_path_ = "/home/duboisa1/ampl_linux-intel64"
-    cplex_path_ = "/home/duboisa1/ampl_linux-intel64/cplex"
+    # WARNING: the user must adapt its CPLEX and AMPL paths into the function config_path()
+    ampl_path_, cplex_path_ = config_path()
     nbr_td_ = 12
     run_step1(nbr_td_, ampl_path_, cplex_path_)

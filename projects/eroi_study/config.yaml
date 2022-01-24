@@ -10,7 +10,7 @@ temp_dir: 'temp'
 # Path to the energy model (.mod and .run files)
 ES_path: 'projects/eroi_study/ampl_model'
 # Output of the step 1 selection of typical days
-step1_output: 'STEP_1_TD_selection/TD_of_days.out'
+step1_output: 'energyscope/step1_io/TD_of_days_12.out'
 
 # Printing
 # printing the data in ETSD_data.dat file for the optimisation problem

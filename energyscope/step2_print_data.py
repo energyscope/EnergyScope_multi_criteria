@@ -360,7 +360,7 @@ def print_estd(out_path: str, data: dict, system_limits: dict):
     print_param('einv_limit', system_limits['EINV_limit'],
                 'einv_limit [GWh/year]: maximum system energy invested', out_path)
     print_param('re_share_primary', re_share_primary, 'Minimum RE share in primary consumption', out_path)
-    print_param('re_be_share_primary', re_be_share_primary, 'Minimum BE RE share in primary consumption', out_path)
+    print_param('re_be_share_primary', re_be_share_primary, 'Minimum domestic RE share in primary consumption', out_path)
     print_param('solar_area', solar_area, '', out_path)
     print_param('power_density_pv', power_density_pv, 'PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2', out_path)
     print_param('power_density_solar_thermal', power_density_solar_thermal,

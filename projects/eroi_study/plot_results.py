@@ -388,14 +388,15 @@ if __name__ == '__main__':
     for tech in config['Technologies']['f_min']:
         all_data['Technologies']['f_min'].loc[tech] = config['Technologies']['f_min'][tech]
 
-    # --------------------------------------------------
-    # Minimize the Einv with the GWP that is not constrained
-    # -------------------------------------------------
+    GWP_tot = True
+    if GWP_tot:
+        dir_name = 're_be_GWP_tot'
+    else:
+        dir_name = 're_be_GWP_op'
 
-    dir_name = 're_be_0'
-    run = 'run_100'
     # Read case study name
-    cs_test = f"{config['case_studies_dir']}/{dir_name + '/' + run}"
+    run = 'run_100'
+    cs_test = f"{config['case_studies_dir']}/{dir_name + '_0/' + run}"
 
     # Compute the FEC from the year_balance.csv
     df_year_balance = pd.read_csv(f"{cs_test}/output/year_balance.csv", index_col=0)
@@ -421,8 +422,8 @@ if __name__ == '__main__':
     # -----------------------------------------------
 
     range_val = range(100, 5, -5)
-    dir_0 = f"{config['case_studies_dir']}/{'re_be_0'}"
-    dir_30 = f"{config['case_studies_dir']}/{'re_be_30'}"
+    dir_0 = f"{config['case_studies_dir']}/{dir_name + '_0'}"
+    dir_30 = f"{config['case_studies_dir']}/{dir_name + '_30'}"
     df_res_0, df_fec_details_0 = eroi_computation(dir=dir_0, user_data=config['user_data'], range_val=range_val)
     df_res_30, df_fec_details_30 = eroi_computation(dir=dir_30, user_data=config['user_data'], range_val=range_val)
     df_Einv_RES_cat_0, df_Einv_TECH_cat_0, df_EI_cat_0, df_EI_0 = res_details(range_val=range_val, all_data=all_data, dir=dir_0, user_data=config['user_data'])
@@ -447,8 +448,9 @@ if __name__ == '__main__':
     # PLOT
     # -----------------------------------------------
     ####################################################################################################################
-    dir_name = 'comparison'
-    make_dir(cwd+'/export/'+dir_name+'/')
+    dir_plot = 'comparison_' + dir_name
+    make_dir(cwd+'/export/')
+    make_dir(cwd+'/export/'+dir_plot+'/')
 
     ####################################################################################################################
     # Plot EROI (computed with FEC from SANKEY and year_balance.csv) vs GWP
@@ -462,7 +464,7 @@ if __name__ == '__main__':
     plt.ylim(0, 10)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/eroi.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/eroi.pdf')
     plt.show()
 
     ####################################################################################################################
@@ -477,7 +479,7 @@ if __name__ == '__main__':
     plt.ylim(0, 400)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/fec.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/fec.pdf')
     plt.show()
 
     plt.figure()
@@ -490,7 +492,7 @@ if __name__ == '__main__':
     plt.ylim(0, 120)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/einv.pdf')
     plt.show()
 
 
@@ -500,7 +502,7 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     plt.ylim(0, 400)
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/fec-details-0.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/fec-details-0.pdf')
     plt.show()
     plt.figure()
     df_fec_details_30.transpose().plot(kind='bar', stacked=True)
@@ -508,7 +510,7 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     plt.ylim(0, 400)
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/fec-details-30.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/fec-details-30.pdf')
     plt.show()
 
 
@@ -522,7 +524,7 @@ if __name__ == '__main__':
     # plt.ylim(0, 11)
     # plt.legend()
     # plt.tight_layout()
-    # plt.savefig(cwd+'/export/'+dir_name+'/eroi-sankey.pdf')
+    # plt.savefig(cwd+'/export/'+dir_plot+'/eroi-sankey.pdf')
     # plt.show()
     #
     ####################################################################################################################
@@ -535,7 +537,7 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     plt.ylim(0, 450)
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/primary-energy-breakdown-res-0-stacked-bar.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/primary-energy-breakdown-res-0-stacked-bar.pdf')
     plt.show()
 
 
@@ -552,7 +554,7 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     # plt.ylim(0, 550)
     plt.tight_layout()
-    plt.savefig(cwd + '/export/' + dir_name + '/primary-energy-renewable-stacked-bar-0.pdf')
+    plt.savefig(cwd + '/export/' + dir_plot + '/primary-energy-renewable-stacked-bar-0.pdf')
     plt.show()
 
     # Non renewable RES: Fossil fuel + Other non-renewable
@@ -566,7 +568,7 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     # plt.ylim(0, 550)
     plt.tight_layout()
-    plt.savefig(cwd + '/export/' + dir_name + '/primary-energy-non-renewable-stacked-bar-0.pdf')
+    plt.savefig(cwd + '/export/' + dir_plot + '/primary-energy-non-renewable-stacked-bar-0.pdf')
     plt.show()
 
     # RE share: 30%
@@ -576,7 +578,7 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     plt.ylim(0, 450)
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/primary-energy-breakdown-res-30-stacked-bar.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/primary-energy-breakdown-res-30-stacked-bar.pdf')
     plt.show()
     ####################################################################################################################
 
@@ -595,7 +597,7 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     plt.ylim(0, 90)
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-res-0-stacked-bar.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/einv-breakdown-res-0-stacked-bar.pdf')
     plt.show()
     # RE share: 30%
     plt.figure()
@@ -604,7 +606,7 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     plt.ylim(0, 90)
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-res-30-stacked-bar.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/einv-breakdown-res-30-stacked-bar.pdf')
     plt.show()
 
 
@@ -617,7 +619,7 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     plt.ylim(0, 35)
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-tech-0-stacked-bar.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/einv-breakdown-tech-0-stacked-bar.pdf')
     plt.show()
     # RE share: 30%
     plt.figure()
@@ -626,5 +628,5 @@ if __name__ == '__main__':
     plt.xlabel('p (%)')
     plt.ylim(0, 35)
     plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_name+'/einv-breakdown-tech-30-stacked-bar.pdf')
+    plt.savefig(cwd+'/export/'+dir_plot+'/einv-breakdown-tech-30-stacked-bar.pdf')
     plt.show()

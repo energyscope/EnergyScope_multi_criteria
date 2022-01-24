@@ -74,12 +74,13 @@ def get_GWP_op_ini(dir_name: str):
     return gwp.sum()['GWP_op']
 
 
-def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict):
+def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict, GWP_tot:bool=True):
     """
-    Minimize the Einv for several GWP_tot <= p*GWP_op_ini with p a percentage.
-    :param range_val: range of GWP constrained values.
+    Minimize the Einv for several GWP <= p*GWP_op_ini with p a percentage, with GWP being either GWP_tot or GWP_op.
+    :param range_val: range of p.
     :param dir_name: directory name.
-    :param GWP_op_ini: GWP_op value computed by minimizing the energy invested without contraint on the GWP_tot.
+    :param GWP_op_ini: GWP_op initial value, computed by minimizing the system energy invested.
+    :param GWP_tot: to select to constrain GWP_tot or GWP_op
     :param config: configuration file.
     """
     for gwp_tot_max, cs_name in zip(np.asarray([i for i in range_val]) * GWP_op_ini / 100, ['run_' + str(i) for i in range_val]):
@@ -94,14 +95,15 @@ def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict):
         es.print_12td(out_path=td12_out_path, time_series=all_data['Time_series'], step1_output_path=config["step1_output"])
 
         # Running EnergyScope
-        # run_fn = f"{config['ES_path']}/master.run"
-        mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
+        if GWP_tot:
+            # INCLUDING GREY EMISSIONS
+            # TotalGWP = sum {j in TECHNOLOGIES} (GWP_constr [j] / lifetime [j]) + sum {i in RESOURCES} GWP_op [i]
+            mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
+        else:
+            # JUST RESOURCES
+            # TotalGWP = sum {i in RESOURCES} GWP_op [i]
+            mod_fns = [f"{config['ES_path']}/ESTD_model_GWP_op.mod"]
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
-
-        # # Example to print the sankey from this script
-        # output_dir = f"{config['case_studies_dir']}/{dir_name + '/' + cs_name}/output/"
-        # es.draw_sankey(path=f"{output_dir}/sankey")
-
 
 def compute_einv_details(cs: str, energyscope_dir: str, all_data: dict):
     """
@@ -188,8 +190,11 @@ if __name__ == '__main__':
     # GWP_tot is not constrained
     # -> allows to compute GWP_op^i
     # -------------------------------------------------
-
-    dir_name = 're_be_30'
+    GWP_tot = True
+    if GWP_tot:
+        dir_name = 're_be_GWP_tot_0'
+    else:
+        dir_name = 're_be_GWP_op_0'
 
     # Running EnergyScope
     mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
@@ -222,4 +227,4 @@ if __name__ == '__main__':
     # FIXME: allow to constraint GWP_tot or GWP_op only
     GWP_op_ini = get_GWP_op_ini(dir_name=dir_name)
     range_val = range(95, 5, -5)
-    loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config)
+    loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config, GWP_tot=GWP_tot)

@@ -15,131 +15,8 @@ import matplotlib.pyplot as plt
 
 from sys import platform
 
-from energyscope.utils import make_dir
+from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
 from energyscope.postprocessing import get_total_einv
-
-def load_config(config_fn: str):
-    """
-    Load the configuration into a dict.
-    :param config_fn: configuration file name.
-    :return: a dict with the configuration.
-    """
-
-    # Load parameters
-    cfg = yaml.load(open(config_fn, 'r'), Loader=yaml.FullLoader)
-
-    if platform == "linux":
-        cfg['energyscope_dir'] = '/home/jdumas/PycharmProjects/EnergyScope_multi_criteria/'
-        cfg['AMPL_path'] = '/home/jdumas/PycharmProjects/ampl_linux-intel64'
-    else:
-        cfg['energyscope_dir'] = '/Users/dumas/PycharmProjects/EnergyScope_multi_criteria/'
-        cfg['AMPL_path'] = '/Users/dumas/PycharmProjects/ampl_macos64'
-        cfg['options']['solver'] = "cplex"
-
-    # Extend path
-    for param in ['case_studies_dir', 'user_data', 'developer_data', 'temp_dir', 'ES_path', 'step1_output']:
-        cfg[param] = os.path.join(cfg['energyscope_dir'], cfg[param])
-
-    return cfg
-
-
-def get_FEC_from_sankey(case_study_dir: str, col:str):
-    """
-    Compute the FEC from the Sankey.
-    :param case_study_dir: path to the case study directory.
-    Return the final energy consumption (FEC) (TWh) by use sector: 'Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand', 'Freight', 'Mob priv', 'Heat HT'
-    """
-    df_sankey = pd.read_csv(f"{case_study_dir}/output/sankey/input2sankey.csv", index_col=0, sep=',')
-    ef_list = ['Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand',
-               'Freight', 'Mob priv', 'Heat HT']
-    ef_final_val = []
-    for final_demand in ef_list:
-        ef_final_val.append(df_sankey[df_sankey['target'] == final_demand]['realValue'].sum())
-
-    return pd.DataFrame(index=ef_list, data=ef_final_val, columns=[col])
-
-def post_treatment(range_val, GWP_op_ini: float, all_data: dict, cs:str, user_data:str):
-    """
-    Compute the EROI "final", Eout=FEC, and Einv from the simulation results and dat.
-
-    Compute the EROI "final":
-    -> compute the FEC=Eout from the SANKEY (TWh)
-    -> get the Einv
-    -> EROI "final" = Eout/Einv with Eout = FEC
-    Note: Eout could be also defined as: Eout = EUD * conversion_factor
-
-    :param range_val: range of GWP constrained values.
-    :param GWP_op_ini: GWP_op value obtained by minimizing Einv without constraint on the GWP_tot.
-    :param all_data: the data into a dict of pd.DataFrames.
-    :param cs: case study path and name.
-    :param user_data: user_data directory.
-    :return: EROI "final", Eout=FEC, and Einv in pd.DataFrames.
-    """
-    eroi_sankey_list = []
-    eroi_list = []
-    einv_list = []
-    df_ef_list = []
-    einv_res_by_subcat_list = []
-    einv_tech_by_cat_list = []
-    primary_energy_subcat_list = []
-    primary_energy_list = []
-    fec_list = []
-    fec_tot_list = []
-    for gwp_limit, run in zip(np.asarray([i for i in range_val]) * GWP_op_ini / 100, ['run_' + str(i) for i in range_val]):
-        cs_temp = cs + '/' + run
-
-        # Compute FEC: final energy consumption (TWh)
-        ef_temp = get_FEC_from_sankey(case_study_dir=cs_temp, col=run)
-        df_ef_list.append(ef_temp)
-
-        # Compute the EROI
-        ef_temp_tot = ef_temp.sum()
-        einv_temp = get_total_einv(cs_temp) / 1000  # TWh
-        einv_list.append(einv_temp)
-        eroi_sankey_temp = ef_temp_tot / einv_temp
-        eroi_sankey_list.append(eroi_sankey_temp.values[0])
-        # Compute FEC from year_balance.csv
-        df_year_balance = pd.read_csv(f"{cs_temp}/output/year_balance.csv", index_col=0).drop(['Unnamed: 30'], axis=1)
-        fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=user_data)
-        fec_system_temp = sum(fec_tot.values()) / 1000  # TWh
-        fec_list.append(fec_system_temp)
-        fec_tot_list.append(pd.DataFrame(data=fec_tot.values(), index=fec_tot.keys(), columns=[run]))
-        eroi_temp = fec_system_temp / einv_temp
-        eroi_list.append(eroi_temp)
-
-        # print('Case %s Einv %.1f Eout %.1f EROI "final" %.2f GWP_op %.2f (MtC02eq)' % (run, einv_temp, ef_temp_tot, eroi_sankey_temp, gwp_limit))
-
-        # Compute the Einv details
-        df_inv_res_by_subcat, df_inv_tech_by_cat = compute_einv_details(cs=cs_temp,
-                                                                        user_data=user_data,
-                                                                        all_data=all_data)
-
-        # Compute the primary energy
-        df_primary_energy_subcat_temp, df_primary_energy_temp = compute_primary_energy(cs=cs_temp, user_data=user_data, run=run, all_data=all_data)
-
-        primary_energy_subcat_list.append(df_primary_energy_subcat_temp)
-        primary_energy_list.append(df_primary_energy_temp.drop(columns=['Subcategory']))
-        einv_res_by_subcat_list.append(df_inv_res_by_subcat)
-        einv_tech_by_cat_list.append(df_inv_tech_by_cat)
-
-    df_primary_energy = pd.concat(primary_energy_list, axis=1)
-    df_primary_energy.columns = [i for i in range_val]
-    df_primary_energy['Subcategory'] = df_primary_energy_temp['Subcategory'].copy()
-    df_ef = pd.concat(df_ef_list, axis=1)
-    df_einv_res_by_subcat = pd.concat(einv_res_by_subcat_list, axis=1) / 1000 # TWh
-    df_einv_res_by_subcat.columns = [i for i in range_val]
-    df_einv_tech_by_cat = pd.concat(einv_tech_by_cat_list, axis=1) / 1000 # TWh
-    df_einv_tech_by_cat.columns = [i for i in range_val]
-    df_eroi_sankey = pd.DataFrame(index=[i for i in range_val], data=eroi_sankey_list, columns=['EROI'])
-    df_eroi = pd.DataFrame(index=[i for i in range_val], data=eroi_list, columns=['EROI'])
-    df_inv = pd.DataFrame(index=[i for i in range_val], data=einv_list, columns=['Einv'])
-    df_primary_energy_subcat = pd.concat(primary_energy_subcat_list, axis=1)
-    df_primary_energy_subcat.columns = [i for i in range_val]
-    df_fec = pd.DataFrame(data=fec_list, index=[i for i in range_val])
-    df_fec_details = pd.concat(fec_tot_list, axis=1) / 1000 # TWh
-    df_fec_details.columns = [i for i in range_val]
-
-    return df_ef, df_eroi_sankey, df_eroi, df_inv, df_einv_res_by_subcat, df_einv_tech_by_cat, df_primary_energy_subcat, df_primary_energy, df_fec, df_fec_details
 
 def compute_einv_details(cs: str, user_data: str, all_data: dict):
     """
@@ -292,10 +169,10 @@ def compute_fec(data: pd.DataFrame, user_data:str):
             prod_corr = prod_tech_EUD[eud][tech] - conso_sum * corr_factor
             if tech not in RESOURCES:
                 fec_tech_corr = fec_given_tech(tech=tech, data=data, prod_corr=prod_corr)
-                fec_tech = fec_given_tech(tech=tech, data=data, prod_corr=prod_tech_EUD[eud][tech])
+                # fec_tech = fec_given_tech(tech=tech, data=data, prod_corr=prod_tech_EUD[eud][tech])
             else:
                 fec_tech_corr = prod_corr
-                fec_tech = prod_tech_EUD[eud][tech]
+                # fec_tech = prod_tech_EUD[eud][tech]
             # print('%s %s %.1f %.1f %.1f' %(eud, tech, fec_tech, fec_tech_corr, corr_factor))
             fec_EUD.append([tech, fec_tech_corr])
         fec_details[eud] = pd.DataFrame(fec_EUD)
@@ -374,9 +251,7 @@ def res_details(range_val, all_data: dict, dir: str, user_data: str):
 
 if __name__ == '__main__':
 
-    # Get the current working directory
     cwd = os.getcwd()
-    # Print the current working directory
     print("Current working directory: {0}".format(cwd))
 
     # Load configuration into a dict
@@ -429,20 +304,6 @@ if __name__ == '__main__':
     df_Einv_RES_cat_0, df_Einv_TECH_cat_0, df_EI_cat_0, df_EI_0 = res_details(range_val=range_val, all_data=all_data, dir=dir_0, user_data=config['user_data'])
     df_Einv_RES_cat_30, df_Einv_TECH_cat_30, df_EI_cat_30, df_EI_30 = res_details(range_val=range_val, all_data=all_data, dir=dir_30, user_data=config['user_data'])
 
-    # GWP op
-    # cs_0 = f"{config['case_studies_dir']}/{'re_be_0/run_100'}"
-    # cs_30 = f"{config['case_studies_dir']}/{'re_be_30/run_100'}"
-    # GWP_op_ini_0 = get_GWP_op_ini(cs=cs_0)
-    # GWP_op_ini_30 = get_GWP_op_ini(cs=cs_30)
-    # #
-    # range_val = range(100, 5, -5)
-    # df_Eout_0, df_eroi_sankey_0, df_eroi_0_bis, df_inv_0, df_einv_res_by_subcat_0, df_einv_tech_by_cat_0, df_primary_energy_subcat_0, df_primary_energy_0, df_fec_0, df_fec_details_0_bis = post_treatment(
-    #     range_val=range_val, GWP_op_ini=GWP_op_ini_0, all_data=all_data,
-    #     cs=f"{config['case_studies_dir']}/{'re_be_0'}", user_data=config['user_data'])
-    # df_Eout_30, df_eroi_sankey_30, df_eroi_30_bis, df_inv_30, df_einv_res_by_subcat_30, df_einv_tech_by_cat_30, df_primary_energy_subcat_30, df_primary_energy_30, df_fec_30, df_fec_details_30_bis = post_treatment(
-    #     range_val=range_val, GWP_op_ini=GWP_op_ini_30, all_data=all_data,
-    #     cs=f"{config['case_studies_dir']}/{'re_be_30'}", user_data=config['user_data'])
-    #
     ####################################################################################################################
     # -----------------------------------------------
     # PLOT
@@ -513,20 +374,6 @@ if __name__ == '__main__':
     plt.savefig(cwd+'/export/'+dir_plot+'/fec-details-30.pdf')
     plt.show()
 
-
-    # plt.figure()
-    # plt.plot([i for i in range_val_0], df_eroi_sankey_0.values, '-Dk', linewidth=3, markersize=10, label='EROIf: RE share 0%')
-    # plt.plot([i for i in range_val_30], df_eroi_sankey_30.values, '-Db', linewidth=3, markersize=10, label='EROIf: RE share 30%')
-    # plt.gca().invert_xaxis()
-    # plt.xticks([i for i in range_val])
-    # plt.ylabel('(-)')
-    # plt.xlabel(r"$GWP_{tot} \leq p \cdot GWP_{op}^0$")
-    # plt.ylim(0, 11)
-    # plt.legend()
-    # plt.tight_layout()
-    # plt.savefig(cwd+'/export/'+dir_plot+'/eroi-sankey.pdf')
-    # plt.show()
-    #
     ####################################################################################################################
     # PLOT: primary energy by subcategory
     # RESOURCES subcategories: Other non-renewable, Fossil fuel, Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
@@ -539,8 +386,6 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig(cwd+'/export/'+dir_plot+'/primary-energy-breakdown-res-0-stacked-bar.pdf')
     plt.show()
-
-
 
     # Renewable RES: biofuel + biomass + non-biomass
     RES_renewable = ['AMMONIA_RE', 'H2_RE', 'BIOETHANOL', 'BIODIESEL', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS', 'WOOD',

@@ -14,63 +14,19 @@ import numpy as np
 
 from sys import platform
 
-from energyscope.utils import make_dir
+from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
 from energyscope.postprocessing import get_total_einv
 from projects.eroi_study.plot_results import compute_fec
 
-
-def load_config(config_fn: str):
+def get_GWP_op(dir_name: str):
     """
-    Load the configuration into a dict.
-    :param config_fn: configuration file name.
-    :return: a dict with the configuration.
-    """
-
-    # Load parameters
-    cfg = yaml.load(open(config_fn, 'r'), Loader=yaml.FullLoader)
-
-    if platform == "linux":
-        cfg['energyscope_dir'] = '/home/jdumas/PycharmProjects/EnergyScope_multi_criteria/'
-        cfg['AMPL_path'] = '/home/jdumas/PycharmProjects/ampl_linux-intel64'
-    else:
-        cfg['energyscope_dir'] = '/Users/dumas/PycharmProjects/EnergyScope_multi_criteria/'
-        cfg['AMPL_path'] = '/Users/dumas/PycharmProjects/ampl_macos64'
-        cfg['options']['solver'] = "cplex"
-
-    # Extend path
-    for param in ['case_studies_dir', 'user_data', 'developer_data', 'temp_dir', 'ES_path', 'step1_output']:
-        cfg[param] = os.path.join(cfg['energyscope_dir'], cfg[param])
-
-    return cfg
-
-
-def get_FEC_from_sankey(case_study_dir: str, col:str):
-    """
-    Compute the FEC from the Sankey.
-    :param case_study_dir: path to the case study directory.
-    Return the final energy consumption (FEC) (TWh) by use sector: 'Non-energy demand', 'Loss DHN', 'Heat LT DHN',
-    'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand', 'Freight', 'Mob priv', 'Heat HT'
-    """
-    df_sankey = pd.read_csv(f"{case_study_dir}/output/sankey/input2sankey.csv", index_col=0, sep=',')
-    ef_list = ['Non-energy demand', 'Loss DHN', 'Heat LT DHN', 'Exp & Loss', 'Mob public', 'Heat LT Dec', 'Elec demand',
-               'Freight', 'Mob priv', 'Heat HT']
-    ef_final_val = []
-    for final_demand in ef_list:
-        ef_final_val.append(df_sankey[df_sankey['target'] == final_demand]['realValue'].sum())
-
-    return pd.DataFrame(index=ef_list, data=ef_final_val, columns=[col])
-
-
-def get_GWP_op_ini(dir_name: str):
-    """
-    Get the GWP_op initial.
+    Get the GWP_op from gwp_breakdown.csv.
     :param dir_name: directory name.
-    :return GWP_op initial into a pd.DataFrames.
+    :return GWP_op value.
     """
     cs = f"{config['case_studies_dir']}/{dir_name + '/run_100'}"
     gwp = pd.read_csv(f"{cs}/output/gwp_breakdown.csv", index_col=0, sep=',')
 
-    # FIXME # sum only of the GWP operation -> maybe to adapt to take into account the GWP construction
     return gwp.sum()['GWP_op']
 
 
@@ -199,7 +155,7 @@ if __name__ == '__main__':
     # Running EnergyScope
     mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
     cs = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}"
-    es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
+    # es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
 
     ################################################
     # Compute the EROI "final":
@@ -225,6 +181,6 @@ if __name__ == '__main__':
     # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i computed by Min Einv without contraint on GWP_tot
     # -----------------------------------------------
     # FIXME: allow to constraint GWP_tot or GWP_op only
-    GWP_op_ini = get_GWP_op_ini(dir_name=dir_name)
+    GWP_op_ini = get_GWP_op(dir_name=dir_name)
     range_val = range(95, 5, -5)
-    loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config, GWP_tot=GWP_tot)
+    # loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config, GWP_tot=GWP_tot)

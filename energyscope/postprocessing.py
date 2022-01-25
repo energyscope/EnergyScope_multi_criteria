@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+This script provides postprocessing functions.
+
+@author: Antoine Dubois, Jonathan Dumas
+"""
+
 import pandas as pd
 
 

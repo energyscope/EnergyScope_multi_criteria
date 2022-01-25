@@ -249,10 +249,32 @@ def res_details(range_val, all_data: dict, dir: str, user_data: str):
 
     return df_Einv_RES_cat, df_Einv_tech_cat, df_EI_cat, df_EI
 
-if __name__ == '__main__':
 
-    cwd = os.getcwd()
-    print("Current working directory: {0}".format(cwd))
+def get_GWP(cs: str):
+    """
+    Get the GWP from gwp_breakdown.csv.
+    :param cs: directory name.
+    :return GWP value.
+    """
+    gwp = pd.read_csv(f"{cs}/output/gwp_breakdown.csv", index_col=0, sep=',')
+
+    return gwp.sum()
+
+def gwp_computation(dir: str, range_val):
+    """
+    GWP computation for several case studies.
+    :param dir: directory to the case studies.
+    :param range: GWP_ini values.
+    :return: GWP in MtC02eq/y
+    """
+    GWP_list = []
+    for run in ['run_' + str(i) for i in range_val]:
+        dir_temp = dir + '/' + run
+        GWP_val = get_GWP(cs=dir_temp)
+        GWP_list.append([GWP_val['GWP_constr'], GWP_val['GWP_op']])
+    return pd.DataFrame(data=np.asarray(GWP_list)/1000, index=[i for i in range_val], columns=['GWP_cons', 'GWP_op'])
+
+if __name__ == '__main__':
 
     # Load configuration into a dict
     config = load_config(config_fn='config.yaml')
@@ -283,195 +305,11 @@ if __name__ == '__main__':
     einv = get_total_einv(cs_test) / 1000  # TWh
     print('FEC SANKEY %.2f vs year_balance %.2f [TWh/y]' % (fec_sankey, fec_tot_val))
     print('EROI %.2f %.2f' % (fec_sankey / einv, fec_tot_val / einv))
+    GWP_val = get_GWP(cs=cs_test)
+    print('GWP_cons %.1f GWP_op %.1f [ktC02/y]' %(GWP_val['GWP_constr'], GWP_val['GWP_op']))
 
     # Compute Einv by ressources and technologies
     df_inv_res_by_subcat, df_inv_tech_by_cat = compute_einv_details(cs=cs_test, user_data=config['user_data'], all_data=all_data)
 
     # Primary Energy by subcategory
     df_primary_energy_subcat, df_primary_energy = compute_primary_energy(cs=cs_test, user_data=config['user_data'], run=run, all_data=all_data)
-
-    # -----------------------------------------------
-    # Compare two case studies with a RE minimal share of 0% and 30%.
-    # Min Einv
-    # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i the value obtained by Min Einv without contraint on GWP_tot
-    # -----------------------------------------------
-
-    range_val = range(100, 5, -5)
-    dir_0 = f"{config['case_studies_dir']}/{dir_name + '_0'}"
-    dir_30 = f"{config['case_studies_dir']}/{dir_name + '_30'}"
-    df_res_0, df_fec_details_0 = eroi_computation(dir=dir_0, user_data=config['user_data'], range_val=range_val)
-    df_res_30, df_fec_details_30 = eroi_computation(dir=dir_30, user_data=config['user_data'], range_val=range_val)
-    df_Einv_RES_cat_0, df_Einv_TECH_cat_0, df_EI_cat_0, df_EI_0 = res_details(range_val=range_val, all_data=all_data, dir=dir_0, user_data=config['user_data'])
-    df_Einv_RES_cat_30, df_Einv_TECH_cat_30, df_EI_cat_30, df_EI_30 = res_details(range_val=range_val, all_data=all_data, dir=dir_30, user_data=config['user_data'])
-
-    ####################################################################################################################
-    # -----------------------------------------------
-    # PLOT
-    # -----------------------------------------------
-    ####################################################################################################################
-    dir_plot = 'comparison_' + dir_name
-    make_dir(cwd+'/export/')
-    make_dir(cwd+'/export/'+dir_plot+'/')
-
-    ####################################################################################################################
-    # Plot EROI (computed with FEC from SANKEY and year_balance.csv) vs GWP
-    plt.figure()
-    plt.plot([i for i in range_val], df_res_0['EROI'].values, '-Dk', linewidth=3, markersize=10, label='EROIf: RE share 0%')
-    plt.plot([i for i in range_val], df_res_30['EROI'].values, '-Db', linewidth=3, markersize=10, label='EROIf: RE share 30%')
-    plt.gca().invert_xaxis()
-    plt.xticks([i for i in range_val])
-    plt.ylabel('(-)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 10)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/eroi.pdf')
-    plt.show()
-
-    ####################################################################################################################
-    # Plot compare FEC & Einv
-    plt.figure()
-    plt.plot([i for i in range_val], df_res_0['FEC'].values, '-Dk', linewidth=3, markersize=10, label='FEC: RE share 0%')
-    plt.plot([i for i in range_val], df_res_30['FEC'].values, '-Db', linewidth=3, markersize=10, label='FEC: RE share 30%')
-    plt.gca().invert_xaxis()
-    plt.xticks([i for i in range_val])
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 400)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/fec.pdf')
-    plt.show()
-
-    plt.figure()
-    plt.plot([i for i in range_val], df_res_0['Einv'].values, '-Dk', linewidth=3, markersize=10, label='Einv: RE share 0%')
-    plt.plot([i for i in range_val], df_res_30['Einv'].values, '-Db', linewidth=3, markersize=10, label='Einv: RE share 30%')
-    plt.gca().invert_xaxis()
-    plt.xticks([i for i in range_val])
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 120)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/einv.pdf')
-    plt.show()
-
-
-    plt.figure()
-    df_fec_details_0.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 400)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/fec-details-0.pdf')
-    plt.show()
-    plt.figure()
-    df_fec_details_30.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 400)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/fec-details-30.pdf')
-    plt.show()
-
-    ####################################################################################################################
-    # PLOT: primary energy by subcategory
-    # RESOURCES subcategories: Other non-renewable, Fossil fuel, Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
-    # RE share: 0%
-    plt.figure()
-    df_EI_cat_0.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 450)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/primary-energy-breakdown-res-0-stacked-bar.pdf')
-    plt.show()
-
-    # Renewable RES: biofuel + biomass + non-biomass
-    RES_renewable = ['AMMONIA_RE', 'H2_RE', 'BIOETHANOL', 'BIODIESEL', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS', 'WOOD',
-                     'RES_HYDRO',
-                     'RES_SOLAR', 'RES_WIND', 'RES_GEO']
-    df_copy = df_EI_0.loc[RES_renewable].drop(columns=['Subcategory']).copy().transpose()
-    df_copy.columns.name = ''
-    plt.figure()
-    df_copy.loc[:, (df_copy != 0).any(axis=0)].plot(kind='bar', stacked=True)  # plot only colmumns where all values are > 0
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    # plt.ylim(0, 550)
-    plt.tight_layout()
-    plt.savefig(cwd + '/export/' + dir_plot + '/primary-energy-renewable-stacked-bar-0.pdf')
-    plt.show()
-
-    # Non renewable RES: Fossil fuel + Other non-renewable
-    RES_non_renewable = ['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE',
-                         'METHANOL', 'URANIUM']
-    df_copy = df_EI_0.loc[RES_non_renewable].drop(columns=['Subcategory']).copy().transpose()
-    df_copy.columns.name = ''
-    plt.figure()
-    df_copy.loc[:, (df_copy != 0).any(axis=0)].plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    # plt.ylim(0, 550)
-    plt.tight_layout()
-    plt.savefig(cwd + '/export/' + dir_plot + '/primary-energy-non-renewable-stacked-bar-0.pdf')
-    plt.show()
-
-    # RE share: 30%
-    plt.figure()
-    df_EI_cat_30.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 450)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/primary-energy-breakdown-res-30-stacked-bar.pdf')
-    plt.show()
-    ####################################################################################################################
-
-
-    ####################################################################################################################
-    # Plot Einv breakdown by subcategories and categories of ressources and technologies, respectively.
-    # Einv = Einv_operation + Einv_construction
-    # RESOURCES -> use Einv only for the operation (0 for construction)
-    # TECHNOLOGIES -> use Einv only for the construction (0 for operation)
-
-    # 1. RESOURCES subcategories: Other non-renewable, Fossil fuel, Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
-    # RE share: 0%
-    plt.figure()
-    df_Einv_RES_cat_0.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 90)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/einv-breakdown-res-0-stacked-bar.pdf')
-    plt.show()
-    # RE share: 30%
-    plt.figure()
-    df_Einv_RES_cat_30.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 90)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/einv-breakdown-res-30-stacked-bar.pdf')
-    plt.show()
-
-
-    # 2. TECHNOLOGIES categories: electricity, mobility, heat, ...
-    # WARNING: the energy invested for technologies is 0 for the operation part
-    # RE share: 0%
-    plt.figure()
-    df_Einv_TECH_cat_0.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 35)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/einv-breakdown-tech-0-stacked-bar.pdf')
-    plt.show()
-    # RE share: 30%
-    plt.figure()
-    df_Einv_TECH_cat_30.transpose().plot(kind='bar', stacked=True)
-    plt.ylabel('(TWh)')
-    plt.xlabel('p (%)')
-    plt.ylim(0, 35)
-    plt.tight_layout()
-    plt.savefig(cwd+'/export/'+dir_plot+'/einv-breakdown-tech-30-stacked-bar.pdf')
-    plt.show()

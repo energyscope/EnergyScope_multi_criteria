@@ -16,7 +16,7 @@ from sys import platform
 
 from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
 from energyscope.postprocessing import get_total_einv
-from projects.eroi_study.plot_results import compute_fec
+from projects.eroi_study.res_RE_domestic_share import compute_fec
 
 def get_GWP_op(dir_name: str):
     """
@@ -61,57 +61,6 @@ def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict, 
             mod_fns = [f"{config['ES_path']}/ESTD_model_GWP_op.mod"]
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
 
-def compute_einv_details(cs: str, energyscope_dir: str, all_data: dict):
-    """
-    Compute the Einv by RESOURCES and TECHNOLOGIES, it details the breakdown by subcategories of RESOURCES and categories of TECHNOLOGIES.
-    :param cs: case study path
-    :param energyscope_dir: energy scopre directory
-    :param all_data: the data into a dict of pd.DataFrames.
-    :return: the data into pd.DataFrames
-    """
-    # Load Einv data
-    df_einv = pd.read_csv(f"{cs}/output/einv_breakdown.csv", index_col=0)
-    # Define the RESOURCES and TECHNOLOGIES lists
-    RESOURCES = list(all_data['Resources'].index)
-    TECHNOLOGIES = list(all_data['Technologies'].index)
-    df_inv_res = df_einv.loc[RESOURCES].copy()
-    df_inv_tech = df_einv.loc[TECHNOLOGIES].copy()
-    # Get the category and subcategory indexes
-    df_aux_res = pd.read_csv(energyscope_dir + "/Data/User_data/aux_resources.csv", index_col=0)
-    df_aux_tech = pd.read_csv(energyscope_dir + "/Data/User_data/aux_technologies.csv", index_col=0)
-
-    # 1. Compute the Einv by subcategory of resources
-    res_subcat = list(df_aux_res['Subcategory'].values)
-    res_subcat = list(dict.fromkeys(res_subcat))  # remove duplicate
-
-    res_by_subcat = dict()
-    for sub_cat in res_subcat:
-        res_by_subcat[sub_cat] = list(df_aux_res['Subcategory'][df_aux_res['Subcategory'] == sub_cat].index)
-
-    einv_res_by_subcat = dict()
-    for sub_cat in res_by_subcat.keys():
-        einv_res_by_subcat[sub_cat] = df_inv_res.loc[res_by_subcat[sub_cat]]
-    df_inv_res_by_subcat = pd.DataFrame(
-        data=[einv_res_by_subcat[sub_cat].sum().sum() for sub_cat in einv_res_by_subcat.keys()],
-        index=einv_res_by_subcat.keys(), columns=['RESSOURCES'])
-
-    # 2. Compute the Einv by category of technologies
-    tech_cat = list(df_aux_tech['Category'].values)
-    tech_cat = list(dict.fromkeys(tech_cat))  # remove duplicate
-
-    tech_by_cat = dict()
-    for cat in tech_cat:
-        tech_by_cat[cat] = list(df_aux_tech['Category'][df_aux_tech['Category'] == cat].index)
-
-    einv_tech_by_cat = dict()
-    for cat in tech_by_cat.keys():
-        einv_tech_by_cat[cat] = df_inv_tech.loc[tech_by_cat[cat]]
-    df_inv_tech_by_cat = pd.DataFrame(data=[einv_tech_by_cat[cat].sum().sum() for cat in einv_tech_by_cat.keys()],
-                                      index=einv_tech_by_cat.keys(), columns=['TECHNOLOGIES'])
-
-    return df_inv_res_by_subcat, df_inv_tech_by_cat
-
-
 if __name__ == '__main__':
 
     # Get the current working directory
@@ -155,7 +104,7 @@ if __name__ == '__main__':
     # Running EnergyScope
     mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
     cs = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}"
-    # es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
+    es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
 
     ################################################
     # Compute the EROI "final":
@@ -180,7 +129,6 @@ if __name__ == '__main__':
     # Min Einv
     # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i computed by Min Einv without contraint on GWP_tot
     # -----------------------------------------------
-    # FIXME: allow to constraint GWP_tot or GWP_op only
     GWP_op_ini = get_GWP_op(dir_name=dir_name)
     range_val = range(95, 5, -5)
-    # loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config, GWP_tot=GWP_tot)
+    loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config, GWP_tot=GWP_tot)

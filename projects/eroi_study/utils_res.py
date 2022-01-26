@@ -18,6 +18,71 @@ from sys import platform
 from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
 from energyscope.postprocessing import get_total_einv
 
+def compute_einv_res(cs: str, all_data: dict):
+    """
+    Compute the Einv by RESOURCES part (Einv_op).
+    :param cs: case study path
+    :param user_data: user_data directory
+    :param all_data: the data into a dict of pd.DataFrames.
+    :return: the data into pd.DataFrames
+    """
+    # Load Einv data
+    df_einv = pd.read_csv(f"{cs}/output/einv_breakdown.csv", index_col=0)
+    # Define the RESOURCES list
+    RESOURCES = list(all_data['Resources'].index)
+    return df_einv.loc[RESOURCES].copy()['Einv_op']
+
+def compute_einv_tech(cs: str, all_data: dict):
+    """
+    Compute the Einv by TECHNOLOGIES part (Einv_const).
+    :param cs: case study path
+    :param user_data: user_data directory
+    :param all_data: the data into a dict of pd.DataFrames.
+    :return: the data into pd.DataFrames
+    """
+    # Load Einv data
+    df_einv = pd.read_csv(f"{cs}/output/einv_breakdown.csv", index_col=0)
+    # Define the TECHNOLOGIES list
+    TECHNOLOGIES = list(all_data['Technologies'].index)
+    return df_einv.loc[TECHNOLOGIES].copy()['Einv_constr']
+
+
+def retrieve_einv_const_by_categories(range_val, all_data: dict, dir: str, user_data: str):
+    """
+    Retrieve the Einv_const values for all case studies classed by categories of technologies.
+    :param range_val: range of GWP constrained values.
+    :param all_data: the data into a dict of pd.DataFrames.
+    :param dir: case study path and name.
+    :param user_data: user_data directory.
+    :return: dict with keys being the categories of technologies. For each catagory, a pd.DataFrame with Einv_const values for all scenarios.
+    """
+    # Retrieve all Einv_const values for all case studies
+    einv_tech = []
+    for run in ['run_' + str(i) for i in range_val]:
+        cs_temp = dir + '/' + run
+        einv_tech.append(compute_einv_tech(cs=cs_temp, all_data=all_data))
+    df_einv_tech = pd.concat(einv_tech, axis=1)
+    df_einv_tech.columns = [i for i in range_val]
+
+    # Retrieve the technologies categories:
+    df_aux_tech = pd.read_csv(user_data + "/aux_technologies.csv", index_col=0)
+    # tech_cat = ['Electricity', 'Heat', 'Mobility', 'Infrastructure', 'Synthetic fuels', 'Storage']
+    tech_cat = list(df_aux_tech['Category'].values)
+    tech_cat = list(dict.fromkeys(tech_cat))  # remove duplicate
+
+    # Class the technologies by categories into a dict
+    tech_by_cat = dict()
+    for cat in tech_cat:
+        tech_by_cat[cat] = list(df_aux_tech['Category'][df_aux_tech['Category'] == cat].index)
+
+    # Retrieve the values of Einv_const per category of technology (and remove tech where Einv_const is always 0)
+    tech_classed_by_cat = dict()
+    for cat in tech_by_cat.keys():
+        tech_classed_by_cat[cat] = retrieve_non_zero_val(df=df_einv_tech.loc[tech_by_cat[cat]].transpose()) /1000 # TWh
+
+    return tech_classed_by_cat
+
+
 def compute_einv_details(cs: str, user_data: str, all_data: dict):
     """
     Compute the Einv by RESOURCES and TECHNOLOGIES, it details the breakdown by subcategories of RESOURCES and categories of TECHNOLOGIES.
@@ -218,6 +283,7 @@ def res_details(range_val, all_data: dict, dir: str, user_data: str):
     """
     Einv_Res_cat_list = []
     Einv_Tech_cat_list = []
+    Einv_res_list = []
     EI_by_cat_list = []
     EI_list = []
     for run in ['run_' + str(i) for i in range_val]:
@@ -230,6 +296,9 @@ def res_details(range_val, all_data: dict, dir: str, user_data: str):
         Einv_Res_cat_list.append(df_Einv_RES_cat_temp)
         Einv_Tech_cat_list.append(df_Einv_TECH_cat_temp)
 
+        # Einv_op only
+        Einv_res_list.append(compute_einv_res(cs=cs_temp, all_data=all_data))
+
         # Compute the primary energy
         df_EI_cat_temp, df_EI_temp = compute_primary_energy(cs=cs_temp, user_data=user_data, run=run, all_data=all_data)
 
@@ -237,6 +306,8 @@ def res_details(range_val, all_data: dict, dir: str, user_data: str):
         EI_list.append(df_EI_temp.drop(columns=['Subcategory']))
 
     cols = [i for i in range_val]
+    df_Einv_op = pd.concat(Einv_res_list, axis=1) / 1000  # TWh
+    df_Einv_op.columns = cols
     df_EI = pd.concat(EI_list, axis=1)
     df_EI.columns = cols
     df_EI['Subcategory'] = df_EI_temp['Subcategory'].copy()
@@ -247,7 +318,7 @@ def res_details(range_val, all_data: dict, dir: str, user_data: str):
     df_EI_cat = pd.concat(EI_by_cat_list, axis=1)
     df_EI_cat.columns = cols
 
-    return df_Einv_RES_cat, df_Einv_tech_cat, df_EI_cat, df_EI
+    return df_Einv_op, df_Einv_RES_cat, df_Einv_tech_cat, df_EI_cat, df_EI
 
 
 def get_GWP(cs: str):
@@ -273,6 +344,15 @@ def gwp_computation(dir: str, range_val):
         GWP_val = get_GWP(cs=dir_temp)
         GWP_list.append([GWP_val['GWP_constr'], GWP_val['GWP_op']])
     return pd.DataFrame(data=np.asarray(GWP_list)/1000, index=[i for i in range_val], columns=['GWP_cons', 'GWP_op'])
+
+
+def retrieve_non_zero_val(df: pd.DataFrame):
+    """
+    Retrieve columns of a DataFrame with 0 values for all rows.
+    :param df: DataFrame of shape (n_scenarios, n_cols).
+    :return: DataFrame of shape (n_scenarios, n_cols_new) with n_cols_new <= n_cols.
+    """
+    return df.loc[:, (df != 0).any(axis=0)].copy()
 
 if __name__ == '__main__':
 

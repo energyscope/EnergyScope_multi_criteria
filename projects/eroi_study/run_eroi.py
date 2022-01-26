@@ -60,6 +60,7 @@ def loop_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict, 
             # TotalGWP = sum {i in RESOURCES} GWP_op [i]
             mod_fns = [f"{config['ES_path']}/ESTD_model_GWP_op.mod"]
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
+        es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
 if __name__ == '__main__':
 
@@ -106,6 +107,9 @@ if __name__ == '__main__':
     cs = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}"
     es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
 
+    # Display sankey
+    es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
+
     ################################################
     # Compute the EROI "final":
     # -> compute the FEC from the year_balance.csv
@@ -130,5 +134,5 @@ if __name__ == '__main__':
     # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i computed by Min Einv without contraint on GWP_tot
     # -----------------------------------------------
     GWP_op_ini = get_GWP_op(dir_name=dir_name)
-    range_val = range(95, 5, -5)
+    range_val = range(95, 0, -5)
     loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config, GWP_tot=GWP_tot)

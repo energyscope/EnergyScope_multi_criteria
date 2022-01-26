@@ -17,6 +17,8 @@ from sys import platform
 from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
 from energyscope.postprocessing import get_total_einv
 from projects.eroi_study.res_RE_domestic_share import compute_fec
+from projects.eroi_study.utils_res import get_GWP
+
 
 def get_GWP_op(dir_name: str):
     """
@@ -119,6 +121,7 @@ if __name__ == '__main__':
     ################################################
 
     # Compute the FEC from the year_balance.csv
+    GWP_val = get_GWP(cs=cs)
     df_year_balance = pd.read_csv(f"{cs}/output/year_balance.csv", index_col=0)
     fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
     fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
@@ -128,11 +131,12 @@ if __name__ == '__main__':
     einv = get_total_einv(cs) / 1000  # TWh
     print('FEC SANKEY %.2f vs year_balance %.2f [TWh/y]' % (fec_sankey, fec_tot_val))
     print('EROI SANKEY %.2f vs year_balance %.2f' % (fec_sankey / einv, fec_tot_val / einv))
+    print('GWP_constr %.1f GWP_op %.1f' %(GWP_val['GWP_constr'], GWP_val['GWP_op']))
 
-    # -----------------------------------------------
-    # Min Einv
-    # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i computed by Min Einv without contraint on GWP_tot
-    # -----------------------------------------------
-    GWP_op_ini = get_GWP_op(dir_name=dir_name)
-    range_val = range(95, 0, -5)
-    loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config, GWP_tot=GWP_tot)
+    # # -----------------------------------------------
+    # # Min Einv
+    # # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i computed by Min Einv without contraint on GWP_tot
+    # # -----------------------------------------------
+    # GWP_op_ini = get_GWP_op(dir_name=dir_name)
+    # range_val = range(95, 0, -5)
+    # loop_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config, GWP_tot=GWP_tot)

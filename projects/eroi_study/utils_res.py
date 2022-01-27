@@ -354,6 +354,22 @@ def retrieve_non_zero_val(df: pd.DataFrame):
     """
     return df.loc[:, (df != 0).any(axis=0)].copy()
 
+
+def res_assets_capacity(range_val, dir: str):
+    """
+    Retrieve the asset installed capacities.
+    :param range_val: range of GWP constrained values.
+    :param dir: case study path and name.
+    :return: Asset installed capacities into a pd.DataFrame.
+    """
+    assets_list = []
+    for run in ['run_' + str(i) for i in range_val]:
+        df_asset_temp = pd.read_csv(dir + '/' + run + "/output/assets.csv", index_col=0)
+        assets_list.append(df_asset_temp['f'])
+    df_assets = pd.concat(assets_list, axis=1)
+    df_assets.index.name = ''
+    df_assets.columns = [i for i in range_val]
+    return df_assets.drop(index='UNITS').astype(float)
 if __name__ == '__main__':
 
     # Load configuration into a dict

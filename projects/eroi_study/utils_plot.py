@@ -10,17 +10,29 @@ import energyscope as es
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_data(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: str, label_2: str, pdf_name: str,
-              x_index: list, ylim: list, ylabel: str):
+
+def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: list, ylim: list, ylabel: str):
     """
-    Compare two timeseries: EROI, FEC, Einv, GWP, etc.
-    :param df_data_1:
-    :param df_data_2:
-    :param label_1:
-    :param label_2:
-    :param pdf_name:
-    :param x_index:
-    :param ylim:
+    Plot one time serie: EROI, FEC, Einv, GWP, etc.
+    """
+    plt.figure()
+    plt.plot(x_index, df_data.values, '-Dk', linewidth=3, markersize=10, label=label)
+    plt.gca().invert_xaxis()
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.ylabel(ylabel, fontsize=15)
+    plt.xlabel('p (%)', fontsize=15)
+    plt.ylim(ylim[0], ylim[1])
+    plt.legend(fontsize=15)
+    plt.tight_layout()
+    plt.savefig(pdf_name)
+    plt.show()
+
+
+def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: str, label_2: str, pdf_name: str,
+                    x_index: list, ylim: list, ylabel: str):
+    """
+    Compare two time series: EROI, FEC, Einv, GWP, etc.
     """
     plt.figure()
     plt.plot(x_index, df_data_1.values, '-Dk', linewidth=3, markersize=10, label=label_1)
@@ -29,7 +41,7 @@ def plot_data(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: str, la
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
     plt.ylabel(ylabel, fontsize=15)
-    plt.xlabel('p (%)', fontsize=15)
+    plt.xlabel('GWP total [MtC02/y]', fontsize=15)
     plt.ylim(ylim[0], ylim[1])
     plt.legend(fontsize=15)
     plt.tight_layout()

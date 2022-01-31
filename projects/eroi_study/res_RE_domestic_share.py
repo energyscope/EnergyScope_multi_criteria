@@ -17,8 +17,8 @@ from sys import platform
 
 from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
 from energyscope.postprocessing import get_total_einv
-from projects.eroi_study.utils_plot import plot_data, plot_stacked_bar
-from projects.eroi_study.utils_res import compute_fec, get_GWP, compute_einv_details, compute_primary_energy, \
+from projects.eroi_study.utils_plot import plot_two_series, plot_stacked_bar
+from projects.eroi_study.utils_res import compute_fec, get_gwp, compute_einv_details, compute_primary_energy, \
     eroi_computation, res_details, gwp_computation
 
 GWP = 'GWP_op' # 'GWP_tot', 'GWP_op'
@@ -65,14 +65,14 @@ if __name__ == '__main__':
     pdf_2 = '30-'+GWP
     ####################################################################################################################
     # Plot EROI, FEC, and Einv vs p [%]
-    plot_data(df_data_1=df_res_1['EROI'], df_data_2=df_res_2['EROI'], label_1='0%', label_2='30%',
-              pdf_name=dir_plot + '/eroi_'+GWP+'.pdf', x_index=[i for i in range_val], ylim=[2, 10], ylabel='(-)')
-    plot_data(df_data_1=df_res_1['FEC'], df_data_2=df_res_2['FEC'], label_1='0%', label_2='30%',
-              pdf_name=dir_plot + '/fec_'+GWP+'.pdf', x_index=[i for i in range_val], ylim=[0, 400], ylabel='(TWh)')
-    plot_data(df_data_1=df_res_1['Einv'], df_data_2=df_res_2['Einv'], label_1='0%', label_2='30%',
-              pdf_name=dir_plot + '/einv_'+GWP+'.pdf', x_index=[i for i in range_val], ylim=[0, 120], ylabel='(TWh)')
-    plot_data(df_data_1=df_GWP_1.sum(axis=1), df_data_2=df_GWP_2.sum(axis=1), label_1='0%', label_2='30%',
-              pdf_name=dir_plot + '/gwp_'+GWP+'.pdf', x_index=[i for i in range_val], ylim=[0, 110], ylabel='(MtC02/y)')
+    plot_two_series(df_data_1=df_res_1['EROI'], df_data_2=df_res_2['EROI'], label_1='0%', label_2='30%',
+                    pdf_name=dir_plot + '/eroi_'+GWP+'.pdf', x_index=[i for i in range_val], ylim=[2, 10], ylabel='(-)')
+    plot_two_series(df_data_1=df_res_1['FEC'], df_data_2=df_res_2['FEC'], label_1='0%', label_2='30%',
+                    pdf_name=dir_plot + '/fec_'+GWP+'.pdf', x_index=[i for i in range_val], ylim=[0, 400], ylabel='(TWh)')
+    plot_two_series(df_data_1=df_res_1['Einv'], df_data_2=df_res_2['Einv'], label_1='0%', label_2='30%',
+                    pdf_name=dir_plot + '/einv_'+GWP+'.pdf', x_index=[i for i in range_val], ylim=[0, 120], ylabel='(TWh)')
+    plot_two_series(df_data_1=df_GWP_1.sum(axis=1), df_data_2=df_GWP_2.sum(axis=1), label_1='0%', label_2='30%',
+                    pdf_name=dir_plot + '/gwp_'+GWP+'.pdf', x_index=[i for i in range_val], ylim=[0, 110], ylabel='(MtC02/y)')
 
     # FEC detailled by stacked bars
     plot_stacked_bar(df_data=df_fec_details_1.transpose(), ylabel='(TWh)', ylim=450,

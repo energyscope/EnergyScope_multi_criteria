@@ -321,13 +321,23 @@ def res_details(range_val, all_data: dict, dir: str, user_data: str):
     return df_Einv_op, df_Einv_RES_cat, df_Einv_tech_cat, df_EI_cat, df_EI
 
 
-def get_GWP(cs: str):
+def get_gwp(cs: str):
     """
     Get the GWP from gwp_breakdown.csv.
     :param cs: directory name.
     :return GWP value.
     """
     gwp = pd.read_csv(f"{cs}/output/gwp_breakdown.csv", index_col=0, sep=',')
+
+    return gwp.sum()
+
+def get_cost(cs: str):
+    """
+    Get the GWP from gwp_breakdown.csv.
+    :param cs: directory name.
+    :return GWP value.
+    """
+    gwp = pd.read_csv(f"{cs}/output/cost_breakdown.csv", index_col=0, sep=',')
 
     return gwp.sum()
 
@@ -341,7 +351,7 @@ def gwp_computation(dir: str, range_val):
     GWP_list = []
     for run in ['run_' + str(i) for i in range_val]:
         dir_temp = dir + '/' + run
-        GWP_val = get_GWP(cs=dir_temp)
+        GWP_val = get_gwp(cs=dir_temp)
         GWP_list.append([GWP_val['GWP_constr'], GWP_val['GWP_op']])
     return pd.DataFrame(data=np.asarray(GWP_list)/1000, index=[i for i in range_val], columns=['GWP_cons', 'GWP_op'])
 
@@ -401,7 +411,7 @@ if __name__ == '__main__':
     einv = get_total_einv(cs_test) / 1000  # TWh
     print('FEC SANKEY %.2f vs year_balance %.2f [TWh/y]' % (fec_sankey, fec_tot_val))
     print('EROI %.2f %.2f' % (fec_sankey / einv, fec_tot_val / einv))
-    GWP_val = get_GWP(cs=cs_test)
+    GWP_val = get_gwp(cs=cs_test)
     print('GWP_cons %.1f GWP_op %.1f [ktC02/y]' %(GWP_val['GWP_constr'], GWP_val['GWP_op']))
 
     # Compute Einv by ressources and technologies

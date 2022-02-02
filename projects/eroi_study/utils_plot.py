@@ -30,18 +30,18 @@ def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: li
 
 
 def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: str, label_2: str, pdf_name: str,
-                    x_index: list, ylim: list, ylabel: str):
+                    x_index: list, ylim: list, ylabel: str, xlabel:str):
     """
     Compare two time series: EROI, FEC, Einv, GWP, etc.
     """
     plt.figure()
     plt.plot(x_index, df_data_1.values, '-Dk', linewidth=3, markersize=10, label=label_1)
-    plt.plot(x_index, df_data_2.values, '-Db', linewidth=3, markersize=10, label=label_2)
+    plt.plot(x_index, df_data_2.values, '-Pb', linewidth=3, markersize=10, label=label_2)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
     plt.ylabel(ylabel, fontsize=15)
-    plt.xlabel('GWP total [MtC02/y]', fontsize=15)
+    plt.xlabel(xlabel=xlabel, fontsize=15)
     plt.ylim(ylim[0], ylim[1])
     plt.legend(fontsize=15)
     plt.tight_layout()
@@ -49,20 +49,16 @@ def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: s
     plt.close()
 
 
-def plot_stacked_bar(df_data: pd.DataFrame, ylabel: str, ylim: float, pdf_name: str):
+def plot_stacked_bar(df_data: pd.DataFrame, xlabel:str, ylabel: str, ylim: float, pdf_name: str, colors=plt.cm.tab20(np.linspace(0, 1, 10))):
     """
     Stacked bar plot of a pd.DataFrame.
-    :param df_data:
-    :param ylabel:
-    :param ylim:
-    :param pdf_name:
     """
     plt.figure()
-    df_data.plot(kind='bar', stacked=True)
+    df_data.plot(kind='bar', stacked=True, color=colors)
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
     plt.ylabel(ylabel, fontsize=15)
-    plt.xlabel('p (%)', fontsize=15)
+    plt.xlabel(xlabel, fontsize=15)
     plt.ylim(0, ylim)
     plt.legend(fontsize=15)
     plt.tight_layout()

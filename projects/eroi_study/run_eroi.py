@@ -87,9 +87,9 @@ if __name__ == '__main__':
     # -------------------------------------------------
     GWP_tot = True
     if GWP_tot:
-        dir_name = 're_be_GWP_tot_0'
+        dir_name = 'einv_GWP_tot_0'
     else:
-        dir_name = 're_be_GWP_op_0'
+        dir_name = 'einv_GWP_op_0'
 
     # Running EnergyScope
     mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]

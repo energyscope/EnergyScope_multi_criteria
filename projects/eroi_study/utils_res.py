@@ -355,6 +355,56 @@ def gwp_computation(dir: str, range_val):
         GWP_list.append([GWP_val['GWP_constr'], GWP_val['GWP_op']])
     return pd.DataFrame(data=np.asarray(GWP_list)/1000, index=[i for i in range_val], columns=['GWP_cons', 'GWP_op'])
 
+def gwp_breakdown(dir: str, range_val):
+    """
+    GWP breakdown for several scenarios.
+    :param dir: directory to the case studies.
+    :param range: GWP_ini values.
+    :return: GWP_const and GWP_op into pd.DataFrame
+    """
+    gwp_const_list = []
+    gwp_op_list = []
+    for run in ['run_' + str(i) for i in range_val]:
+        dir_temp = dir + '/' + run
+        gwp = pd.read_csv(f"{dir_temp}/output/gwp_breakdown.csv", index_col=0, sep=',')
+        gwp_const_list.append(gwp['GWP_constr'])
+        gwp_op_list.append(gwp['GWP_op'])
+    df_gwp_const = pd.concat(gwp_const_list, axis=1)
+    df_gwp_const.columns = [i for i in range_val]
+    df_gwp_op = pd.concat(gwp_op_list, axis=1)
+    df_gwp_op.columns = [i for i in range_val]
+    return df_gwp_const / 1000, df_gwp_op / 1000 # MtC02/y
+
+
+def gwp_const_per_category(df_gwp_const: pd.DataFrame, user_data: str):
+    """
+    Build a dict with technology categories as keys.
+    In each category a pd.DataFrame lists the GWP_const of the corresponding technologies for several scenarios.
+    :param df_gwp_const: GWP_const raw data for several scenarios.
+    :param user_data: path to user_data.
+    :return: dict.
+    """
+
+    df_aux_tech = pd.read_csv(user_data + "/aux_technologies.csv", index_col=0)
+
+    # Retrieve the list subcategory of technologies
+    tech_subcategory_list = list(dict.fromkeys(list(df_aux_tech['Subcategory'])))
+    tech_by_subcategory = dict()
+    for cat in tech_subcategory_list:
+        tech_by_subcategory[cat] = list(df_aux_tech[df_aux_tech['Subcategory'] == cat].index)
+
+    # Select per technology category the GWP_const
+    gwp_const_by_tech_cat = dict()
+    for cat in tech_by_subcategory.keys():
+        temp_list = []
+        for tech in tech_by_subcategory[cat]:
+            if tech in list(df_gwp_const.columns):
+                temp_list.append(df_gwp_const[tech])
+        if len(temp_list) > 0:
+            gwp_const_by_tech_cat[cat] = pd.concat(temp_list, axis=1)
+        else:
+            gwp_const_by_tech_cat[cat] = None
+    return gwp_const_by_tech_cat
 
 def retrieve_non_zero_val(df: pd.DataFrame):
     """

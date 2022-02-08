@@ -51,6 +51,9 @@ def loop_eroi_computation(range_val, dir_name: str, GWP_op_ini: float, config: d
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
         es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
+
+DOMESTIC_RE_SHARE = 0 # (%) Domestic RE share in the primary energy mix (by default is set to 0 in the config file)
+
 if __name__ == '__main__':
 
     # Get the current working directory
@@ -60,6 +63,7 @@ if __name__ == '__main__':
 
     # Load configuration into a dict
     config = load_config(config_fn='config.yaml')
+    config['system_limits']['re_be_share_primary'] = DOMESTIC_RE_SHARE
 
     # Create the temp_dir if it does not exist
     make_dir(config['temp_dir'])
@@ -85,11 +89,13 @@ if __name__ == '__main__':
     # GWP_tot is not constrained
     # -> allows to compute GWP_op^i
     # -------------------------------------------------
+
+
     GWP_tot = True
     if GWP_tot:
-        dir_name = 'einv_GWP_tot_0'
+        dir_name = 'einv_GWP_tot_'+str(int(100 * DOMESTIC_RE_SHARE))
     else:
-        dir_name = 'einv_GWP_op_0'
+        dir_name = 'einv_GWP_op_'+str(int(100 * DOMESTIC_RE_SHARE))
 
     # Running EnergyScope
     mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]

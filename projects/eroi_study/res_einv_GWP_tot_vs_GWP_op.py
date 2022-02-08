@@ -192,8 +192,8 @@ if __name__ == '__main__':
     ####################################################################################################################
     # EROI, FEC, Einv_tot, and GWP_tot
     # \alpha^0 = \text{GWP}_{op}^0
-    label1 = r'$x^{op}$' # x^{op} = \frac{\text{GWP}_{op}}{\alpha^0}
-    label2 = r'$x^{tot}$' # x^{tot} = \frac{\text{GWP}_{tot}}{\alpha^0}
+    label1 = r'${GWP}_{op} \leq p \cdot gwp^0$' # x^{op} = \frac{\text{GWP}_{op}}{\alpha^0}
+    label2 = r'${GWP}_{tot} \leq p \cdot gwp^0$' # x^{tot} = \frac{\text{GWP}_{tot}}{\alpha^0}
     plot_two_series(df_data_1=df_res_1['EROI'], df_data_2=df_res_2['EROI'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/eroi_'+ str(domestic_RE_share)+'.pdf', x_index=[i for i in range_val], ylim=[2.5, 10], ylabel='EROI [-]', xlabel='p [%]')
     plot_two_series(df_data_1=df_res_1['FEC'], df_data_2=df_res_2['FEC'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/fec_'+ str(domestic_RE_share)+'.pdf', x_index=[i for i in range_val], ylim=[300, 480], ylabel='FEC [TWh/y]', xlabel='p [%]')
     plot_two_series(df_data_1=df_res_1['Einv'], df_data_2=df_res_2['Einv'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/einv_'+ str(domestic_RE_share)+'.pdf', x_index=[i for i in range_val], ylim=[30, 180], ylabel=r'$Einv{tot}$ [TWh/y]', xlabel='p [%]')

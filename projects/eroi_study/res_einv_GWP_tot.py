@@ -34,7 +34,7 @@ def replace_item_in_list(l: list, item_old: str, item_new: str):
             l[i] = item_new
     return l
 
-def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: list, ylim: list, ylabel: str):
+def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: list, ylim: list, ylabel: str, yticks_val=None):
     """
     Plot one time serie: EROI, FEC, Einv, GWP, etc.
     """
@@ -43,6 +43,7 @@ def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: li
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
+    plt.yticks(yticks_val)
     plt.ylabel(ylabel, fontsize=15)
     plt.xlabel('GWP total [MtC02/y]', fontsize=15)
     plt.ylim(ylim[0], ylim[1])
@@ -79,15 +80,16 @@ if __name__ == '__main__':
     df_res, df_fec_details = eroi_computation(dir=dir, user_data=config['user_data'], range_val=range_val)
     df_Einv_op, df_Einv_RES_cat, df_Einv_TECH_cat, df_EI_cat, df_EI = res_details(range_val=range_val, all_data=all_data, dir=dir, user_data=config['user_data'])
     df_GWP = gwp_computation(dir=dir, range_val=range_val)
-    df_Einv_const = retrieve_einv_const_by_categories(range_val=range_val, all_data=all_data, dir=dir, user_data=config['user_data'])
+    Einv_const_dict = retrieve_einv_const_by_categories(range_val=range_val, all_data=all_data, dir=dir, user_data=config['user_data'])
     df_assets = res_assets_capacity(range_val=range_val, dir=dir)
     df_gwp_const, df_gwp_op = gwp_breakdown(dir=dir, range_val=range_val)
 
     ######
     # Share of energies
     for p in range(100, 60, -5):
+        tot_EI = df_EI[p].sum()
         print('GWP_tot %.1f [MtC02/y]: offshore %.1f [GW] onshore %.1f [GW] PV %.1f [GW]' %(df_GWP.sum(axis=1).loc[p], df_assets[p].loc['WIND_OFFSHORE'], df_assets[p].loc['WIND_ONSHORE'], df_assets[p].loc['PV']))
-        print('Gas %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f percentage of primary energy share' % (100 * df_EI[p]['GAS'] / df_EI[p].sum(), 100 * df_EI[p]['RES_SOLAR'] / df_EI[p].sum(), 100 * df_EI[p]['RES_WIND'] / df_EI[p].sum(), 100 * df_EI[p]['WOOD'] / df_EI[p].sum(), 100 * df_EI[p]['WET_BIOMASS'] / df_EI[p].sum(),  100 * df_EI[p]['WASTE'] / df_EI[p].sum()))
+        print('Gas %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f percentage of primary energy share' % (100 * df_EI[p]['GAS'] / tot_EI, 100 * df_EI[p]['RES_SOLAR'] / tot_EI, 100 * df_EI[p]['RES_WIND'] / tot_EI, 100 * df_EI[p]['WOOD'] / tot_EI, 100 * df_EI[p]['WET_BIOMASS'] / tot_EI,  100 * df_EI[p]['WASTE'] / tot_EI))
 
     ####################################################################################################################
     # Compare the case p = 100, 20, 10 and 5
@@ -102,8 +104,11 @@ if __name__ == '__main__':
     # df_year_balance_5 = pd.read_csv(dir + '/run_5/' + "/output/year_balance.csv", index_col=0)
     # fec_details_5, fec_tot_5 = compute_fec(data=df_year_balance_5, user_data=config['user_data'])
     #
-    # df_energy_stored_5 = pd.read_csv(dir + '/run_5/' + "/output/hourly_data/energy_stored.csv", index_col=0).dropna(axis=1)
-    # df_energy_stored_5['GAS_STORAGE']
+    # df_energy_stored_50 = pd.read_csv(dir + '/run_50/' + "/output/hourly_data/energy_stored.csv", index_col=0).dropna(axis=1)
+    # df_layer_elec_50 = pd.read_csv(dir + '/run_50/' + "/output/hourly_data/layer_ELECTRICITY.csv", index_col=0).dropna(axis=1)
+    # df_layer_HEAT_LOW_T_DECEN_50 = pd.read_csv(dir + '/run_50/' + "/output/hourly_data/layer_HEAT_LOW_T_DECEN.csv", index_col=0).dropna(axis=1)
+    # df_layer_HEAT_LOW_T_DHN_50 = pd.read_csv(dir + '/run_50/' + "/output/hourly_data/layer_HEAT_LOW_T_DHN.csv", index_col=0).dropna(axis=1)
+
     #
     # df_layer_gas_5 = pd.read_csv(dir + '/run_5/' + "/output/hourly_data/layer_GAS.csv", index_col=0).dropna(axis=1)
     # df_layer_gas_5['GAS_STORAGE_Pin']
@@ -128,6 +133,7 @@ if __name__ == '__main__':
     # EROI, FEC, Einv_tot, and GWP_tot
     # \alpha^0 = \text{GWP}_{op}^0
     x_gwp_tot_index = df_GWP.sum(axis=1).values
+    plot_one_serie(df_data=df_res['EROI'], label='EROI', pdf_name=dir_plot + '/eroi_custom_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[1, 10], ylabel='[-]', yticks_val=[3,5,7,9])
     plot_one_serie(df_data=df_res['EROI'], label='EROI', pdf_name=dir_plot + '/eroi_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[2.5, 10], ylabel='[-]')
     plot_one_serie(df_data=df_res['FEC'], label='FEC', pdf_name=dir_plot + '/fec_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[300, 480], ylabel='[TWh/y]')
     plot_one_serie(df_data=df_res['Einv'], label='Einv', pdf_name=dir_plot + '/einv_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[30, 180], ylabel='[TWh/y]')
@@ -178,15 +184,44 @@ if __name__ == '__main__':
     # RESOURCES -> use Einv only for the operation (0 for construction)
     # TECHNOLOGIES -> use Einv only for the construction (0 for operation)
 
-    # # Einv_op by RESOURCES subcategories: Other non-renewable, Fossil fuel, Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
-    # plot_stacked_bar(df_data=df_Einv_RES_cat.transpose(), ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-res-'+pdf+'.pdf')
-    #
-    # # Einv_op classed by RESOURCES
-    # df = retrieve_non_zero_val(df=df_Einv_op.transpose())
-    # plot_stacked_bar(df_data=df, ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-res-details-'+pdf+'.pdf')
-    #
-    # # 2. Einv_const by TECHNOLOGIES categories: electricity, mobility, heat, ...
-    # plot_stacked_bar(df_data=df_Einv_TECH_cat.transpose(), ylabel='[TWh]', ylim=35, pdf_name=dir_plot+'/einv-tech-'+pdf+'.pdf')
+    # Einv_op by RESOURCES subcategories: Other non-renewable, Fossil fuel, Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
+    df_Einv_RES_cat.columns = np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(df_data=df_Einv_RES_cat.transpose(), xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-res-'+pdf+'.pdf')
+
+    # Einv_op classed by RESOURCES (RE and non-RE)
+    df_einv_op_filtered = retrieve_non_zero_val(df=df_Einv_op.transpose())
+    df_einv_op_filtered.index = np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(df_data=df_einv_op_filtered, xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-details-'+pdf+'.pdf')
+
+    # Einv_op by RE-RESOURCES
+    df_einv_op_RE_filtered = retrieve_non_zero_val(df=df_Einv_op.loc[RES_renewable].transpose())
+    df_einv_op_RE_filtered.index = np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(df_data=df_einv_op_RE_filtered, xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-re-res-'+pdf+'.pdf')
+
+    # Einv_op by NON-RE-RESOURCES
+    df_einv_op_non_RE_filtered = retrieve_non_zero_val(df=df_Einv_op.loc[RES_non_renewable].transpose())
+    df_einv_op_non_RE_filtered.index = np.round(x_gwp_tot_index, 1)
+    new_cols = list(df_einv_op_non_RE_filtered.columns)
+    new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
+    df_einv_op_non_RE_filtered.columns = new_cols
+    plot_stacked_bar(df_data=df_einv_op_non_RE_filtered, xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=30, pdf_name=dir_plot+'/einv-op-non-re-res-'+pdf+'.pdf')
+
+    # 2. Einv_const by TECHNOLOGIES categories: electricity, mobility, heat, ...
+    df_Einv_TECH_cat.columns =np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(df_data=df_Einv_TECH_cat.drop(index=['Infrastructure']).transpose(), xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=35, pdf_name=dir_plot+'/einv-tech-'+pdf+'.pdf')
+
+    # Einv_const classed by categories of technologies: 'Electricity', 'Heat', 'Mobility', 'Infrastructure', 'Synthetic fuels', 'Storage'
+    Einv_const_dict['Electricity'].index = np.round(x_gwp_tot_index, 1)
+    ymax = Einv_const_dict['Electricity'].sum(axis=1).max() * 1.05
+    elec_tech = list(Einv_const_dict['Electricity'].max(axis=0)[Einv_const_dict['Electricity'].max(axis=0) > 0.1].index)
+    plot_stacked_bar(df_data=Einv_const_dict['Electricity'][elec_tech], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-elec-'+pdf+'.pdf')
+
+    Einv_const_dict['Mobility'].index = np.round(x_gwp_tot_index, 1)
+    ymax = Einv_const_dict['Mobility'].sum(axis=1).max() * 1.05
+    # select only the mobility technologies with Einv_const > 0.5 GWh/y
+    mobility_tech = list(Einv_const_dict['Mobility'].max(axis=0)[Einv_const_dict['Mobility'].max(axis=0) > 0.5].index)
+    plot_stacked_bar(df_data=Einv_const_dict['Mobility'][mobility_tech], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-mob-'+pdf+'.pdf')
+
 
     ##############################################################################################################
     # GWP breakdown by resources and technologies
@@ -220,3 +255,9 @@ if __name__ == '__main__':
     # PLot assets installed capacities
     df_assets.columns = np.round(x_gwp_tot_index, 1)
     plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='[MtC02/y]')
+
+    ##############
+    #
+    df_EI_filtered = retrieve_non_zero_val(df=df_EI.drop(columns=['Subcategory']).transpose())
+    df_EI_percentage = df_EI_filtered.divide(df_EI_filtered.sum(axis=1), axis=0) * 100
+    df_EI_percentage.index = np.round(x_gwp_tot_index, 1)

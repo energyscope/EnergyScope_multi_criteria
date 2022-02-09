@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: list, ylim: list, ylabel: str):
+def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: list, ylim: list, ylabel: str, yticks_val=None):
     """
     Plot one time serie: EROI, FEC, Einv, GWP, etc.
     """
@@ -20,23 +20,27 @@ def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: li
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
+    plt.yticks(yticks_val)
     plt.ylabel(ylabel, fontsize=15)
-    plt.xlabel('p (%)', fontsize=15)
+    plt.xlabel('GWP total [MtC02/y]', fontsize=15)
     plt.ylim(ylim[0], ylim[1])
     plt.legend(fontsize=15)
     plt.tight_layout()
     plt.savefig(pdf_name)
-    plt.show()
+    plt.close()
 
 
 def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: str, label_2: str, pdf_name: str,
-                    x_index: list, ylim: list, ylabel: str, xlabel:str):
+                    x_index: list, ylim: list, ylabel: str, xlabel:str, x_index_2: list=None):
     """
     Compare two time series: EROI, FEC, Einv, GWP, etc.
     """
+    if x_index_2 is None:
+        x_index_2 = x_index
+
     plt.figure()
     plt.plot(x_index, df_data_1.values, '-Dk', linewidth=3, markersize=10, label=label_1)
-    plt.plot(x_index, df_data_2.values, '-Pb', linewidth=3, markersize=10, label=label_2)
+    plt.plot(x_index_2, df_data_2.values, '-Pb', linewidth=3, markersize=10, label=label_2)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)

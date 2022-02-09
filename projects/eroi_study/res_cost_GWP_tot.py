@@ -17,23 +17,13 @@ from sys import platform
 
 from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
 from energyscope.postprocessing import get_total_einv
+from projects.eroi_study.res_einv_GWP_tot import replace_item_in_list
 from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import fec_plots, primary_energy_plots, \
     plot_asset_capacities_by_tech
 from projects.eroi_study.utils_plot import plot_two_series, plot_stacked_bar, plot_one_serie
 from projects.eroi_study.utils_res import compute_fec, get_gwp, compute_einv_details, compute_primary_energy, \
     eroi_computation, res_details, gwp_computation, retrieve_non_zero_val, retrieve_einv_const_by_categories, \
     res_assets_capacity, gwp_breakdown, gwp_const_per_category, cost_computation
-
-
-def replace_item_in_list(l: list, item_old: str, item_new: str):
-    """
-    Replace a specific item into a list
-    """
-    for i in range(len(l)):
-        if l[i] == item_old:
-            l[i] = item_new
-    return l
-
 
 # parameters
 domestic_RE_share = 0 # 0, 30 %
@@ -58,8 +48,8 @@ if __name__ == '__main__':
     #  with p a percentage and GWP_op^i the GHG emissions target.
     # -----------------------------------------------
 
-    range_val = range(100, 0, -5)
-    dir = f"{config['case_studies_dir']}/{'einv_GWP_tot_' + str(domestic_RE_share)}"
+    range_val = range(100, 5, -5)
+    dir = f"{config['case_studies_dir']}/{'cost_GWP_tot_' + str(domestic_RE_share)}"
     df_res, df_fec_details = eroi_computation(dir=dir, user_data=config['user_data'], range_val=range_val)
     df_Einv_op, df_Einv_RES_cat, df_Einv_TECH_cat, df_EI_cat, df_EI = res_details(range_val=range_val, all_data=all_data, dir=dir, user_data=config['user_data'])
     df_GWP = gwp_computation(dir=dir, range_val=range_val)
@@ -68,12 +58,13 @@ if __name__ == '__main__':
     df_assets = res_assets_capacity(range_val=range_val, dir=dir)
     df_gwp_const, df_gwp_op = gwp_breakdown(dir=dir, range_val=range_val)
 
+
     ######
     # Share of energies
-    for p in range(100, 0, -5):
+    for p in range(100, 5, -5):
         tot_EI = df_EI[p].sum()
         print('GWP_tot %.1f [MtC02/y]: offshore %.1f [GW] onshore %.1f [GW] PV %.1f [GW]' %(df_GWP.sum(axis=1).loc[p], df_assets[p].loc['WIND_OFFSHORE'], df_assets[p].loc['WIND_ONSHORE'], df_assets[p].loc['PV']))
-        print('Gas %.1f Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f percentage of primary energy share' % (100 * df_EI[p]['GAS'] / tot_EI, 100 * df_EI[p]['GAS_RE'] / tot_EI, 100 * df_EI[p]['RES_SOLAR'] / tot_EI, 100 * df_EI[p]['RES_WIND'] / tot_EI, 100 * df_EI[p]['WOOD'] / tot_EI, 100 * df_EI[p]['WET_BIOMASS'] / tot_EI,  100 * df_EI[p]['WASTE'] / tot_EI))
+        print('Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f percentage of primary energy share' % (100 * df_EI[p]['GAS'] / tot_EI, 100 * df_EI[p]['METHANOL_RE'] / tot_EI, 100 * df_EI[p]['AMMONIA_RE'] / tot_EI, 100 * df_EI[p]['H2_RE'] / tot_EI,100 * df_EI[p]['GAS_RE'] / tot_EI, 100 * df_EI[p]['RES_SOLAR'] / tot_EI, 100 * df_EI[p]['RES_WIND'] / tot_EI, 100 * df_EI[p]['WOOD'] / tot_EI, 100 * df_EI[p]['WET_BIOMASS'] / tot_EI,  100 * df_EI[p]['WASTE'] / tot_EI))
 
     ####################################################################################################################
     # Compare the case p = 100, 20, 10 and 5
@@ -107,19 +98,19 @@ if __name__ == '__main__':
     # PLOT
     # -----------------------------------------------
     ####################################################################################################################
-    dir_plot = 'einv_GWP_tot_' + str(domestic_RE_share)
+    dir_plot = 'cost_GWP_tot_' + str(domestic_RE_share)
     make_dir(cwd+'/export/')
     make_dir(cwd+'/export/'+dir_plot+'/')
-    dir_plot = cwd+'/export/einv_GWP_tot_' + str(domestic_RE_share)
+    dir_plot = cwd+'/export/cost_GWP_tot_' + str(domestic_RE_share)
     pdf = 'gwp-tot-' + str(domestic_RE_share)
 
     ####################################################################################################################
     # EROI, FEC, Einv_tot, and GWP_tot
     # \alpha^0 = \text{GWP}_{op}^0
     x_gwp_tot_index = df_GWP.sum(axis=1).values
-    plot_one_serie(df_data=df_cost.sum(axis=1), label='Cost', pdf_name=dir_plot + '/cost_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[40, 100], ylabel='[bEUR/y]')
+    plot_one_serie(df_data=df_cost.sum(axis=1), label='Cost', pdf_name=dir_plot + '/cost_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[40, 65], ylabel='[bEUR/y]')
     plot_one_serie(df_data=df_res['EROI'], label='EROI', pdf_name=dir_plot + '/eroi_custom_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[1, 10], ylabel='[-]', yticks_val=[3,5,7,9])
-    plot_one_serie(df_data=df_res['EROI'], label='EROI', pdf_name=dir_plot + '/eroi_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[2.5, 10], ylabel='[-]')
+    plot_one_serie(df_data=df_res['EROI'], label='EROI', pdf_name=dir_plot + '/eroi_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[1, 10], ylabel='[-]')
     plot_one_serie(df_data=df_res['FEC'], label='FEC', pdf_name=dir_plot + '/fec_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[300, 480], ylabel='[TWh/y]')
     plot_one_serie(df_data=df_res['Einv'], label='Einv', pdf_name=dir_plot + '/einv_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[30, 180], ylabel='[TWh/y]')
     plot_one_serie(df_data=df_EI.drop(columns=['Subcategory']).transpose().sum(axis=1), label='Primary energy', pdf_name=dir_plot + '/EI_tot_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[350, 550], ylabel='[TWh/y]')
@@ -150,8 +141,8 @@ if __name__ == '__main__':
     # https://matplotlib.org/stable/tutorials/colors/colormaps.html
     colors = plt.cm.tab20b(np.linspace(0, 1, 10))
     df_EI_RES_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_RE[['AMMONIA_SYN', 'METHANOL_SYN', 'GAS_SYN', 'WET_BIOMASS', 'WOOD',
-       'HYDRO', 'SOLAR', 'WIND']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
+    plot_stacked_bar(df_data=df_EI_RES_RE[['AMMONIA_SYN', 'METHANOL_SYN', 'GAS_SYN','WET_BIOMASS', 'WOOD', 'HYDRO', 'SOLAR', 'WIND', 'H2_SYN', 'BIODIESEL']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
+
 
     # Non renewable RES: Fossil fuel + Other non-renewable
     RES_non_renewable = ['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE',
@@ -162,7 +153,7 @@ if __name__ == '__main__':
     new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
     df_EI_RES_non_RE.columns = new_cols
     df_EI_RES_non_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_non_RE, xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=350, pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
+    plot_stacked_bar(df_data=df_EI_RES_non_RE[['GAS', 'ELECTRICITY_IMPORT', 'AMMONIA', 'WASTE', 'LFO', 'COAL']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=350, pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
 
 
     ####################################################################################################################

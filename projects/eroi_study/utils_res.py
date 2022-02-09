@@ -333,13 +333,13 @@ def get_gwp(cs: str):
 
 def get_cost(cs: str):
     """
-    Get the GWP from gwp_breakdown.csv.
+    Get the cost from cost_breakdown.csv.
     :param cs: directory name.
-    :return GWP value.
+    :return cost values breakdown between C_inv, C_maint, and C_op.
     """
-    gwp = pd.read_csv(f"{cs}/output/cost_breakdown.csv", index_col=0, sep=',')
+    cost = pd.read_csv(f"{cs}/output/cost_breakdown.csv", index_col=0, sep=',')
 
-    return gwp.sum()
+    return cost.sum()
 
 def gwp_computation(dir: str, range_val):
     """
@@ -354,6 +354,22 @@ def gwp_computation(dir: str, range_val):
         GWP_val = get_gwp(cs=dir_temp)
         GWP_list.append([GWP_val['GWP_constr'], GWP_val['GWP_op']])
     return pd.DataFrame(data=np.asarray(GWP_list)/1000, index=[i for i in range_val], columns=['GWP_cons', 'GWP_op'])
+
+
+def cost_computation(dir: str, range_val):
+    """
+    Cost computation for several case studies.
+    :param dir: directory to the case studies.
+    :param range: GWP_ini values.
+    :return: Cost in bEUR/y
+    """
+    cost_list = []
+    for run in ['run_' + str(i) for i in range_val]:
+        dir_temp = dir + '/' + run
+        cost_val = get_cost(cs=dir_temp)
+        cost_list.append([cost_val['C_inv'], cost_val['C_maint'], cost_val['C_op']])
+    return pd.DataFrame(data=np.asarray(cost_list)/1000, index=[i for i in range_val], columns=['C_inv', 'C_maint', 'C_op'])
+
 
 def gwp_breakdown(dir: str, range_val):
     """

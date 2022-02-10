@@ -52,7 +52,7 @@ def loop_eroi_computation(range_val, dir_name: str, GWP_op_ini: float, config: d
         es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
 
-DOMESTIC_RE_SHARE = 0 # (%) Domestic RE share in the primary energy mix (by default is set to 0 in the config file)
+DOMESTIC_RE_SHARE = 0.3 # (%) Domestic RE share in the primary energy mix (by default is set to 0 in the config file)
 
 if __name__ == '__main__':
 
@@ -90,7 +90,6 @@ if __name__ == '__main__':
     # -> allows to compute GWP_op^i
     # -------------------------------------------------
 
-
     GWP_tot = True
     if GWP_tot:
         dir_name = 'einv_GWP_tot_'+str(int(100 * DOMESTIC_RE_SHARE))
@@ -101,7 +100,6 @@ if __name__ == '__main__':
     mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
     cs = f"{config['case_studies_dir']}/{dir_name+'/'+config['case_study_name']}"
     es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
-    # Display sankey
     es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
     ################################################
@@ -131,6 +129,8 @@ if __name__ == '__main__':
     # Min Einv
     # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i computed by Min Einv without contraint on GWP_tot
     # -----------------------------------------------
-    GWP_op_ini = get_gwp(cs=f"{config['case_studies_dir']}/{dir_name + '/run_100'}")['GWP_op']
-    range_val = range(95, 0, -5)
+    # GWP_op_ini = get_gwp(cs=f"{config['case_studies_dir']}/{dir_name + '/run_100'}")['GWP_op']
+    GWP_op_ini = get_gwp(cs=f"{config['case_studies_dir']}/{'einv_GWP_tot_0/run_100'}")['GWP_op']
+    print('GWP_limit initial %.1f [MtC02/y]' %(GWP_op_ini/1000))
+    range_val = range(100, 0, -5)
     loop_eroi_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config, GWP_tot=GWP_tot)

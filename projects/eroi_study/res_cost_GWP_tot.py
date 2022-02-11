@@ -23,7 +23,7 @@ from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import fec_plots, primary_en
 from projects.eroi_study.utils_plot import plot_two_series, plot_stacked_bar, plot_one_serie
 from projects.eroi_study.utils_res import compute_fec, get_gwp, compute_einv_details, compute_primary_energy, \
     eroi_computation, res_details, gwp_computation, retrieve_non_zero_val, retrieve_einv_const_by_categories, \
-    res_assets_capacity, gwp_breakdown, gwp_const_per_category, cost_computation
+    res_assets_capacity, gwp_breakdown, gwp_const_per_category, cost_computation, cost_breakdown
 
 # parameters
 domestic_RE_share = 0 # 0, 30 %
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     #  with p a percentage and GWP_op^i the GHG emissions target.
     # -----------------------------------------------
 
-    range_val = range(100, 5, -5)
+    range_val = range(100, 0, -5)
     dir = f"{config['case_studies_dir']}/{'cost_GWP_tot_' + str(domestic_RE_share)}"
     df_res, df_fec_details = eroi_computation(dir=dir, user_data=config['user_data'], range_val=range_val)
     df_Einv_op, df_Einv_RES_cat, df_Einv_TECH_cat, df_EI_cat, df_EI = res_details(range_val=range_val, all_data=all_data, dir=dir, user_data=config['user_data'])
@@ -57,14 +57,15 @@ if __name__ == '__main__':
     Einv_const_dict = retrieve_einv_const_by_categories(range_val=range_val, all_data=all_data, dir=dir, user_data=config['user_data'])
     df_assets = res_assets_capacity(range_val=range_val, dir=dir)
     df_gwp_const, df_gwp_op = gwp_breakdown(dir=dir, range_val=range_val)
-
+    df_cost_inv, df_cost_maint , df_cost_op = cost_breakdown(dir=dir, range_val=range_val)
 
     ######
     # Share of energies
-    for p in range(100, 5, -5):
+    for p in range(100, 0, -5):
         tot_EI = df_EI[p].sum()
         print('GWP_tot %.1f [MtC02/y]: offshore %.1f [GW] onshore %.1f [GW] PV %.1f [GW]' %(df_GWP.sum(axis=1).loc[p], df_assets[p].loc['WIND_OFFSHORE'], df_assets[p].loc['WIND_ONSHORE'], df_assets[p].loc['PV']))
-        print('Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f percentage of primary energy share' % (100 * df_EI[p]['GAS'] / tot_EI, 100 * df_EI[p]['METHANOL_RE'] / tot_EI, 100 * df_EI[p]['AMMONIA_RE'] / tot_EI, 100 * df_EI[p]['H2_RE'] / tot_EI,100 * df_EI[p]['GAS_RE'] / tot_EI, 100 * df_EI[p]['RES_SOLAR'] / tot_EI, 100 * df_EI[p]['RES_WIND'] / tot_EI, 100 * df_EI[p]['WOOD'] / tot_EI, 100 * df_EI[p]['WET_BIOMASS'] / tot_EI,  100 * df_EI[p]['WASTE'] / tot_EI))
+        print('GWh: Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f' % ( df_EI[p]['GAS'] ,  df_EI[p]['METHANOL_RE'] ,  df_EI[p]['AMMONIA_RE'] ,  df_EI[p]['H2_RE'] , df_EI[p]['GAS_RE'] ,  df_EI[p]['RES_SOLAR'] ,  df_EI[p]['RES_WIND'] ,  df_EI[p]['WOOD'] ,  df_EI[p]['WET_BIOMASS'] ,   df_EI[p]['WASTE'] ))
+        print('Percentage: Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f' % (100 * df_EI[p]['GAS'] / tot_EI, 100 * df_EI[p]['METHANOL_RE'] / tot_EI, 100 * df_EI[p]['AMMONIA_RE'] / tot_EI, 100 * df_EI[p]['H2_RE'] / tot_EI,100 * df_EI[p]['GAS_RE'] / tot_EI, 100 * df_EI[p]['RES_SOLAR'] / tot_EI, 100 * df_EI[p]['RES_WIND'] / tot_EI, 100 * df_EI[p]['WOOD'] / tot_EI, 100 * df_EI[p]['WET_BIOMASS'] / tot_EI,  100 * df_EI[p]['WASTE'] / tot_EI))
 
     ####################################################################################################################
     # Compare the case p = 100, 20, 10 and 5
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     make_dir(cwd+'/export/')
     make_dir(cwd+'/export/'+dir_plot+'/')
     dir_plot = cwd+'/export/cost_GWP_tot_' + str(domestic_RE_share)
-    pdf = 'gwp-tot-' + str(domestic_RE_share)
+    pdf = 'cost-' + str(domestic_RE_share)
 
     ####################################################################################################################
     # EROI, FEC, Einv_tot, and GWP_tot
@@ -227,6 +228,36 @@ if __name__ == '__main__':
     df_gwp_op_filtered.columns = new_cols
     plot_stacked_bar(df_data=df_gwp_op_filtered, xlabel='p [%]', ylabel='[MtC02/y]', ylim=100, pdf_name=dir_plot + '/gwp_op-breakdown-' + pdf + '.pdf')
 
+    ##############################################################################################################
+    # Cost breakdown by resources and technologies
+    df_cost_inv_filtered = retrieve_non_zero_val(df=df_cost_inv.transpose())
+    df_cost_maint_filtered = retrieve_non_zero_val(df=df_cost_maint.transpose())
+    df_cost_op_filtered = retrieve_non_zero_val(df=df_cost_op.transpose())
+
+    # Retrieve the list of technologies
+    df_aux_tech = pd.read_csv(config['user_data'] + "/aux_technologies.csv", index_col=0)
+
+    # Retrieve the list subcategory of technologies
+    tech_subcategory_list = list(dict.fromkeys(list(df_aux_tech['Subcategory'])))
+    tech_by_subcategory = dict()
+    for cat in tech_subcategory_list:
+        tech_by_subcategory[cat] = list(df_aux_tech[df_aux_tech['Subcategory'] == cat].index)
+
+    concat_list = []
+    for cat in tech_by_subcategory.keys():
+        concat_list.append(df_cost_inv_filtered[[i for i in df_cost_inv_filtered.columns if i in tech_by_subcategory[cat]]].sum(axis=1))
+    df_cost_inv_by_cat = pd.concat(concat_list, axis=1)
+    df_cost_inv_by_cat.columns =tech_by_subcategory.keys()
+
+    plot_stacked_bar(df_data=df_cost_inv_filtered[[i for i in df_cost_inv_filtered.columns if i in tech_by_subcategory['Electricity']]], xlabel='p [%]', ylabel='[bEUR/y]', ylim=30, pdf_name=dir_plot + '/cost-inv-elec-breakdown-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_cost_inv_filtered[[i for i in df_cost_inv_filtered.columns if i in tech_by_subcategory['Passenger private']]], xlabel='p [%]', ylabel='[bEUR/y]', ylim=30, pdf_name=dir_plot + '/cost-inv-private-mob-breakdown-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_cost_inv_by_cat, xlabel='p [%]', ylabel='[bEUR/y]', ylim=30, pdf_name=dir_plot + '/cost-inv-breakdown-' + pdf + '.pdf')
+
+    df_cost_inv_by_cat_aggregated = pd.concat([df_cost_inv_by_cat[['Electricity', 'Infrastructure', 'Synthetic fuels']], df_cost_inv_by_cat[['Electricity storage', 'Thermal storage', 'Other storage']].sum(axis=1), df_cost_inv_by_cat[['Heat high temperature','Heat low temperature centralised','Heat low temperature decentralised']].sum(axis=1),      df_cost_inv_by_cat[['Passenger public','Passenger private', 'Freight']].sum(axis=1)], axis=1)
+    df_cost_inv_by_cat_aggregated.columns = ['Electricity', 'Infrastructure', 'Synthetic fuels', 'storage', 'heat', 'mobility']
+    plot_stacked_bar(df_data=df_cost_inv_by_cat_aggregated, xlabel='p [%]', ylabel='[bEUR/y]', ylim=30, pdf_name=dir_plot + '/cost-inv-breakdown-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_cost_op_filtered[[i for i in RES_renewable if i in df_cost_op_filtered.columns]], xlabel='p [%]', ylabel='[bEUR/y]', ylim=60, pdf_name=dir_plot + '/cost-op-re-breakdown-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_cost_op_filtered[[i for i in RES_non_renewable if i in df_cost_op_filtered.columns]], xlabel='p [%]', ylabel='[bEUR/y]', ylim=20, pdf_name=dir_plot + '/cost-op-non-re-breakdown-' + pdf + '.pdf')
 
     ####################################################################################################################
     # PLot assets installed capacities

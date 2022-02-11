@@ -59,7 +59,7 @@ if __name__ == '__main__':
     # -----------------------------------------------
 
     range_val_einv = range(100, 0, -5)
-    range_val_cost = range(100, 5, -5)
+    range_val_cost = range(100, 0, -5)
     dir_einv = f"{config['case_studies_dir']}/{'einv_GWP_tot_' + str(domestic_RE_share)}"
     dir_cost = f"{config['case_studies_dir']}/{'cost_GWP_tot_' + str(domestic_RE_share)}"
     df_res_einv, df_fec_details_einv = eroi_computation(dir=dir_einv, user_data=config['user_data'], range_val=range_val_einv)

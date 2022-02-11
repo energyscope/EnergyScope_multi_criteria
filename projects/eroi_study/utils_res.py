@@ -375,7 +375,7 @@ def gwp_breakdown(dir: str, range_val):
     """
     GWP breakdown for several scenarios.
     :param dir: directory to the case studies.
-    :param range: GWP_ini values.
+    :param range_val: scenario values.
     :return: GWP_const and GWP_op into pd.DataFrame
     """
     gwp_const_list = []
@@ -390,6 +390,30 @@ def gwp_breakdown(dir: str, range_val):
     df_gwp_op = pd.concat(gwp_op_list, axis=1)
     df_gwp_op.columns = [i for i in range_val]
     return df_gwp_const / 1000, df_gwp_op / 1000 # MtC02/y
+
+def cost_breakdown(dir: str, range_val):
+    """
+    Cost breakdown for several scenarios.
+    :param dir: directory to the case studies.
+    :param range_val: scenario values.
+    :return: GWP_const and GWP_op into pd.DataFrame
+    """
+    cost_inv_list = []
+    cost_maint_list = []
+    cost_op_list = []
+    for run in ['run_' + str(i) for i in range_val]:
+        dir_temp = dir + '/' + run
+        gwp = pd.read_csv(f"{dir_temp}/output/cost_breakdown.csv", index_col=0, sep=',')
+        cost_inv_list.append(gwp['C_inv'])
+        cost_maint_list.append(gwp['C_maint'])
+        cost_op_list.append(gwp['C_op'])
+    df_cost_inv = pd.concat(cost_inv_list, axis=1)
+    df_cost_inv.columns = [i for i in range_val]
+    df_cost_maint = pd.concat(cost_maint_list, axis=1)
+    df_cost_maint.columns = [i for i in range_val]
+    df_cost_op = pd.concat(cost_op_list, axis=1)
+    df_cost_op.columns = [i for i in range_val]
+    return df_cost_inv / 1000, df_cost_maint / 1000 , df_cost_op / 1000 # bEUR/y
 
 
 def gwp_const_per_category(df_gwp_const: pd.DataFrame, user_data: str):

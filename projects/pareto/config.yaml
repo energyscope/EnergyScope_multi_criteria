@@ -66,4 +66,4 @@ options:
   solver: "/home/duboisa1/ampl_linux-intel64/cplex"
   show_stats: 1
   log_file: "log.txt"
-  cplex_options: ["mipdisplay 5", "mipinterval 1000", "mipgap 0.01", "timelimit 3600"]
+  cplex_options: "timelimit=3600 crossover=0 bardisplay=1 display=1 feasibility=1e-3 optimality=1e-3"

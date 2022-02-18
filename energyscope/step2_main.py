@@ -83,11 +83,7 @@ def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
     # Set solver and solver options
     for option_name in solver_options.keys():
         option_value = solver_options[option_name]
-        if isinstance(option_value, list):
-            for value in option_value:
-                ampl_trans.setOption(option_name, value)
-        else:
-            ampl_trans.setOption(option_name, option_value)
+        ampl_trans.setOption(option_name, option_value)
 
     # Read models
     for model_fn in model_fns:

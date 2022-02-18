@@ -112,11 +112,11 @@ def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
     # with open(f"{temp_dir}/output/sets/sets.json", "w") as outfile:
     #     json.dump(sets, outfile, indent=2)
 
-    logging.info("Saving results")
-    save_results(results, parameters, sets, f"{temp_dir}/output/")
-
     logging.info("Creating Sankey diagram input file")
     generate_sankey_file(results, parameters, sets, f"{temp_dir}/output/sankey/")
+
+    logging.info("Saving results")
+    save_results(results, parameters, sets, f"{temp_dir}/output/")
 
     # Copy temporary results to case studies directory
     shutil.copytree(temp_dir, case_study_dir)

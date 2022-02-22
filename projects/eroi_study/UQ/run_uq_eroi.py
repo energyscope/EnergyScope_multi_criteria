@@ -22,7 +22,7 @@ from projects.eroi_study.utils_res import get_gwp, get_cost, compute_fec
 ID_sample = 1 # from 1 to 5
 # sample_i = 0 # from to 0 to N
 gwp_tot_max = 56900 # ktCO2/y -> constraint on the GWP_tot
-
+N_run = 2 * 178 # 177 uncertain parameters -> 178 first-order PCE 178.0 number of coefficients
 if __name__ == '__main__':
 
     cwd = os.getcwd()
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     df_other_samples = pd.read_csv('data_uq_copy/other-samples-' + str(ID_sample) + '.csv', index_col=0)
 
     # loop on all sampled parameters
-    for sample_i in range(2, 1+1):
+    for sample_i in range(0, 360+1):
         print('run %s in progress' % (sample_i))
 
         # Load configuration into a dict

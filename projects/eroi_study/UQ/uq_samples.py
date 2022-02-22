@@ -99,7 +99,7 @@ def eff_mature_standard_tech(df: pd.DataFrame):
     # eff_H2_ELECTROLYSIS_heat_low_T = 1/all_data['Layers_in_out'].loc['H2_ELECTROLYSIS']['HEAT_LOW_T_DHN']
 
 
-N_samples = 2*180
+N_samples = 500
 ID_sample = 1
 
 if __name__ == '__main__':

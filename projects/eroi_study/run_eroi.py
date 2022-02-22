@@ -52,7 +52,7 @@ def loop_eroi_computation(range_val, dir_name: str, GWP_op_ini: float, config: d
         es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
 
-DOMESTIC_RE_SHARE = 0.3 # (%) Domestic RE share in the primary energy mix (by default is set to 0 in the config file)
+DOMESTIC_RE_SHARE = 0 # (%) Domestic RE share in the primary energy mix (by default is set to 0 in the config file)
 
 if __name__ == '__main__':
 

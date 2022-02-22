@@ -9,6 +9,7 @@ Also contains functions to analyse input data
 """
 import logging
 import shutil
+import pickle
 from subprocess import CalledProcessError, run
 from typing import Dict, List
 
@@ -55,7 +56,7 @@ def run_step2(case_study_dir: str, run_file_name: str, ampl_path: str, temp_dir:
 
 
 def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
-                  model_fns: List[str], data_fns: List[str], temp_dir: str) -> None:
+                  model_fns: List[str], data_fns: List[str], temp_dir: str, dump_res_only:bool=False) -> None:
     """
     Run ESTD STEP 2 using Python and amplpy.
 
@@ -104,19 +105,31 @@ def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
     results = get_results(ampl_trans)
     # for ix, (key, val) in enumerate(results.items()):
     #     val.to_csv(f"{temp_dir}/output/results/{key}.csv")
+
     parameters = get_parameters(ampl_trans)
     # for ix, (key, val) in enumerate(parameters.items()):
     #     val.to_csv(f"{temp_dir}/output/parameters/{key}.csv")
+
     sets = get_sets(ampl_trans)
     # import json
     # with open(f"{temp_dir}/output/sets/sets.json", "w") as outfile:
     #     json.dump(sets, outfile, indent=2)
 
-    logging.info("Saving results")
-    save_results(results, parameters, sets, f"{temp_dir}/output/")
+    # Dump results into a pickle file
+    if dump_res_only:
+        logging.info("Only dump results")
+        with open(f"{temp_dir}/output/results.pickle", 'wb') as handle:
+            pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"{temp_dir}/output/parameters.pickle", 'wb') as handle:
+            pickle.dump(parameters, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"{temp_dir}/output/sets.pickle", 'wb') as handle:
+            pickle.dump(sets, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    else:
+        logging.info("Saving results")
+        save_results(results, parameters, sets, f"{temp_dir}/output/")
 
-    logging.info("Creating Sankey diagram input file")
-    generate_sankey_file(results, parameters, sets, f"{temp_dir}/output/sankey/")
+        logging.info("Creating Sankey diagram input file")
+        generate_sankey_file(results, parameters, sets, f"{temp_dir}/output/sankey/")
 
     # Copy temporary results to case studies directory
     shutil.copytree(temp_dir, case_study_dir)

@@ -1,0 +1,63 @@
+# Path from main directory to energyscope subdirectories and files
+# Case studies directory and name of case study
+case_studies_dir: 'case_studies'
+case_study_name: 'run_100'
+# Folders containing the csv data files
+user_data: 'Data/User_data'
+developer_data: 'Data/Developer_data'
+# Directory to save temporary output files
+temp_dir: 'temp'
+# Path to the energy model (.mod and .run files)
+ES_path: 'projects/eroi_study/ampl_model'
+# Output of the step 1 selection of typical days
+step1_output: 'energyscope/step1_io/TD_of_days_12.out'
+
+# Printing
+# printing the data in ETSD_data.dat file for the optimisation problem
+printing: True
+# printing the time related data in ESTD_12TD.dat for the optimisation problem
+printing_td: True
+
+# Parameters
+system_limits:
+  GWP_limit: 'Infinity'  # [ktCO2-eq./year]	# Minimum GWP reduction
+  COST_limit: 'Infinity'
+  EINV_limit: 'Infinity'
+  import_capacity: 9.72  # [GW] Maximum power of electrical interconnections
+  i_rate : 0.015  # [-]
+  re_share_primary: 0  # [-] by default 0 Minimum RE share in primary consumption (all RE technologies including imported RE such as synthetic fuels)
+  re_be_share_primary: 0  # by default 0 [-] Minimum domestic RE share (non-biomass and biomass RE such as SOLAR, WIND, HYDRO)
+  solar_area: 250 # [km^2]
+  power_density_pv : 0.2367  # PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2
+  power_density_solar_thermal : 0.2857  # Solar thermal : 1 kW/3.5m2 => 0.2857 kW/m2 => 0.2857 GW/km2
+  technologie_shares:
+    share_mobility_public_min : 0.199
+    share_mobility_public_max : 0.5
+    share_freight_train_min : 0.109
+    share_freight_train_max : 0.25
+    share_freight_road_min : 0
+    share_freight_road_max : 1
+    share_freight_boat_min : 0.156
+    share_freight_boat_max : 0.3
+    share_heat_dhn_min : 0.02
+    share_heat_dhn_max : 0.37
+  share_ned: [0.779, 0.029, 0.192]
+  loss_network:
+    ELECTRICITY: 4.7E-02
+    HEAT_LOW_T_DHN: 5.0E-02
+  c_grid_extra: 367.8  # cost to reinforce the grid due to intermittent renewable energy penetration. See 2.2.2
+
+# minimum capacities of some technologies
+Technologies:
+  f_min:
+    PV: 3.846
+    WIND_ONSHORE: 1.177
+    WIND_OFFSHORE: 0.692
+    HYDRO_RIVER: 0.11
+
+# Run options
+options:
+  solver: "/home/jdumas/PycharmProjects/ampl_linux-intel64/cplex"
+  show_stats: 1
+  log_file: "log.txt"
+  cplex_options: ["mipdisplay 5", "mipinterval 1000", "mipgap 0.01", "timelimit 3600"]

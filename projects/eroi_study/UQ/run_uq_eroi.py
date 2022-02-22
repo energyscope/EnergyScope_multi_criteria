@@ -35,7 +35,7 @@ if __name__ == '__main__':
     df_other_samples = pd.read_csv('data_uq_copy/other-samples-' + str(ID_sample) + '.csv', index_col=0)
 
     # loop on all sampled parameters
-    for sample_i in range(0, 1+1):
+    for sample_i in range(2, 1+1):
         print('run %s in progress' % (sample_i))
 
         # Load configuration into a dict

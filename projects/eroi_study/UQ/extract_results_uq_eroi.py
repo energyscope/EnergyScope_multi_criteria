@@ -27,10 +27,6 @@ from energyscope.step2_output_generator import save_results
 from energyscope.utils import load_config
 from projects.eroi_study.utils_res import get_gwp, get_cost, compute_fec
 
-ID_sample = 1 # from 1 to 5
-# sample_i = 0 # from to 0 to N
-gwp_tot_max = 56900 # ktCO2/y -> constraint on the GWP_tot
-
 def extract_result_step2(case_study_dir: str) -> None:
     """
     Extract results.
@@ -61,13 +57,19 @@ def extract_result_step2(case_study_dir: str) -> None:
     logging.info('End of run')
 
 
+ID_sample = 1  # from 1 to 5
+# sample_i = 0 # from to 0 to N
+gwp_tot_max = 56900  # ktCO2/y -> constraint on the GWP_tot
+
+N_samples = 2
+
 if __name__ == '__main__':
 
     cwd = os.getcwd()
     print("Current working directory: {0}".format(cwd))
 
-    # loop on all sampled parameters
-    for sample_i in range(0, 1+1):
+    # loop on all sampled parameters to extract results from pickle files
+    for sample_i in range(0, N_samples):
         print('run %s in progress' % (sample_i))
 
         # Load configuration into a dict
@@ -78,6 +80,16 @@ if __name__ == '__main__':
         mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
         cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
         extract_result_step2(cs)
+
+    # loop on all sampled parameters to compute EROI
+    for sample_i in range(0, N_samples):
+        # Load configuration into a dict
+        config = load_config(config_fn='config_uq.yaml')
+
+        # Running EnergyScope
+        dir_name = 'einv_uq_' + str(ID_sample)
+        mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
+        cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
         es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
         # Compute the FEC from the year_balance.csv

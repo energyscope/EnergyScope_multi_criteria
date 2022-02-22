@@ -60,4 +60,4 @@ options:
   solver: "/home/jdumas/PycharmProjects/ampl_linux-intel64/cplex"
   show_stats: 1
   log_file: "log.txt"
-  cplex_options: ["mipdisplay 5", "mipinterval 1000", "mipgap 0.01", "timelimit 3600"]
+  cplex_options: "timelimit 3600"

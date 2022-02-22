@@ -2,12 +2,18 @@
 """
 This script modifies the input data and runs the EnergyScope model
 
-@author: Paolo Thiran, Matija Pavičević, Antoine Dubois
+@author: Antoine Dubois
 """
 import yaml
 import os
+import shutil
 
 import energyscope as es
+
+
+def empty_temp(temp_dir: str):
+    shutil.rmtree(temp_dir)
+    os.makedirs(temp_dir)
 
 
 def load_config(config_fn: str):
@@ -33,7 +39,10 @@ if __name__ == '__main__':
         all_data['Technologies']['f_min'].loc[tech] = config['Technologies']['f_min'][tech]
 
     # New optimal solution run
-    if 1:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
+    if 0:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
+
+        # Empty temp dir
+        empty_temp(config['temp_dir'])
 
         # Saving .dat files
         estd_out_path = f"{config['temp_dir']}/ESTD_data.dat"
@@ -44,15 +53,15 @@ if __name__ == '__main__':
 
         # Running EnergyScope
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/optimal_cost.mod"]
-        cs = f"{config['case_studies_dir']}/{config['case_study_name']}"
+        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_cost/"
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
         # Display sankey
-        es.draw_sankey(some_path=f"{cs}/output/sankey")
-
-    exit()
+        es.draw_sankey(f"{cs}/output/sankey")
 
     if 0:
+        empty_temp(config['temp_dir'])
+
         # Optimal solution in terms of EINV
         data_fns = [f"{config['temp_dir']}/ESTD_data.dat", f"{config['temp_dir']}/ESTD_12TD.dat"]
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/optimal_einv.mod"]
@@ -63,71 +72,95 @@ if __name__ == '__main__':
         # output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}_einv/output/"
         # es.draw_sankey(path=f"{output_dir}sankey")
 
-    # Get total cost
-    cost = es.get_total_cost(f"{config['case_studies_dir']}/{config['case_study_name']}")
-    # Get total einv
-    einv = es.get_total_einv(f"{config['case_studies_dir']}/{config['case_study_name']}")
+    # Get optimal cost
+    opt_cost = es.get_total_cost(f"{config['case_studies_dir']}/{config['case_study_name']}_cost/")
+    # Get optimal einv
+    opt_einv = es.get_total_einv(f"{config['case_studies_dir']}/{config['case_study_name']}_einv/")
 
-    # Get approximation of pareto front
-    epsilons = [0.0125, 0.025, 0.05, 0.1, 0.15]
+    # Get approximation of pareto front minimizing einv with constraint on cost
+    epsilons = []  # [0.003125, 0.00625, 0.0125, 0.025, 0.05, 0.1, 0.15]
     for epsilon in epsilons:
 
         print("Run for epsilon", epsilon)
+        empty_temp(config['temp_dir'])
 
         # Printing the .dat files for the optimisation problem
         td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
+        es.print_12td(td12_out_path, all_data['Time_series'], config["step1_output"])
         estd_out_path = f"{config['temp_dir']}/ESTD_data_epsilon.dat"
         es.print_estd(estd_out_path, all_data, config["system_limits"])
         # Add specific elements
         es.newline(estd_out_path)
-        es.print_param("TOTAL_COST_OP", cost, "Optimal cost of the system", estd_out_path)
+        es.print_param("TOTAL_COST_OP", opt_cost, "Optimal cost of the system", estd_out_path)
         es.newline(estd_out_path)
         es.print_param("EPSILON", epsilon, "Epsilon value", estd_out_path)
         data_fns = [estd_out_path, td12_out_path]
 
-        # newline(out_path)
-        # technologies_to_minimize = ["WIND_ONSHORE", "WIND_OFFSHORE"]
-        # print_set(technologies_to_minimize, "TECHNOLOGIES_TO_MINIMIZE", out_path)
-
         # Run the model
-        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/epsilon.mod"]
-        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_epsilon_{epsilon}/"
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/epsilon_cost.mod"]
+        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_cost_epsilon_{epsilon}/"
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
-        # Example to print the sankey from this script
-        # output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}_epsilon_{epsilon}/output/"
-        # es.draw_sankey(path=f"{output_dir}sankey")
+    # Get approximation of pareto front minimizing COST with constraint on EINV
+    epsilons = []
+    for epsilon in epsilons:
 
-    exit()
+        print("Run for epsilon", epsilon)
+        empty_temp(config['temp_dir'])
+
+        # Printing the .dat files for the optimisation problem
+        td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
+        es.print_12td(td12_out_path, all_data['Time_series'], config["step1_output"])
+        estd_out_path = f"{config['temp_dir']}/ESTD_data_epsilon.dat"
+        es.print_estd(estd_out_path, all_data, config["system_limits"])
+        # Add specific elements
+        es.newline(estd_out_path)
+        es.print_param("TOTAL_EINV_OP", opt_einv, "Optimal einv of the system", estd_out_path)
+        es.newline(estd_out_path)
+        es.print_param("EPSILON_EINV", epsilon, "Epsilon value for einv", estd_out_path)
+        data_fns = [estd_out_path, td12_out_path]
+
+        # Run the model
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/epsilon_einv.mod"]
+        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_einv_epsilon_{epsilon}/"
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+
     # Get epsilon necessary condition
-    epsilons_pairs = []  # , (0.1, 0.1), (0.1, 0.2), (0.15, 0.1), (0.15, 0.2), (0.15, 0.3)]
+    technologies_to_minimize = ["DEC_HP_ELEC", "DEC_THHP_GAS", "DHN_HP_ELEC"]  # - Heat Pumps
+    # ["GAS", "GAS_RE"]  # - Technologies whose output is GAS
+    # ["WIND_ONSHORE", "WIND_OFFSHORE", "PV"]  # - Local RES
+    run_name = 'hps'
+
+    # Pairs (dev cost, dev einv)
+    epsilons_pairs = [(0.05, 0.4), (0.1, 0.3), (0.15, 0.2)]
     for epsilon_pair in epsilons_pairs:
 
         epsilon_cost, epsilon_einv = epsilon_pair
         print("Run for epsilon", epsilon_pair)
+        empty_temp(config['temp_dir'])
 
         # Printing the .dat files for the optimisation problem
         td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
-        estd_out_path = f"{config['temp_dir']}/ESTD_data_wind.dat"
+        es.print_12td(td12_out_path, all_data['Time_series'], config["step1_output"])
+        estd_out_path = f"{config['temp_dir']}/ESTD_data_{run_name}.dat"
         es.print_estd(estd_out_path, all_data, config["system_limits"])
         # Add specific elements
         es.newline(estd_out_path)
-        es.print_param("TOTAL_COST_OP", cost, "Optimal cost of the system", estd_out_path)
+        es.print_param("TOTAL_COST_OP", opt_cost, "Optimal cost of the system", estd_out_path)
         es.newline(estd_out_path)
         es.print_param("EPSILON_COST", epsilon_cost, "Epsilon value for cost", estd_out_path)
         es.newline(estd_out_path)
-        es.print_param("TOTAL_EINV_OP", einv, "Optimal einv of the system", estd_out_path)
+        es.print_param("TOTAL_EINV_OP", opt_einv, "Optimal einv of the system", estd_out_path)
         es.newline(estd_out_path)
         es.print_param("EPSILON_EINV", epsilon_einv, "Epsilon value for einv", estd_out_path)
 
         es.newline(estd_out_path)
-        technologies_to_minimize = ["WIND_ONSHORE", "WIND_OFFSHORE"]
         es.print_set(technologies_to_minimize, "TECHNOLOGIES_TO_MINIMIZE", estd_out_path)
         data_fns = [estd_out_path, td12_out_path]
 
         # Run the model
-        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/wind.mod"]
-        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_wind_{epsilon_cost}_{epsilon_einv}/"
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/necessary_condition.mod"]
+        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_{run_name}_{epsilon_cost}_{epsilon_einv}/"
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
 
         # Example to print the sankey from this script

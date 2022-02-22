@@ -107,7 +107,9 @@ def add_ft_single(sankey_df: pd.DataFrame, index: int, times: pd.Series,
         "PYROLYSIS_TO_LFO": [
             ["Wood", "Pyrolysis", -1, "WOOD", "Wood", "#CD853F", "TWh"],
             ["Pyrolysis", "Elec", 1, "ELECTRICITY", "Electricity", "#00BFFF", "TWh"],
-            ["Pyrolysis", "Oil", 1, "OIL", "Oil", "#8B008B", "TWh"]],
+            # FIXME: Was in sankey.run but entry ('PYROLYSIS_TO_LFO', 'OIL') does not exist in layers_in_out
+            # ["Pyrolysis", "Oil", 1, "OIL", "Oil", "#8B008B", "TWh"]
+            ],
         "PYROLYSIS_TO_FUELS": [
             ["Wood", "Pyrolysis", -1, "WOOD", "Wood", "#CD853F", "TWh"],
             ["Pyrolysis", "Elec", 1, "ELECTRICITY", "Electricity", "#00BFFF", "TWh"],
@@ -278,10 +280,10 @@ def add_solar(sankey_df: pd.DataFrame, index: int, times: pd.Series, sets: Dict,
         for tech in set(sets["TECHNOLOGIES_OF_END_USES_TYPE"]["HEAT_LOW_T_DECEN"]) - {'DEC_SOLAR'}:
             for ts in sets["TS_OF_DEC_TECH"][tech]:
                 term1 = layers_in_out[tech, "HEAT_LOW_T_DECEN"] * f_t_solar[tech][times]
-                term2 = layers_in_out[tech, "HEAT_LOW_T_DECEN"] * (f_t[tech][times] + f_t_solar[tech][times])
-                term2 = max(term2, 1e-4)
-                term3 = storage_in[ts, "HEAT_LOW_T_DECEN"][times] - storage_out[ts, "HEAT_LOW_T_DECEN"][times]
-                term3 = max(term3, 0)
+                term2 = (layers_in_out[tech, "HEAT_LOW_T_DECEN"] * (f_t[tech][times] + f_t_solar[tech][times]))\
+                    .apply(lambda x: max(x, 1e-4))
+                term3 = (storage_in[ts, "HEAT_LOW_T_DECEN"][times] - storage_out[ts, "HEAT_LOW_T_DECEN"][times])\
+                    .apply(lambda x: max(x, 0))
                 real_value_1 += (term1/term2 * term3).sum()
                 real_value_1 += (term1 - (term1/term2 * term3)).sum()
         sankey_df.loc[index] = ['Solar', 'Dec. sto', round(real_value_1/1000., 2), layer_id, layer_color, layer_unit]

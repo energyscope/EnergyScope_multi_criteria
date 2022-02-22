@@ -104,3 +104,10 @@ def draw_sankey(sankey_dir: str, title='Energy', auto_open: bool = True) -> None
     fig = generate_sankey(flows, title=title)
     # Save the figure
     fig.write_html(f"{sankey_dir}/python_generated_sankey.html", auto_open=auto_open)
+
+
+if __name__ == '__main__':
+
+    dir_name = "/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria/case_studies/pareto/"
+    dir_name += "run1_cost_epsilon_0.003125/output/sankey"
+    draw_sankey(dir_name)

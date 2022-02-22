@@ -4,7 +4,7 @@ energyscope_dir: '/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria'
 # Path from main directory to energyscope subdirectories and files
 # Case studies directory and name of case study
 case_studies_dir: 'case_studies/pareto'
-case_study_name: 'run_test2'
+case_study_name: 'run1'
 # Folders containing the csv data files
 user_data: 'Data/User_data'
 developer_data: 'Data/Developer_data'
@@ -66,4 +66,4 @@ options:
   solver: "/home/duboisa1/ampl_linux-intel64/cplex"
   show_stats: 1
   log_file: "log.txt"
-  cplex_options: ["mipdisplay 5", "mipinterval 1000", "mipgap 0.01", "timelimit 3600"]
+  cplex_options: "timelimit=3600 crossover=0 bardisplay=1 display=1 feasibility=1e-3 optimality=1e-3"

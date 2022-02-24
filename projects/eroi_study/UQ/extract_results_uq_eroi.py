@@ -61,36 +61,37 @@ ID_sample = 1  # from 1 to 5
 # sample_i = 0 # from to 0 to N
 gwp_tot_max = 56900  # ktCO2/y -> constraint on the GWP_tot
 
-N_samples = 2
+N_samples = 362
 
 if __name__ == '__main__':
 
     cwd = os.getcwd()
     print("Current working directory: {0}".format(cwd))
 
-    # loop on all sampled parameters to extract results from pickle files
-    for sample_i in range(0, N_samples):
-        print('run %s in progress' % (sample_i))
+    # Load configuration into a dict
+    config = load_config(config_fn='config_uq.yaml')
+    dir_name = 'einv_uq_' + str(ID_sample)
 
-        # Load configuration into a dict
-        config = load_config(config_fn='config_uq.yaml')
-
-        # Running EnergyScope
-        dir_name = 'einv_uq_' + str(ID_sample)
-        mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
-        cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
-        extract_result_step2(cs)
+    # # loop on all sampled parameters to extract results from pickle files
+    # for sample_i in range(361, 363+1):
+    # # for sample_i in range(0, N_samples+1):
+    #     print('run %s in progress' % (sample_i))
+    #     cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
+    #     extract_result_step2(cs)
 
     # loop on all sampled parameters to compute EROI
-    for sample_i in range(0, N_samples):
-        # Load configuration into a dict
-        config = load_config(config_fn='config_uq.yaml')
-
-        # Running EnergyScope
-        dir_name = 'einv_uq_' + str(ID_sample)
-        mod_fns = [f"{config['ES_path']}/ESTD_model.mod"]
+    l = list(range(0, N_samples+1))
+    # remove cases where problem was not solved
+    if ID_sample ==1:
+        for i in [42, 114, 167, 267, 271, 279, 319, 349, 352]:
+            l.remove(i)
+    elif ID_sample ==2:
+        for i in [31, 187, 211, 251, 334, 346, 351]:
+            l.remove(i)
+    res_list = []
+    for sample_i in l:
         cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
-        es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
+        # es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
         # Compute the FEC from the year_balance.csv
         cost_val = get_cost(cs=cs) /1000 # bEUR/y
@@ -99,3 +100,9 @@ if __name__ == '__main__':
         fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
         einv = get_total_einv(cs) / 1000  # TWh
         print('run %s EROI %.2f cost %.2f [bEUR/y]' % (sample_i, fec_tot_val / einv, cost_val.sum()))
+        res_list.append([fec_tot_val / einv, cost_val.sum()])
+    df_res = pd.DataFrame(data=np.asarray(res_list), columns=['EROI', 'cost'], index=[i for i in l])
+
+    df_samples = pd.read_csv('data_uq_copy/all-samples-'+str(ID_sample)+'.csv', index_col=0)
+    df_concat = pd.concat([df_samples, df_res], axis=1).dropna()
+    df_concat.drop(['f_max-PHS'], axis=1).to_csv('data_uq_copy/res-samples-' + str(ID_sample) + '.csv', sep=' ', index=False)

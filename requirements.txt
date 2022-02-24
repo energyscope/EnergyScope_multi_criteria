@@ -4,5 +4,4 @@ numpy
 matplotlib
 plotly
 amplpy
-rheia
 pvlib

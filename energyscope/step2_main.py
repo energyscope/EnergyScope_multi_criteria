@@ -127,9 +127,6 @@ def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
         logging.info("Creating Sankey diagram input file")
         generate_sankey_file(results, parameters, sets, f"{temp_dir}/output/sankey/")
 
-        logging.info("Saving results")
-        save_results(results, parameters, sets, f"{temp_dir}/output/")
-
     # Copy temporary results to case studies directory
     shutil.copytree(temp_dir, case_study_dir)
 

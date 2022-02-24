@@ -7,7 +7,7 @@ At this stage we only consider uncertainty on:
 - EUD;
 - resources availability;
 - resources einv_op: same ranges than c_op;
-- technologies f_max capacities
+- technologies f_max capacities: fmax is uncertain only for renewable resources: PV, wind offshore and onshore
 - technologies einv_const: same ranges than c_inv
 - technologies capacity factors;
 
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     # einv_const: CCS and storages technologies -> not taken into account
     # einv_const: by default U[-25%, 25%] -> a study similar to the one conducted in the Ph.D. thesis of S. Moret must be conducted
 
-    # The following technologiues are not taken into account:
+    # The following technologies are not taken into account:
     # COAL_IGCC, COAL_US, IND_BOILER_COAL -> not used when constraining GHG emissions
     # Boilers: "boilers are rarely used more than 50% of the time, so the constraints containing the boilers capacity factor are never activated"
     # convert dtype from object to float

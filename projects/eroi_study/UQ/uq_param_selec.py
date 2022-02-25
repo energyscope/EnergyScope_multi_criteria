@@ -1,36 +1,45 @@
 # -*- coding: utf-8 -*-
 """
-This script quantifies the impact of uncertain parameters on the model output.
-For the uncertainty ranges see Appendix D, Table D.1 Ph.D. thesis G. Limpens.
-The ranges were determined by the Ph.D. of S. Morret see Table 2.1.
+This script provides the parameters and their uncertainty intervals to be used in the RHEIA python library.
+
 At this stage we only consider uncertainty on:
 - EUD;
 - resources availability;
 - resources einv_op: by default 25%;
-- technologies f_max capacities: fmax is uncertain only for renewable resources: PV, wind offshore and onshore.
 - technologies einv_const: by default 25%;
-- technologies capacity factors;
+- technologies f_max capacities;
+- "other" parameters such as i_rate, etc.
 
-Extensions by including uncertainty on:
-- cost: c_op, c_maint, and c_inv
-- gwp: gwp_op and gwp_const
-- efficiencies
-- einv_const: inlude storage technologies
-- einv_op and einv_const: determine relevant uncertainty intervals
+For the uncertainty ranges, see [2] Appendix D, Table D.1. The ranges were determined [3] see Table 2.1.
+
+Extensions need to be conducted by including uncertainty on:
+- cost: c_op, c_maint, and c_inv;
+- gwp: gwp_op and gwp_const;
+- efficiencies;
+- einv_const: inlude storage technologies;
+- einv_op and einv_const: determine relevant uncertainty intervals;
+- technologies capacity factors.
+
+Note: this script generates the design_space and stochastic_space files required by the RHEIA python library to generate samples.
+These samples are then used to run ES-TD to compute the corresponding EROI values.
+Then, the RHEIA python library is used to perform PCE using these samples to compute the Sobol indexes.
+For more information about the uncertainty quantification in ES-TD see:
+[1] Rixhon, Xavier, et al. "The Role of Electrofuels under Uncertainties for the Belgian Energy Transition." Energies 14.13 (2021): 4027.
+[2] Limpens, Gauthier. Generating energy transition pathways: application to Belgium. Diss. UCL-Université Catholique de Louvain, 2021. -> chapter 6 and appendix D.
+[3] Moret, Stefano, et al. "Characterization of input uncertainties in strategic energy planning models." Applied energy 202 (2017): 597-617.
+[4] Coppitters, Diederik. Robust design optimization of hybrid renewable energy systems. Diss. University of Plymouth, 2021.
 
 @author: Jonathan Dumas
 """
 
 import yaml
 import os
-import scipy.special
+import json
 
 import pandas as pd
 import energyscope as es
 import numpy as np
 import matplotlib.pyplot as plt
-
-from sys import platform
 
 from energyscope.utils import load_config
 
@@ -102,7 +111,7 @@ def eff_mature_standard_tech(df: pd.DataFrame):
 def res_avaiv_params(data: pd.DataFrame):
     """
     Define the uncertainty parameters related to availability or resources.
-    U[-32.1%, 32.1%]: wood, wet biomass, and waste
+    U[-32.1%, 32.1%]: wood, wet biomass, and waste.
     """
     l = ['WOOD', 'WET_BIOMASS', 'WASTE']
     df_design = pd.DataFrame(data=['par'] * len(l), index=['avail-' + i for i in l], columns=['type'])
@@ -119,7 +128,7 @@ def res_avaiv_params(data: pd.DataFrame):
 def res_einv_op_params(data: pd.DataFrame):
     """
     Define the uncertainty parameters related to einv_op of resources.
-    Set by default U[-25%, 25%] -> a study similar to the one conducted in the Ph.D. thesis of S. Moret must be conducted
+    FIXME: set by default to U[-25%, 25%] -> a study similar to the one conducted in the Ph.D. thesis of S. Moret must be conducted.
     """
     l = ['ELECTRICITY', 'GASOLINE', 'DIESEL', 'BIOETHANOL', 'BIODIESEL', 'LFO', 'GAS', 'GAS_RE', 'WOOD', 'WET_BIOMASS',
          'URANIUM', 'WASTE', 'H2', 'H2_RE', 'AMMONIA', 'METHANOL', 'AMMONIA_RE', 'METHANOL_RE']
@@ -136,8 +145,8 @@ def res_einv_op_params(data: pd.DataFrame):
 def res_einv_constr_params(data: pd.DataFrame):
     """
     Define the uncertainty parameters related to einv_constr of technologies.
-    Set by default U[-25%, 25%] -> a study similar to the one conducted in the Ph.D. thesis of S. Moret must be conducted
-    Remove all storage and CCS technologies.
+    FIXME: set by default U[-25%, 25%] -> a study similar to the one conducted in the Ph.D. thesis of S. Moret must be conducted.
+    Note: the storage and CCS technologies are not taken into account.
     """
     l =['AMMONIA_TO_H2', 'BATT_LI', 'BIOMASS_TO_HVC', 'BIOMASS_TO_METHANOL',
      'BIOMETHANATION', 'BIO_HYDROLYSIS', 'BOAT_FREIGHT_DIESEL', 'BOAT_FREIGHT_METHANOL', 'BOAT_FREIGHT_NG',
@@ -255,14 +264,13 @@ def tech_cpt_params(data: pd.DataFrame):
 
     return df_design, df_stochastic
 
-
 def other_params(config: dict):
     """
-    Define the uncertainty parameters related to other parameters.
-    electricity import capacity U[-10%, 10%]
-    i_rate U[-46.2%, 46.2%]
-    loss elec and heat U[-2.0%, 2.0%]
-    public/rail/boat and dhn share max  U[-10.0%, 10.0%]:
+    Define the uncertainty parameters related to other parameters:
+     - electricity import capacity U[-10%, 10%]
+     - i_rate U[-46.2%, 46.2%]
+     - loss elec and heat U[-2.0%, 2.0%]
+     - public/rail/boat and dhn share max U[-10.0%, 10.0%]
     """
 
     l1 = ['import_capacity', 'i_rate']
@@ -300,9 +308,6 @@ def other_params(config: dict):
     return pd.concat([df_design1, df_design2, df_design3], axis=0), pd.concat(
         [df_stochastic1, df_stochastic2, df_stochastic3], axis=0)
 
-N_samples = 500
-ID_sample = 1
-
 if __name__ == '__main__':
 
     cwd = os.getcwd()
@@ -313,11 +318,11 @@ if __name__ == '__main__':
 
     # Loading data
     all_data = es.import_data(user_data_dir=config['user_data'], developer_data_dir=config['developer_data'])
-    # Modify the minimum capacities of some technologies
+    # Modify the minimum capacities of some technologies using the configuration file
     for tech in config['Technologies']['f_min']:
         all_data['Technologies']['f_min'].loc[tech] = config['Technologies']['f_min'][tech]
 
-    # Def list of uncertain parameters
+    # Build the list of uncertain parameters
     df_design_res_av, df_stochastic_res_av = res_avaiv_params(data=all_data['Resources'])
     df_design_res_einv_op, df_stochastic_res_einv_op = res_einv_op_params(data=all_data['Resources'])
     df_design_demand, df_stochastic_demand = res_demand_params(data=all_data['Demand'])
@@ -328,5 +333,16 @@ if __name__ == '__main__':
 
     df_design = pd.concat([df_design_res_av, df_design_res_einv_op, df_design_demand, df_design_tech_fmax, df_design_res_einv_constr, df_design_res_c_pt, df_design_other], axis=0)
     df_stochastic = pd.concat([df_stochastic_res_av, df_stochastic_res_einv_op, df_stochastic_demand, df_stochastic_tech_fmax, df_stochastic_res_einv_constr, df_stochastic_res_c_pt, df_stochastic_other], axis=0)
-    df_design.to_csv('design_space', sep=' ')
-    df_stochastic.to_csv('stochastic_space', sep=' ')
+    df_design.to_csv('data_samples/design_space', sep=' ')
+    df_stochastic.to_csv('data_samples/stochastic_space', sep=' ')
+
+    param_list = dict()
+    param_list['avail'] = list(df_design_res_av.index)
+    param_list['einv_op'] = list(df_design_res_einv_op.index)
+    param_list['demand'] = list(df_design_demand.index)
+    param_list['f_max'] = list(df_design_tech_fmax.index)
+    param_list['einv_constr'] = list(df_design_res_einv_constr.index)
+    param_list['c_pt'] = list(df_design_res_c_pt.index)
+    param_list['other'] = list(df_design_other.index)
+
+    json.dump(param_list, open("data_samples/param_list.json", "w"), sort_keys=True, indent=4)

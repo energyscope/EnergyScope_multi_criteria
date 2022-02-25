@@ -72,12 +72,12 @@ if __name__ == '__main__':
     config = load_config(config_fn='config_uq.yaml')
     dir_name = 'einv_uq_' + str(ID_sample)
 
-    # # loop on all sampled parameters to extract results from pickle files
-    # for sample_i in range(361, 363+1):
-    # # for sample_i in range(0, N_samples+1):
-    #     print('run %s in progress' % (sample_i))
-    #     cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
-    #     extract_result_step2(cs)
+    # loop on all sampled parameters to extract results from pickle files
+    for sample_i in range(361, 363+1):
+    # for sample_i in range(0, N_samples+1):
+        print('run %s in progress' % (sample_i))
+        cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
+        extract_result_step2(cs)
 
     # loop on all sampled parameters to compute EROI
     l = list(range(0, N_samples+1))

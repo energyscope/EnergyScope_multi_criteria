@@ -59,6 +59,6 @@ if __name__ == '__main__':
     param_list_order_2 = dict()
     df_param = pd.DataFrame([key.split('-') for key in param_sel_one])
     for key in list(param_list_order_1.keys()):
-        param_list_order_2[key] = list(df_param[1][df_param[0] == key].values)
+        param_list_order_2[key] = [key +'-'+ l for l in list(df_param[1][df_param[0] == key].values)]
 
     json.dump(param_list_order_2, open("data_samples/param_list_order_2.json", "w"), sort_keys=True, indent=4)

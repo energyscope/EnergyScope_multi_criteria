@@ -12,34 +12,41 @@ import pandas as pd
 import rheia.UQ.uncertainty_quantification as rheia_uq
 import rheia.POST_PROCESS.post_process as rheia_pp
 
-dict_uq_no_model = {'case':         'ES_einv',
-           'pol order':             1,
-           'objective names':       ['EROI', 'cost'],
-           'objective of interest': 'EROI',
-           'results dir':           'results_1',
-           'sampling method':       'SOBOL',
-           'create only samples': True,
-            # 'draw pdf cdf': [True, 1000],
-           }
+batch = 3
+pol_order = 1
+
+dict_uq = {'case': 'ES_einv',
+                    'pol order': pol_order,
+                    'objective names': ['EROI', 'cost'],
+                    'objective of interest': 'EROI',
+                    'results dir': 'batch_' + str(batch),
+                    'sampling method': 'SOBOL',
+                    'create only samples': False,
+                    'draw pdf cdf': [True, 1000],
+                    }
 
 if __name__ == '__main__':
 
-    dict_uq = dict_uq_no_model #, dict_uq_order_2, dict_uq_no_model
+    # If sampling only:
+    # set: 'create only samples': True
+    # comment the line 'draw pdf cdf': [True, 1000]
+
+    # For extracting results:
+    # set: 'create only samples': False
+    # uncomment the line 'draw pdf cdf': [True, 1000]
+
     rheia_uq.run_uq(dict_uq, design_space='design_space')
 
-    case = 'ES_einv'
-    pol_order = dict_uq['pol order']
-    my_post_process_uq = rheia_pp.PostProcessUQ(case, pol_order)
-    result_dir = dict_uq['results dir']
+    my_post_process_uq = rheia_pp.PostProcessUQ(dict_uq['case'], dict_uq['pol order'])
     objective = 'EROI'
-    names, sobol = my_post_process_uq.get_sobol(result_dir, objective)
+    names, sobol = my_post_process_uq.get_sobol(dict_uq['results dir'], objective)
     plt.barh(names, sobol)
     plt.show()
 
-    loo = my_post_process_uq.get_loo(result_dir, objective)
+    loo = my_post_process_uq.get_loo(dict_uq['results dir'], objective)
 
-    x_pdf, y_pdf = my_post_process_uq.get_pdf(result_dir, objective)
+    x_pdf, y_pdf = my_post_process_uq.get_pdf(dict_uq['results dir'], objective)
     plt.plot(x_pdf, y_pdf)
-    plt.xlabel('EROI')
+    plt.xlabel(objective)
     plt.ylabel('probability density')
     plt.show()

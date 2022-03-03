@@ -13,6 +13,9 @@ from typing import Dict
 import pandas as pd
 from functools import reduce
 from itertools import product
+import pickle
+
+from energyscope.sankey_input import generate_sankey_file
 
 
 def simplify_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -422,3 +425,29 @@ def save_results(results: Dict[str, pd.DataFrame], parameters: Dict[str, pd.Data
     save_layers(results, parameters, sets, f"{output_dir}hourly_data/")
     logging.info('Saving energy stored')
     save_energy_stored(results, parameters, sets, f"{output_dir}hourly_data/")
+
+
+def extract_result_step2(case_study_dir: str) -> None:
+    """
+    Extract results.
+
+    :param case_study_dir: path to the case study directory.
+    """
+
+    # Load results
+    with open(f"{case_study_dir}/output/results.pickle", 'rb') as handle:
+        results = pickle.load(handle)
+
+    with open(f"{case_study_dir}/output/parameters.pickle", 'rb') as handle:
+        parameters = pickle.load(handle)
+
+    with open(f"{case_study_dir}/output/sets.pickle", 'rb') as handle:
+        sets = pickle.load(handle)
+
+    logging.info("Saving results")
+    save_results(results, parameters, sets, f"{case_study_dir}/output/")
+
+    logging.info("Creating Sankey diagram input file")
+    generate_sankey_file(results, parameters, sets, f"{case_study_dir}/output/sankey/")
+
+    logging.info('End of run')

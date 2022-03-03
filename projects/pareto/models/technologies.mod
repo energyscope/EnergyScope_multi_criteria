@@ -22,6 +22,6 @@ subject to epsilon_space_einv :
 ### OBJECTIVE FUNCTION ###
 ##########################
 
-# Minimize sum of capacities
+# Minimize sum of capacities of technologies
 minimize obj :
 	sum {j in TECHNOLOGIES_TO_MINIMIZE} F[j] ;

@@ -4,7 +4,7 @@ energyscope_dir: '/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria'
 # Path from main directory to energyscope subdirectories and files
 # Case studies directory and name of case study
 case_studies_dir: 'case_studies/pareto'
-case_study_name: 'run1'
+case_study_name: 'gwp_constraint_50000'
 # Folders containing the csv data files
 user_data: 'Data/User_data'
 developer_data: 'Data/Developer_data'
@@ -26,7 +26,7 @@ printing_td: True
 
 # Parameters
 system_limits:
-  GWP_limit: 'Infinity'  # [ktCO2-eq./year]	# Minimum GWP reduction
+  GWP_limit: 50000 # [ktCO2-eq./year] # Minimum GWP reduction
   COST_limit: 'Infinity'
   EINV_limit: 'Infinity'
   import_capacity: 9.72  # [GW] Maximum power of electrical interconnections

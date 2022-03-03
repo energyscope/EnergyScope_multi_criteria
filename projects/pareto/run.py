@@ -39,7 +39,7 @@ if __name__ == '__main__':
         all_data['Technologies']['f_min'].loc[tech] = config['Technologies']['f_min'][tech]
 
     # New optimal solution run
-    if 0:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
+    if 1:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
 
         # Empty temp dir
         empty_temp(config['temp_dir'])
@@ -56,11 +56,12 @@ if __name__ == '__main__':
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}/cost/"
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
                          dump_res_only=True)
+        es.extract_results_step2(cs.strip("/"))
 
         # Display sankey
-        es.draw_sankey(f"{cs}output/sankey")
+        # es.draw_sankey(f"{cs}output/sankey")
 
-    if 0:
+    if 1:
         empty_temp(config['temp_dir'])
 
         # Optimal solution in terms of EINV
@@ -74,9 +75,10 @@ if __name__ == '__main__':
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}/einv/"
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
                          dump_res_only=True)
+        es.extract_results_step2(cs.strip("/"))
 
         # Example to print the sankey from this script
-        es.draw_sankey(f"{cs}output/sankey")
+        # es.draw_sankey(f"{cs}output/sankey")
 
     # Get optimal cost
     opt_cost = es.get_total_cost(f"{config['case_studies_dir']}/{config['case_study_name']}/cost")
@@ -144,6 +146,7 @@ if __name__ == '__main__':
     epsilons_pairs = [(2.5/100, 40/100), (2.5/100, 30/100), (2.5/100, 20/100),
                       (5/100, 30/100), (5/100, 20/100), (5/100, 10/100),
                       (7.5/100, 20/100), (7.5/100, 10/100)]
+    epsilons_pairs = []
     for epsilon_pair in epsilons_pairs:
 
         epsilon_cost, epsilon_einv = epsilon_pair

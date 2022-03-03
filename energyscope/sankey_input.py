@@ -10,7 +10,7 @@ from typing import Dict
 
 import pandas as pd
 
-from energyscope.step2_output_generator import simplify_df, time_to_pandas
+from energyscope.amplpy_aux import simplify_df, time_to_pandas
 
 
 def add_ft_single(sankey_df: pd.DataFrame, index: int, times: pd.Series,

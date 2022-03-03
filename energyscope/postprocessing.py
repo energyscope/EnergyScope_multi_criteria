@@ -29,6 +29,11 @@ def get_asset_value(output_path: str, param: str, tech: str):
     return float(assets.loc[tech, param])
 
 
+def get_resource_used(output_path: str, res: str):
+    resources_breakdown = pd.read_csv(f"{output_path}/output/resources_breakdown.csv", index_col=0)
+    return resources_breakdown.loc[res, 'Used']
+
+
 # Function to compute the annual average emission factors of each resource from the outputs #
 def compute_gwp_op(import_folders, out_path='STEP_2_Energy_Model'):
     # import data and model outputs

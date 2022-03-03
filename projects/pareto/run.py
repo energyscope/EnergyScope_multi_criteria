@@ -56,7 +56,7 @@ if __name__ == '__main__':
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}/cost/"
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
                          dump_res_only=True)
-        es.extract_results_step2(cs.strip("/"))
+        es.extract_results_step2(cs[:-1])
 
         # Display sankey
         # es.draw_sankey(f"{cs}output/sankey")
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}/einv/"
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
                          dump_res_only=True)
-        es.extract_results_step2(cs.strip("/"))
+        es.extract_results_step2(cs[:-1])
 
         # Example to print the sankey from this script
         # es.draw_sankey(f"{cs}output/sankey")

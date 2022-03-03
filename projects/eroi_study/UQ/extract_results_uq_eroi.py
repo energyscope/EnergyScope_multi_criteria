@@ -23,7 +23,7 @@ from sys import platform
 
 from energyscope import get_total_einv
 from energyscope.utils import load_config
-from energyscope.step2_output_generator import extract_result_step2
+from energyscope.step2_output_generator import extract_results_step2
 from projects.eroi_study.utils_res import get_gwp, get_cost, compute_fec
 
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     #     # for sample_i in range(0, n_samples+1):
     #         print('batch %s run %s in progress' % (batch, sample_i))
     #         cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
-    #         extract_result_step2(cs)
+    #         extract_results_step2(cs)
 
     # loop on all sampled parameters to compute EROI
     # for batch in [1, 2, 3, 4, 5]:

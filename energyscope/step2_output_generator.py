@@ -399,7 +399,7 @@ def save_results(results: Dict[str, pd.DataFrame], parameters: Dict[str, pd.Data
     save_energy_stored(results, parameters, sets, f"{output_dir}hourly_data/")
 
 
-def extract_result_step2(case_study_dir: str) -> None:
+def extract_results_step2(case_study_dir: str) -> None:
     """
     Extract results.
 

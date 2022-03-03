@@ -1,0 +1,15 @@
+name: energyscope
+channels:
+  - defaults
+  - conda-forge
+  - pvlib
+dependencies:
+  - python
+  - pip
+  - pyyaml
+  - numpy
+  - pandas
+  - amplpy
+  - pvlib
+  - matplotlib
+  - plotly

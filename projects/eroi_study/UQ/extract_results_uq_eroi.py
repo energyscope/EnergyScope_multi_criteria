@@ -68,13 +68,26 @@ if __name__ == '__main__':
 
     cwd = os.getcwd()
     print("Current working directory: {0}".format(cwd))
+    #
+    # df_samples = pd.read_csv('data_samples/samples.csv', index_col=0)
+    # M_var = len(df_samples.columns)
+    # n_samples = 2 * (M_var + 1)
 
-    df_samples = pd.read_csv('data_samples/samples.csv', index_col=0)
-    M_var = len(df_samples.columns)
-    n_samples = 2 * (M_var + 1)
+    df_samples = pd.read_csv('data_samples/samples-order-2.csv', index_col=0)
+    df_samples3 = pd.read_csv('data_samples/samples-order-3.csv', index_col=0)
+    df_samples.loc[2945] = df_samples3.loc[len(df_samples)]
 
     # Load configuration into a dict
     config = load_config(config_fn='config_uq.yaml')
+    dir_name = 'einv_uq_order_2'
+    # loop on all sampled parameters to extract results from pickle files
+    # for sample_i in range(0, len(df_samples)):
+    for sample_i in range(2945, 2945 + 1):
+        # for sample_i in range(0, n_samples+1):
+        print('run %s in progress' % (sample_i))
+        cs = f"{config['case_studies_dir']}/{dir_name + '/sample_' + str(sample_i)}"
+        extract_result_step2(cs)
+
     # for batch in [5]:
     #     dir_name = 'einv_uq_' + str(batch)
     #
@@ -87,12 +100,15 @@ if __name__ == '__main__':
 
     # loop on all sampled parameters to compute EROI
     # for batch in [1, 2, 3, 4, 5]:
-    batch = 5
-    df_samples_batch = df_samples.loc[n_samples * (batch - 1):n_samples * batch - 1].copy()
-    df_samples_batch.index = [i for i in range(n_samples)]
-    dir_name = 'einv_uq_' + str(batch)
+    # batch = 5
+    # df_samples_batch = df_samples.loc[n_samples * (batch - 1):n_samples * batch - 1].copy()
+    # df_samples_batch.index = [i for i in range(n_samples)]
+    # dir_name = 'einv_uq_' + str(batch)
+    dir_name = 'einv_uq_order_2'
     res_list = []
-    for sample_i in range(0, n_samples):
+    # 2945 error
+    for sample_i in range(0, len(df_samples)):
+    # for sample_i in range(0, len(df_samples)):
         cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
         # es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
@@ -102,9 +118,12 @@ if __name__ == '__main__':
         fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
         fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
         einv = get_total_einv(cs) / 1000  # TWh
-        print('batch %s run %s EROI %.2f cost %.2f [bEUR/y]' % (batch, sample_i, fec_tot_val / einv, cost_val.sum()))
+        # print('batch %s run %s EROI %.2f cost %.2f [bEUR/y]' % (batch, sample_i, fec_tot_val / einv, cost_val.sum()))
+        print('run %s EROI %.2f cost %.2f [bEUR/y]' % (sample_i, fec_tot_val / einv, cost_val.sum()))
         res_list.append([fec_tot_val / einv, cost_val.sum()])
-    df_res = pd.DataFrame(data=np.asarray(res_list), columns=['EROI', 'cost'], index=[i for i in range(0, n_samples)])
+    df_res = pd.DataFrame(data=np.asarray(res_list), columns=['EROI', 'cost'], index=[i for i in range(0, len(df_samples))])
 
-    df_concat = pd.concat([df_samples_batch, df_res], axis=1).dropna()
-    df_concat.to_csv('data_samples/res-samples-' + str(batch) + '.csv', sep=' ', index=False)
+    # df_concat = pd.concat([df_samples_batch, df_res], axis=1).dropna()
+    df_concat = pd.concat([df_samples, df_res], axis=1).dropna()
+    # df_concat.to_csv('data_samples/res-samples-' + str(batch) + '.csv', sep=' ', index=False)
+    df_concat.to_csv('data_samples/res-samples-order-2.csv', sep=' ', index=False)

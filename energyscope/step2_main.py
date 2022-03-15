@@ -56,7 +56,8 @@ def run_step2(case_study_dir: str, run_file_name: str, ampl_path: str, temp_dir:
 
 
 def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
-                  model_fns: List[str], data_fns: List[str], temp_dir: str, dump_res_only:bool=False) -> None:
+                  model_fns: List[str], data_fns: List[str], temp_dir: str,
+                  dump_res_only: bool = False) -> None:
     """
     Run ESTD STEP 2 using Python and amplpy.
 
@@ -66,6 +67,7 @@ def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
     :param model_fns: list of paths to the model files
     :param data_fns: list of paths to the data files
     :param temp_dir: directory to copy the results.
+    :param dump_res_only: save raw results only
     """
 
     make_dir(f"{temp_dir}/output")
@@ -97,19 +99,10 @@ def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
     # Solve
     ampl_trans.solve()
 
-    # Save output
+    # Get inputs and outputs
     results = get_results(ampl_trans)
-    # for ix, (key, val) in enumerate(results.items()):
-    #     val.to_csv(f"{temp_dir}/output/results/{key}.csv")
-
     parameters = get_parameters(ampl_trans)
-    # for ix, (key, val) in enumerate(parameters.items()):
-    #     val.to_csv(f"{temp_dir}/output/parameters/{key}.csv")
-
     sets = get_sets(ampl_trans)
-    # import json
-    # with open(f"{temp_dir}/output/sets/sets.json", "w") as outfile:
-    #     json.dump(sets, outfile, indent=2)
 
     # Dump results into a pickle file
     if dump_res_only:

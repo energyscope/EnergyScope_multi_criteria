@@ -39,7 +39,7 @@ if __name__ == '__main__':
         all_data['Technologies']['f_min'].loc[tech] = config['Technologies']['f_min'][tech]
 
     # New optimal solution run
-    if 0:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
+    if 1:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
 
         # Empty temp dir
         empty_temp(config['temp_dir'])
@@ -53,32 +53,41 @@ if __name__ == '__main__':
 
         # Running EnergyScope
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/optimal_cost.mod"]
-        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_cost/"
-        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+        cs = f"{config['case_studies_dir']}/{config['case_study_name']}/cost/"
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
+                         dump_res_only=True)
+        es.extract_results_step2(cs[:-1])
 
         # Display sankey
-        es.draw_sankey(f"{cs}/output/sankey")
+        # es.draw_sankey(f"{cs}output/sankey")
 
-    if 0:
+    if 1:
         empty_temp(config['temp_dir'])
 
         # Optimal solution in terms of EINV
-        data_fns = [f"{config['temp_dir']}/ESTD_data.dat", f"{config['temp_dir']}/ESTD_12TD.dat"]
+        estd_out_path = f"{config['temp_dir']}/ESTD_data.dat"
+        es.print_estd(estd_out_path, all_data, config["system_limits"])
+        td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
+        es.print_12td(td12_out_path, all_data['Time_series'], config["step1_output"])
+        data_fns = [estd_out_path, td12_out_path]
+
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/optimal_einv.mod"]
-        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_einv/"
-        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+        cs = f"{config['case_studies_dir']}/{config['case_study_name']}/einv/"
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
+                         dump_res_only=True)
+        es.extract_results_step2(cs[:-1])
 
         # Example to print the sankey from this script
-        # output_dir = f"{config['case_studies_dir']}/{config['case_study_name']}_einv/output/"
-        # es.draw_sankey(path=f"{output_dir}sankey")
+        # es.draw_sankey(f"{cs}output/sankey")
 
     # Get optimal cost
-    opt_cost = es.get_total_cost(f"{config['case_studies_dir']}/{config['case_study_name']}_cost/")
+    opt_cost = es.get_total_cost(f"{config['case_studies_dir']}/{config['case_study_name']}/cost")
     # Get optimal einv
-    opt_einv = es.get_total_einv(f"{config['case_studies_dir']}/{config['case_study_name']}_einv/")
+    opt_einv = es.get_total_einv(f"{config['case_studies_dir']}/{config['case_study_name']}/einv")
 
     # Get approximation of pareto front minimizing einv with constraint on cost
-    epsilons = []  # [0.003125, 0.00625, 0.0125, 0.025, 0.05, 0.1, 0.15]
+    # epsilons = [0.003125, 0.00625, 0.0125, 0.025, 0.05, 0.1, 0.15]
+    epsilons = []
     for epsilon in epsilons:
 
         print("Run for epsilon", epsilon)
@@ -98,8 +107,9 @@ if __name__ == '__main__':
 
         # Run the model
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/epsilon_cost.mod"]
-        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_cost_epsilon_{epsilon}/"
-        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+        cs = f"{config['case_studies_dir']}/{config['case_study_name']}/cost_epsilon_{epsilon}/"
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
+                         dump_res_only=True)
 
     # Get approximation of pareto front minimizing COST with constraint on EINV
     epsilons = []
@@ -123,16 +133,20 @@ if __name__ == '__main__':
         # Run the model
         mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/epsilon_einv.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}_einv_epsilon_{epsilon}/"
-        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
+                         dump_res_only=True)
 
     # Get epsilon necessary condition
     technologies_to_minimize = ["DEC_HP_ELEC", "DEC_THHP_GAS", "DHN_HP_ELEC"]  # - Heat Pumps
-    # ["GAS", "GAS_RE"]  # - Technologies whose output is GAS
     # ["WIND_ONSHORE", "WIND_OFFSHORE", "PV"]  # - Local RES
+    # ["GAS"]  # - GAS
     run_name = 'hps'
 
     # Pairs (dev cost, dev einv)
-    epsilons_pairs = [(0.05, 0.4), (0.1, 0.3), (0.15, 0.2)]
+    epsilons_pairs = [(2.5/100, 40/100), (2.5/100, 30/100), (2.5/100, 20/100),
+                      (5/100, 30/100), (5/100, 20/100), (5/100, 10/100),
+                      (7.5/100, 20/100), (7.5/100, 10/100)]
+    epsilons_pairs = []
     for epsilon_pair in epsilons_pairs:
 
         epsilon_cost, epsilon_einv = epsilon_pair
@@ -156,12 +170,15 @@ if __name__ == '__main__':
 
         es.newline(estd_out_path)
         es.print_set(technologies_to_minimize, "TECHNOLOGIES_TO_MINIMIZE", estd_out_path)
+        # es.print_set(technologies_to_minimize, "RESOURCES_TO_MINIMIZE", estd_out_path)
         data_fns = [estd_out_path, td12_out_path]
 
         # Run the model
-        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/necessary_condition.mod"]
-        cs = f"{config['case_studies_dir']}/{config['case_study_name']}_{run_name}_{epsilon_cost}_{epsilon_einv}/"
-        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'])
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/technologies.mod"]
+        # mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/resources.mod"]
+        cs = f"{config['case_studies_dir']}/{config['case_study_name']}/{run_name}_{epsilon_cost}_{epsilon_einv}/"
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
+                         dump_res_only=True)
 
         # Example to print the sankey from this script
         # output_dir = f"{cs}output"

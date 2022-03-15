@@ -69,6 +69,8 @@ from .step2_main import run_step2, run_step2_new
 from .step2_print_data import import_data, print_param, newline, print_df, print_set, ampl_syntax, \
     print_estd, print_12td
 from .step2_print_run import print_run
+from .step2_output_generator import extract_results_step2
 
-from energyscope.postprocessing import get_total_cost, get_total_gwp, get_total_einv, get_asset_value
+from energyscope.postprocessing import get_total_cost, get_total_gwp, get_total_einv,\
+    get_asset_value, get_resource_used
 from energyscope.sankey_diagram import draw_sankey

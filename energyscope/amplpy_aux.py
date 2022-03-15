@@ -112,3 +112,32 @@ def get_sets(ampl_trans: amplpy.AMPL) -> Dict:
         else:
             sets[name] = get_subset(s)
     return sets
+
+
+def simplify_df(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.set_index("index0")
+    df.index.name = 'Name'
+    df.columns = [c.split('.')[0] for c in df.columns]
+    return df
+
+
+def time_to_pandas(sets: Dict) -> pd.Series:
+    """
+    Aggregate time sets 'HOUR_OF_PERIOD' and 'TYPICAL_DAY_OF_PERIOD' into a pandas Series
+
+    Parameters
+    ----------
+    sets: Dict
+        Dictionary containing all the sets 'PERIODS', 'HOUR_OF_PERIOD' and 'TYPICAL_DAY_OF_PERIOD'
+
+    Returns
+    -------
+    pd.Series
+        Series with index 'PERIODS' and values which are tuples combining 'HOUR_OF_PERIOD' and 'TYPICAL_DAY_OF_PERIOD'
+    """
+
+    # Convert 'time' sets to pandas
+    hs = [sets['HOUR_OF_PERIOD'][t][0] for t in sets['PERIODS']]  # corresponding hour of the day
+    tds = [sets['TYPICAL_DAY_OF_PERIOD'][t][0] for t in sets['PERIODS']]  # corresponding number of the typical day
+    hs_tds = list(zip(hs, tds))
+    return pd.Series(hs_tds, index=sets['PERIODS'])

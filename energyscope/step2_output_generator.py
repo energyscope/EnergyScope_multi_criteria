@@ -13,35 +13,10 @@ from typing import Dict
 import pandas as pd
 from functools import reduce
 from itertools import product
+import pickle
 
-
-def simplify_df(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.set_index("index0")
-    df.index.name = 'Name'
-    df.columns = [c.split('.')[0] for c in df.columns]
-    return df
-
-
-def time_to_pandas(sets: Dict) -> pd.Series:
-    """
-    Aggregate time sets 'HOUR_OF_PERIOD' and 'TYPICAL_DAY_OF_PERIOD' into a pandas Series
-
-    Parameters
-    ----------
-    sets: Dict
-        Dictionary containing all the sets 'PERIODS', 'HOUR_OF_PERIOD' and 'TYPICAL_DAY_OF_PERIOD'
-
-    Returns
-    -------
-    pd.Series
-        Series with index 'PERIODS' and values which are tuples combining 'HOUR_OF_PERIOD' and 'TYPICAL_DAY_OF_PERIOD'
-    """
-
-    # Convert 'time' sets to pandas
-    hs = [sets['HOUR_OF_PERIOD'][t][0] for t in sets['PERIODS']]  # corresponding hour of the day
-    tds = [sets['TYPICAL_DAY_OF_PERIOD'][t][0] for t in sets['PERIODS']]  # corresponding number of the typical day
-    hs_tds = list(zip(hs, tds))
-    return pd.Series(hs_tds, index=sets['PERIODS'])
+from energyscope.amplpy_aux import simplify_df, time_to_pandas
+from energyscope.sankey_input import generate_sankey_file
 
 
 def save_breakdowns(results: Dict[str, pd.DataFrame], parameters: Dict[str, pd.DataFrame],
@@ -422,3 +397,29 @@ def save_results(results: Dict[str, pd.DataFrame], parameters: Dict[str, pd.Data
     save_layers(results, parameters, sets, f"{output_dir}hourly_data/")
     logging.info('Saving energy stored')
     save_energy_stored(results, parameters, sets, f"{output_dir}hourly_data/")
+
+
+def extract_results_step2(case_study_dir: str) -> None:
+    """
+    Extract results.
+
+    :param case_study_dir: path to the case study directory.
+    """
+
+    # Load results
+    with open(f"{case_study_dir}/output/results.pickle", 'rb') as handle:
+        results = pickle.load(handle)
+
+    with open(f"{case_study_dir}/output/parameters.pickle", 'rb') as handle:
+        parameters = pickle.load(handle)
+
+    with open(f"{case_study_dir}/output/sets.pickle", 'rb') as handle:
+        sets = pickle.load(handle)
+
+    logging.info("Saving results")
+    save_results(results, parameters, sets, f"{case_study_dir}/output/")
+
+    logging.info("Creating Sankey diagram input file")
+    generate_sankey_file(results, parameters, sets, f"{case_study_dir}/output/sankey/")
+
+    logging.info('End of run')

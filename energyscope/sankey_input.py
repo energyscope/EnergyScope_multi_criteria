@@ -10,7 +10,7 @@ from typing import Dict
 
 import pandas as pd
 
-from energyscope.step2_output_generator import simplify_df, time_to_pandas
+from energyscope.amplpy_aux import simplify_df, time_to_pandas
 
 
 def add_ft_single(sankey_df: pd.DataFrame, index: int, times: pd.Series,
@@ -249,16 +249,16 @@ def add_f(sankey_df: pd.DataFrame, index: int, times: pd.Series, f: pd.Series, f
         real_value = storage_in[key1, key2][times].sum()/1000.0
         sankey_df.loc[index] = ['H2 prod', 'H2 sto.', round(real_value, 2), layer_id, layer_color, layer_unit]
         index += 1
-        real_value = (storage_out[key1, key2][times]*storage_eff_out[key1, key2]).sum()/1000.0
+        real_value = storage_out[key1, key2][times].sum()*storage_eff_out[key1, key2]/1000.0
         sankey_df.loc[index] = ['H2 sto.', 'H2', round(real_value, 2), layer_id, layer_color, layer_unit]
         index += 1
         real_value = sum([layers_in_out[key, key2]*f_t[key][times] for key in keys])
         real_value = (real_value - storage_in[key1, key2][times]).sum()/1000.0
-        sankey_df.loc[index] = ['H2 Prod', 'H2', round(real_value, 2), layer_id, layer_color, layer_unit]
+        sankey_df.loc[index] = ['H2 prod', 'H2', round(real_value, 2), layer_id, layer_color, layer_unit]
         index += 1
     elif sum([f_t[key][times].sum() for key in keys]) > 10:
         real_value = sum([(layers_in_out[key, key2] * f_t[key][times]).sum() for key in keys]) / 1000.0
-        sankey_df.loc[index] = ['H2 Prod', 'H2', round(real_value, 2), layer_id, layer_color, layer_unit]
+        sankey_df.loc[index] = ['H2 prod', 'H2', round(real_value, 2), layer_id, layer_color, layer_unit]
         index += 1
 
     return sankey_df, index
@@ -614,7 +614,8 @@ def generate_sankey_file(results: Dict[str, pd.DataFrame], parameters: Dict[str,
 if __name__ == '__main__':
     import json
 
-    output_dir_ = "/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria/temp/output2/"
+    output_dir_ = "/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria/case_studies/pareto/"
+    output_dir_ += "gwp_constraint_1000/einv/output/"
 
     sets_ = json.load(open(f"{output_dir_}sets/sets.json", "r"))
 

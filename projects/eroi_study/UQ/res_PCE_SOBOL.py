@@ -24,11 +24,24 @@ if __name__ == '__main__':
         res_list.append([df.loc[param] for df in df_list])
 
     df_res = pd.DataFrame(index=param_list_order_1, data=np.asarray(res_list))
+    df_res_reorder = df_res.reindex(axis='index', labels=list(df_res.max(axis=1).sort_values(ascending=False).index)).copy() # reorder index
+    y_mean = 100 * df_res_reorder.mean(axis=1).values
+    y_min = 100 * df_res_reorder.min(axis=1).values
+    y_max = 100 * df_res_reorder.max(axis=1).values
+    y_max_critical = y_max[y_max > 100/len(y_max)]
+    y_max_negligible = y_max[y_max < 100 / len(y_max)]
+    x_critical = np.arange(len(y_max_critical))
+    x_negligible = np.arange(len(y_max_critical), len(y_max_critical)+len(y_max_negligible))
 
     plt.figure()
-    for col in df_res.columns:
-        plt.plot(100 * df_res[col].values, '.', markersize=10, alpha=0.5)
-    plt.plot(100 * df_res.mean(axis=1).values, '*-', color='k', markersize=5, label='mean')
+    # for col in df_res.columns:
+    #     plt.plot(100 * df_res[col].values, '.', markersize=10, alpha=0.5)
+    plt.plot(y_min, '-or', label='min')
+    # plt.plot(y_max, '-^b', label='max')
+    plt.plot(x_critical, y_max_critical, '-^', color='blue', label='max critical')
+    plt.plot(x_negligible, y_max_negligible, '-^', color='gray', label='max negligible')
+    # plt.fill_between(np.arange(len(y_mean)), y_mean + y_max, y_mean - y_min, facecolor='gray', label='-min/+max')
+    plt.plot(y_mean, '*-', color='k', markersize=5, label='mean')
     plt.hlines(y=100/len(param_list_order_1), xmin=0, xmax=len(param_list_order_1), colors='k', label='negligible: 1/'+str(len(param_list_order_1)), linestyles='-', linewidth=3)
     plt.xlabel('Parameters', fontsize=15)
     plt.ylabel('%', rotation=180, fontsize=15)

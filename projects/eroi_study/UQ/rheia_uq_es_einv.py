@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     # For extracting results:
     # set: 'create only samples': False
-    # uncomment the line 'draw pdf cdf': [True, 1000]
+    # uncomment the line 'draw pdf cdf': [True, 1000000]
 
     rheia_uq.run_uq(dict_uq, design_space='design_space')
 
@@ -45,8 +45,21 @@ if __name__ == '__main__':
 
     loo = my_post_process_uq.get_loo(dict_uq['results dir'], objective)
 
+    eroi_mean = my_post_process_uq.get_mean_std(dict_uq['results dir'], objective)[0]
+    eroi_std = my_post_process_uq.get_mean_std(dict_uq['results dir'], objective)[1]
+
     x_pdf, y_pdf = my_post_process_uq.get_pdf(dict_uq['results dir'], objective)
-    plt.plot(x_pdf, y_pdf)
-    plt.xlabel(objective)
-    plt.ylabel('probability density')
+    plt.plot(x_pdf, y_pdf,  linewidth=3)
+    plt.ylim(0, 1)
+    plt.vlines(x=eroi_mean, ymin=-1, ymax=1, colors='r', label='mean: %.1f'%(eroi_mean), linewidth=3)
+    plt.vlines(x=6.2, ymin=-1, ymax=1, colors='g', label='deterministic: 6.2', linewidth=3)
+    plt.vlines(x=eroi_mean + 2*eroi_std, ymin=-1, ymax=1, colors='k', label='mean + 2*std ', linestyles=':', linewidth=3)
+    plt.vlines(x=eroi_mean - 2*eroi_std, ymin=-1, ymax=1, colors='k', label='mean - 2*std ', linestyles=':', linewidth=3)
+    plt.xlabel(objective, fontsize=15)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.legend(fontsize=15)
+    plt.ylabel('probability density', fontsize=15)
+    plt.tight_layout()
+    plt.savefig(my_post_process_uq.result_path + '/' + dict_uq['results dir'] +'/eroi-pdf.pdf')
     plt.show()

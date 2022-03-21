@@ -7,6 +7,7 @@ Plot the total Sobol indices following the first-order PCE.
 import json
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import StrMethodFormatter, NullFormatter, ScalarFormatter
 import pandas as pd
 import numpy as np
 
@@ -26,13 +27,22 @@ if __name__ == '__main__':
 
     plt.figure()
     for col in df_res.columns:
-        plt.plot(df_res[col].values, '.', label='run '+str(col))
-    plt.plot(df_res.mean(axis=1).values, 'k', label='mean')
-    plt.hlines(y=1/len(param_list_order_1), xmin=0, xmax=len(param_list_order_1), colors='k', label='negligible', linestyles=':')
-    plt.xlabel('parameters')
-    plt.ylabel('Total-order Sobol indices')
-    plt.legend()
+        plt.plot(100 * df_res[col].values, '.', markersize=10, alpha=0.5)
+    plt.plot(100 * df_res.mean(axis=1).values, '*-', color='k', markersize=5, label='mean')
+    plt.hlines(y=100/len(param_list_order_1), xmin=0, xmax=len(param_list_order_1), colors='k', label='negligible: 1/'+str(len(param_list_order_1)), linestyles='-', linewidth=3)
+    plt.xlabel('Parameters', fontsize=15)
+    plt.ylabel('%', rotation=180, fontsize=15)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.legend(fontsize=15)
+    plt.yscale('log')
+    ax = plt.gca()
+    ax.yaxis.set_major_formatter(StrMethodFormatter('{x:.2f}'))
+    ax.yaxis.set_minor_formatter(NullFormatter())
+    ax.set_yticks([0.01, 0.1, 1, 10, 30])
+    ax.get_xaxis().set_major_formatter(ScalarFormatter())
     plt.tight_layout()
+    plt.savefig('sobol_res/first-order-total-order-sobol-indices.pdf')
     plt.show()
 
     # Retrieve parameters which have at least one total Sobol indice > 1 / nb parameters
@@ -73,13 +83,23 @@ if __name__ == '__main__':
     second_order_params =  list(df_param_order_2[df_param_order_2 > 1 / len(df_param_order_2)].index)
 
     plt.figure()
-    plt.plot(df_param_order_2.values, '.', label='Second-order PCE')
-    plt.hlines(y=1/len(param_list_order_1), xmin=0, xmax=len(df_param_order_2), colors='k', label='negligible', linestyles=':')
-    plt.xlabel('parameters')
-    plt.ylabel('Total-order Sobol indices')
-    plt.legend()
+    # plt.plot(df_param_order_2.values, '*', markersize=10, label='Second-order PCE')
+    plt.plot(range(len(df_param_order_2.values[df_param_order_2.values > 1 / len(df_param_order_2)])), 100 * df_param_order_2.values[df_param_order_2.values > 1 / len(df_param_order_2)], '*', markersize=10, label='critical')
+    plt.plot(range(len(df_param_order_2.values[df_param_order_2.values > 1 / len(df_param_order_2)]), len(df_param_order_2.values[df_param_order_2.values > 1 / len(df_param_order_2)])+ len(df_param_order_2.values[df_param_order_2.values < 1 / len(param_list_order_1)])), 100 * df_param_order_2.values[df_param_order_2.values < 1 / len(param_list_order_1)], '.', markersize=10, color='grey', label='neglected')
+    plt.hlines(y=100/len(df_param_order_2), xmin=0, xmax=len(df_param_order_2), colors='k', label='negligible: 1/'+str(len(df_param_order_2)), linestyles='-', linewidth=3)
+    plt.xlabel('Parameters', fontsize=15)
+    plt.ylabel('%', rotation=180, fontsize=15)
+    plt.yscale('log')
+    ax = plt.gca()
+    ax.yaxis.set_major_formatter(StrMethodFormatter('{x:.1f}'))
+    ax.yaxis.set_minor_formatter(NullFormatter())
+    ax.set_yticks([0.1, 1, 5, 10, 20, 30])
+    ax.get_xaxis().set_major_formatter(ScalarFormatter())
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.legend(fontsize=15)
     plt.tight_layout()
-    plt.savefig('sobol_res/total-order-sobol-indices.pdf')
+    plt.savefig('sobol_res/second-order-total-order-sobol-indices.pdf')
     plt.show()
 
 

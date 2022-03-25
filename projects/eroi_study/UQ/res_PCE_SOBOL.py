@@ -11,12 +11,16 @@ from matplotlib.ticker import StrMethodFormatter, NullFormatter, ScalarFormatter
 import pandas as pd
 import numpy as np
 
+gwp_tot_max = 28500 # ktCO2/y, 28500
+
 if __name__ == '__main__':
+
+    dir_name = 'sobol_res_'+str(gwp_tot_max)
 
     # First-order PCE results
     df_list = []
     for batch in range(1, 5+1):
-        df_list.append(pd.read_csv('sobol_res/full_pce_order_1_EROI_Sobol_indices-'+str(batch)+'.csv', index_col=0)['Total-order Sobol indices'])
+        df_list.append(pd.read_csv(dir_name+'/full_pce_order_1_EROI_Sobol_indices-'+str(batch)+'.csv', index_col=0)['Total-order Sobol indices'])
 
     param_list_order_1 = list(df_list[0].index)
     res_list = []
@@ -55,7 +59,7 @@ if __name__ == '__main__':
     ax.set_yticks([0.01, 0.1, 1, 10, 30])
     ax.get_xaxis().set_major_formatter(ScalarFormatter())
     plt.tight_layout()
-    plt.savefig('sobol_res/first-order-total-order-sobol-indices.pdf')
+    plt.savefig(dir_name+'/first-order-total-order-sobol-indices.pdf')
     plt.show()
 
     # Retrieve parameters which have at least one total Sobol indice > 1 / nb parameters
@@ -70,27 +74,28 @@ if __name__ == '__main__':
     print('%s parameters with all Sobol indices > 1 / nb parameters' %(len(param_sel_all)))
     print('%s parameters with the mean of all Sobol indices > 1 / nb parameters' %(len(param_sel_mean)))
 
-    print(df_res.mean(axis=1).sort_values()[-len(param_sel_mean):])
-    list(df_res.mean(axis=1).sort_values().index[-10:])
+    # Print the first 10 critical parameters selected
+    print(df_res[df_res.max(axis=1) > 1 / len(param_list_order_1)].mean(axis=1).sort_values(ascending=False)[:10])
+    list(df_res[df_res.max(axis=1) > 1 / len(param_list_order_1)].mean(axis=1).sort_values(ascending=False)[:10].index)
 
     # Select the parameters for the second-order PCE based on the results of the first-order PCE
-    # df_design = pd.read_csv('data_samples/design_space', sep=' ', index_col=0)
-    # df_stochastic = pd.read_csv('data_samples/stochastic_space', sep=' ', index_col=0)
-    #
-    # df_design.loc[param_sel_one].to_csv('data_samples/design_space-order-2', sep=' ')
-    # df_stochastic.loc[param_sel_one].to_csv('data_samples/stochastic_space-order-2', sep=' ')
-    #
-    # param_list_order_1 = json.load(open('data_samples/param_list.json'))
-    #
-    # param_list_order_2 = dict()
-    # df_param = pd.DataFrame([key.split('-') for key in param_sel_one])
-    # for key in list(param_list_order_1.keys()):
-    #     param_list_order_2[key] = [key +'-'+ l for l in list(df_param[1][df_param[0] == key].values)]
-    #
-    # json.dump(param_list_order_2, open("data_samples/param_list_order_2.json", "w"), sort_keys=True, indent=4)
+    df_design = pd.read_csv('data_samples/design_space', sep=' ', index_col=0)
+    df_stochastic = pd.read_csv('data_samples/stochastic_space', sep=' ', index_col=0)
+
+    df_design.loc[param_sel_one].to_csv('data_samples/design_space-order-2-gwp-'+str(gwp_tot_max), sep=' ')
+    df_stochastic.loc[param_sel_one].to_csv('data_samples/stochastic_space-order-2-gwp-'+str(gwp_tot_max), sep=' ')
+
+    param_list_order_1 = json.load(open('data_samples/param_list.json'))
+
+    param_list_order_2 = dict()
+    df_param = pd.DataFrame([key.split('-') for key in param_sel_one])
+    for key in list(param_list_order_1.keys()):
+        param_list_order_2[key] = [key +'-'+ l for l in list(df_param[1][df_param[0] == key].values)]
+
+    json.dump(param_list_order_2, open('data_samples/param_list_order_2-'+str(gwp_tot_max)+'.json', "w"), sort_keys=True, indent=4)
 
     # Second-order PCE results
-    df_param_order_2 = pd.read_csv('sobol_res/full_pce_order_2_EROI_Sobol_indices.csv', index_col=0)['Total-order Sobol indices']
+    df_param_order_2 = pd.read_csv(dir_name+'/full_pce_order_2_EROI_Sobol_indices.csv', index_col=0)['Total-order Sobol indices']
 
     # Retrieve parameters from second-order PCE which have at least one total Sobol indice > 1 / nb parameters
     second_order_params =  list(df_param_order_2[df_param_order_2 > 1 / len(df_param_order_2)].index)
@@ -112,9 +117,8 @@ if __name__ == '__main__':
     plt.yticks(fontsize=15)
     plt.legend(fontsize=15)
     plt.tight_layout()
-    plt.savefig('sobol_res/second-order-total-order-sobol-indices.pdf')
+    plt.savefig(dir_name+'/second-order-total-order-sobol-indices.pdf')
     plt.show()
-
 
     # Comparison between order 1 and order 2
     df_param_order_1_selected.mean(axis=1)

@@ -11,7 +11,7 @@ from matplotlib.ticker import StrMethodFormatter, NullFormatter, ScalarFormatter
 import pandas as pd
 import numpy as np
 
-gwp_tot_max = 28500 # ktCO2/y, 28500
+gwp_tot_max = 28500 # ktCO2/y, 28500, 56900
 
 if __name__ == '__main__':
 
@@ -37,6 +37,11 @@ if __name__ == '__main__':
     x_critical = np.arange(len(y_max_critical))
     x_negligible = np.arange(len(y_max_critical), len(y_max_critical)+len(y_max_negligible))
 
+    if gwp_tot_max == 56900:
+        y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 30]
+    elif gwp_tot_max == 28500:
+        y_ticks = [0.1, 100/len(param_list_order_1), 10, 80]
+
     plt.figure()
     # for col in df_res.columns:
     #     plt.plot(100 * df_res[col].values, '.', markersize=10, alpha=0.5)
@@ -56,7 +61,7 @@ if __name__ == '__main__':
     ax = plt.gca()
     ax.yaxis.set_major_formatter(StrMethodFormatter('{x:.2f}'))
     ax.yaxis.set_minor_formatter(NullFormatter())
-    ax.set_yticks([0.01, 0.1, 1, 10, 30])
+    ax.set_yticks(y_ticks)
     ax.get_xaxis().set_major_formatter(ScalarFormatter())
     plt.tight_layout()
     plt.savefig(dir_name+'/first-order-total-order-sobol-indices.pdf')
@@ -99,11 +104,18 @@ if __name__ == '__main__':
 
     # Retrieve parameters from second-order PCE which have at least one total Sobol indice > 1 / nb parameters
     second_order_params =  list(df_param_order_2[df_param_order_2 > 1 / len(df_param_order_2)].index)
+    n_second_param_critical = len(second_order_params)
+    n_second_param_negligible = len(list(df_param_order_2[df_param_order_2 < 1 / len(df_param_order_2)].index))
+
+    if gwp_tot_max == 56900:
+        y_ticks = [0.1, 1, 100/55, 5, 10, 20, 30]
+    elif gwp_tot_max == 28500:
+        y_ticks = [0.1, 1, 100/42, 5, 10, 70]
 
     plt.figure()
     # plt.plot(df_param_order_2.values, '*', markersize=10, label='Second-order PCE')
-    plt.plot(range(len(df_param_order_2.values[df_param_order_2.values > 1 / len(df_param_order_2)])), 100 * df_param_order_2.values[df_param_order_2.values > 1 / len(df_param_order_2)], '*', markersize=10, label='critical')
-    plt.plot(range(len(df_param_order_2.values[df_param_order_2.values > 1 / len(df_param_order_2)]), len(df_param_order_2.values[df_param_order_2.values > 1 / len(df_param_order_2)])+ len(df_param_order_2.values[df_param_order_2.values < 1 / len(param_list_order_1)])), 100 * df_param_order_2.values[df_param_order_2.values < 1 / len(param_list_order_1)], '.', markersize=10, color='grey', label='neglected')
+    plt.plot(range(0, n_second_param_critical), 100 * df_param_order_2.values[df_param_order_2.values > 1 / len(df_param_order_2)], '*', markersize=10, label='critical')
+    plt.plot(range(n_second_param_critical, n_second_param_critical+ n_second_param_negligible), 100 * df_param_order_2.values[df_param_order_2.values < 1 / len(df_param_order_2)], '.', markersize=10, color='grey', label='neglected')
     plt.hlines(y=100/len(df_param_order_2), xmin=0, xmax=len(df_param_order_2), colors='k', label='negligible: 1/'+str(len(df_param_order_2)), linestyles='-', linewidth=3)
     plt.xlabel('Parameters', fontsize=15)
     plt.ylabel('%', rotation=180, fontsize=15)
@@ -111,7 +123,7 @@ if __name__ == '__main__':
     ax = plt.gca()
     ax.yaxis.set_major_formatter(StrMethodFormatter('{x:.1f}'))
     ax.yaxis.set_minor_formatter(NullFormatter())
-    ax.set_yticks([0.1, 1, 5, 10, 20, 30])
+    ax.set_yticks(y_ticks)
     ax.get_xaxis().set_major_formatter(ScalarFormatter())
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
@@ -119,6 +131,3 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig(dir_name+'/second-order-total-order-sobol-indices.pdf')
     plt.show()
-
-    # Comparison between order 1 and order 2
-    df_param_order_1_selected.mean(axis=1)

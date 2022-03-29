@@ -72,7 +72,7 @@ if __name__ == '__main__':
     # Share of energies
     for p in range(100, 0, -5):
         tot_EI = df_EI[p].sum()
-        print('GWP_tot %.1f [MtC02/y]: offshore %.1f [GW] onshore %.1f [GW] PV %.1f [GW]' %(df_GWP.sum(axis=1).loc[p], df_assets[p].loc['WIND_OFFSHORE'], df_assets[p].loc['WIND_ONSHORE'], df_assets[p].loc['PV']))
+        print('GWP_tot %.1f [MtC02/y]: EROI %.1f offshore %.1f [GW] onshore %.1f [GW] PV %.1f [GW]' %(df_GWP.sum(axis=1).loc[p], df_res['EROI'].loc[p], df_assets[p].loc['WIND_OFFSHORE'], df_assets[p].loc['WIND_ONSHORE'], df_assets[p].loc['PV']))
         print('GWh: Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f' % ( df_EI[p]['GAS'] ,  df_EI[p]['METHANOL_RE'] ,  df_EI[p]['AMMONIA_RE'] ,  df_EI[p]['H2_RE'] , df_EI[p]['GAS_RE'] ,  df_EI[p]['RES_SOLAR'] ,  df_EI[p]['RES_WIND'] ,  df_EI[p]['WOOD'] ,  df_EI[p]['WET_BIOMASS'] ,   df_EI[p]['WASTE'] ))
         print('Percentage: Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f' % (100 * df_EI[p]['GAS'] / tot_EI, 100 * df_EI[p]['METHANOL_RE'] / tot_EI, 100 * df_EI[p]['AMMONIA_RE'] / tot_EI, 100 * df_EI[p]['H2_RE'] / tot_EI,100 * df_EI[p]['GAS_RE'] / tot_EI, 100 * df_EI[p]['RES_SOLAR'] / tot_EI, 100 * df_EI[p]['RES_WIND'] / tot_EI, 100 * df_EI[p]['WOOD'] / tot_EI, 100 * df_EI[p]['WET_BIOMASS'] / tot_EI,  100 * df_EI[p]['WASTE'] / tot_EI))
 
@@ -239,9 +239,127 @@ if __name__ == '__main__':
 
 
     ####################################################################################################################
-    # PLot assets installed capacities
+    # Plot assets installed capacities with stacked bars
     df_assets.columns = np.round(x_gwp_tot_index, 1)
     plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='[MtC02/y]')
+
+    ####################################################################################################################
+    # Plot assets installed capacities with lines
+    plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='Yearly emissions [MtC02]')
+
+    def plot_asset_capacities_by_tech(df_assets: pd.DataFrame, pdf: str, user_data:str, dir_plot:str, xlabel:str='p (%)'):
+        """
+        Line plot of asset installed capacities by technology subcategories such as electricity, heat high temperature, etc.
+        :param df_assets: data of asset installed capacities for all scenarios.
+        :param pdf: pdf name.
+        :param user_data: user_data path.
+        """
+
+        # Retrieve the list of technologies
+        df_aux_tech = pd.read_csv(user_data + "/aux_technologies.csv", index_col=0)
+
+        # Retrieve the list subcategory of technologies
+        tech_subcategory_list = list(dict.fromkeys(list(df_aux_tech['Subcategory'])))
+        tech_by_subcategory = dict()
+        for cat in tech_subcategory_list:
+            tech_by_subcategory[cat] = list(df_aux_tech[df_aux_tech['Subcategory'] == cat].index)
+
+        # Retrieve for each technology subcategory the corresponding assets
+        df_elec_tech = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Electricity']].transpose())
+        df_heat_low_DEC = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Heat low temperature decentralised']].transpose())
+        df_heat_low_DHN = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Heat low temperature centralised']].transpose())
+        df_heat_high_T = retrieve_non_zero_val( df=df_assets.loc[tech_by_subcategory['Heat high temperature']].transpose())
+        df_synthetic_fuels = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Synthetic fuels']].transpose())
+        df_elec_storage = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Electricity storage']].transpose())
+        df_thermal_storage = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Thermal storage']].transpose())
+        df_mob_private = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Passenger private']].transpose())
+        df_mob_public = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Passenger public']].transpose())
+        df_mob_freight = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Freight']].transpose())
+        df_other_storage = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Other storage']].transpose())
+
+        x_index = list(df_elec_tech.index)
+        # Installed capacity for electricity production for different scenarios (hydro is removed because too small)
+        plt.figure()
+        plt.plot(x_index, df_elec_tech['PV'].values, '-D', color='gold', linewidth=3, markersize=5, label='PV')
+        plt.plot(x_index, df_elec_tech['WIND_ONSHORE'].values + df_elec_tech['WIND_ONSHORE'].values, '-Dg', linewidth=3, markersize=5, label='Wind')
+        plt.plot(x_index, df_elec_tech['CCGT'].values, '-Dk', linewidth=3, markersize=5, label='CCGT')
+        plt.plot(x_index, df_heat_high_T['IND_COGEN_GAS'].values + df_heat_low_DHN['DHN_COGEN_GAS'].values, '--P', color='orange', linewidth=3, markersize=5, label='IND. +DHN gas CHP')
+        plt.plot(x_index, df_heat_low_DHN['DHN_COGEN_BIO_HYDROLYSIS'].values, '--P', color='brown', linewidth=3, markersize=5, label='Bio. hydro. CHP')
+        plt.xlabel(xlabel, fontsize=15)
+        plt.ylabel('Installed capacity [GW]', rotation=90, fontsize=15)
+        plt.gca().invert_xaxis()
+        plt.xticks(fontsize=15)
+        plt.yticks(fontsize=15)
+        plt.legend(fontsize=15)
+        plt.tight_layout()
+        plt.savefig(dir_plot+ '/f-elec-line-' + pdf + '.pdf')
+        plt.show()
+
+        # Installed capacity for decentralised low temperature heat production for different scenarios.
+        plt.figure()
+        plt.plot(x_index, df_heat_low_DEC['DEC_HP_ELEC'].values, '-D', linewidth=3, markersize=5, label='Heat pumps')
+        # plt.plot(x_index, df_heat_low_DEC['DEC_ADVCOGEN_GAS'].values, '-D', linewidth=3, markersize=5, label='DEC_ADVCOGEN_GAS')
+        plt.plot(x_index, df_heat_low_DEC['DEC_BOILER_GAS'].values, '-D', linewidth=3, markersize=5, label='Gas boilers')
+        plt.xlabel(xlabel, fontsize=15)
+        plt.ylabel('Installed capacity [GW]', rotation=90, fontsize=15)
+        plt.gca().invert_xaxis()
+        plt.xticks(fontsize=15)
+        plt.yticks(fontsize=15)
+        plt.legend(fontsize=15)
+        plt.tight_layout()
+        plt.savefig(dir_plot+ '/f-heat-low-DEC-line-' + pdf + '.pdf')
+        plt.show()
+
+        # Installed capacity for centralised low temperature heat production for different scenarios.
+        plt.figure()
+        plt.plot(x_index, df_heat_low_DHN['DHN_HP_ELEC'].values, '-D', linewidth=3, markersize=5, label='Heat pumps')
+        plt.plot(x_index, df_heat_low_DHN['DHN_BOILER_GAS'].values, '-D', linewidth=3, markersize=5, label='Gas boilers')
+        plt.plot(x_index, df_heat_low_DHN['DHN_COGEN_GAS'].values, '-D', linewidth=3, markersize=5, label='Gas CHP')
+        plt.plot(x_index, df_heat_low_DHN['DHN_COGEN_BIO_HYDROLYSIS'].values, '-D', linewidth=3, markersize=5, label='Bio. hydro. CHP')
+        plt.plot(x_index, df_heat_low_DHN['DHN_SOLAR'].values, '-D', linewidth=3, markersize=5, label='Solar')
+        plt.xlabel(xlabel, fontsize=15)
+        plt.ylabel('Installed capacity [GW]', rotation=90, fontsize=15)
+        plt.gca().invert_xaxis()
+        plt.xticks(fontsize=15)
+        plt.yticks(fontsize=15)
+        plt.legend(fontsize=15)
+        plt.tight_layout()
+        plt.savefig(dir_plot+ '/f-heat-low-DHN-line-' + pdf + '.pdf')
+        plt.show()
+
+        # Installed capacity for industrial heat production for different scenarios.
+        plt.figure()
+        plt.plot(x_index, df_heat_high_T['IND_BOILER_WASTE'].values, '-D', linewidth=3, markersize=5, label='Waste boilers')
+        plt.plot(x_index, df_heat_high_T['IND_BOILER_GAS'].values, '-D', linewidth=3, markersize=5, label='Gas boilers')
+        plt.plot(x_index, df_heat_high_T['IND_COGEN_GAS'].values, '-D', linewidth=3, markersize=5, label='Gas CHP')
+        plt.plot(x_index, df_heat_high_T['IND_DIRECT_ELEC'].values, '-D', linewidth=3, markersize=5, label='Direct electricity')
+        plt.xlabel(xlabel, fontsize=15)
+        plt.ylabel('Installed capacity [GW]', rotation=90, fontsize=15)
+        plt.gca().invert_xaxis()
+        plt.xticks(fontsize=15)
+        plt.yticks(fontsize=15)
+        plt.legend(fontsize=15)
+        plt.tight_layout()
+        plt.savefig(dir_plot+ '/f-heat-high-T-line-' + pdf + '.pdf')
+        plt.show()
+
+        # Installed capacity for synthetic gas production for different scenarios (installed capacities greater than 15 GW are not shown).
+        plt.figure()
+        plt.plot(x_index, df_synthetic_fuels['SMR'].values, '-D', linewidth=3, markersize=5, label='Methane reforming')
+        plt.plot(x_index, df_synthetic_fuels['METHANE_TO_METHANOL'].values, '-D', linewidth=3, markersize=5, label='Methane to methanol')
+        plt.plot(x_index, df_synthetic_fuels['BIOMASS_TO_METHANOL'].values, '-D', linewidth=3, markersize=5, label='Biomass methanolation')
+        plt.plot(x_index, df_synthetic_fuels['HABER_BOSCH'].values, '-D', linewidth=3, markersize=5, label='Haber bosch')
+        plt.plot(x_index, df_synthetic_fuels['METHANOL_TO_HVC'].values, '-D', linewidth=3, markersize=5, label='Methanol to HVC')
+        plt.xlabel(xlabel, fontsize=15)
+        plt.ylabel('Installed capacity [GW]', rotation=90, fontsize=15)
+        plt.gca().invert_xaxis()
+        plt.xticks(fontsize=15)
+        plt.yticks(fontsize=15)
+        plt.legend(fontsize=15)
+        plt.tight_layout()
+        plt.savefig(dir_plot+ '/f-synthetic-fuels-line-' + pdf + '.pdf')
+        plt.show()
+
 
     ##############
     #

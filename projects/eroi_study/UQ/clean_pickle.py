@@ -58,7 +58,7 @@ def remove_pickle(case_study_dir: str) -> None:
 
 ID_sample = 1  # from 1 to 5
 # sample_i = 0 # from to 0 to N
-gwp_tot_max = 56900  # ktCO2/y -> constraint on the GWP_tot
+gwp_tot_max = 28500  # ktCO2/y -> constraint on the GWP_tot
 
 # N_samples = 362
 # batch = 1
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     # Load configuration into a dict
     config = load_config(config_fn='config_uq.yaml')
     for batch in [1, 2, 3, 4, 5]:
-        dir_name = 'einv_uq_' + str(batch)
+        dir_name = 'einv_uq_' + str(batch) + '_gwp_' + str(gwp_tot_max)
 
         # loop on all sampled parameters to extract results from pickle files
         for sample_i in range(0, n_samples):
@@ -86,11 +86,11 @@ if __name__ == '__main__':
             remove_pickle(cs)
 
     # Clean pickle second order PCE
-    df_samples = pd.read_csv('data_samples/samples-order-2.csv', index_col=0)
+    df_samples = pd.read_csv('data_samples/samples-order-2-'+ str(gwp_tot_max)+'.csv', index_col=0)
 
     # Load configuration into a dict
     config = load_config(config_fn='config_uq.yaml')
-    dir_name = 'einv_uq_order_2'
+    dir_name = 'einv_uq_order_2_gwp_' + str(gwp_tot_max)
 
     # loop on all sampled parameters to extract results from pickle files
     for sample_i in range(0, len(df_samples)):

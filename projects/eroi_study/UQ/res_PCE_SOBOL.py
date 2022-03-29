@@ -64,7 +64,7 @@ if __name__ == '__main__':
     ax.set_yticks(y_ticks)
     ax.get_xaxis().set_major_formatter(ScalarFormatter())
     plt.tight_layout()
-    plt.savefig(dir_name+'/first-order-total-order-sobol-indices.pdf')
+    plt.savefig(dir_name+'/first-order-total-order-sobol-indices-'+str(gwp_tot_max)+'.pdf')
     plt.show()
 
     # Retrieve parameters which have at least one total Sobol indice > 1 / nb parameters
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     print('%s parameters with the mean of all Sobol indices > 1 / nb parameters' %(len(param_sel_mean)))
 
     # Print the first 10 critical parameters selected
-    print(df_res[df_res.max(axis=1) > 1 / len(param_list_order_1)].mean(axis=1).sort_values(ascending=False)[:10])
+    print(100*df_res[df_res.max(axis=1) > 1 / len(param_list_order_1)].mean(axis=1).sort_values(ascending=False)[:10].round(3))
     list(df_res[df_res.max(axis=1) > 1 / len(param_list_order_1)].mean(axis=1).sort_values(ascending=False)[:10].index)
 
     # Select the parameters for the second-order PCE based on the results of the first-order PCE
@@ -129,5 +129,7 @@ if __name__ == '__main__':
     plt.yticks(fontsize=15)
     plt.legend(fontsize=15)
     plt.tight_layout()
-    plt.savefig(dir_name+'/second-order-total-order-sobol-indices.pdf')
+    plt.savefig(dir_name+'/second-order-total-order-sobol-indices-'+str(gwp_tot_max)+'.pdf')
     plt.show()
+
+    print(100 * df_param_order_2[df_param_order_2 > 1 / len(df_param_order_2)].round(3))

@@ -343,12 +343,12 @@ if __name__ == '__main__':
         plt.savefig(dir_plot+ '/f-heat-high-T-line-' + pdf + '.pdf')
         plt.show()
 
-        # Installed capacity for synthetic gas production for different scenarios (installed capacities greater than 15 GW are not shown).
+        # Installed capacity for synthetic gas production for different scenarios.
         plt.figure()
         plt.plot(x_index, df_synthetic_fuels['SMR'].values, '-D', linewidth=3, markersize=5, label='Methane reforming')
         plt.plot(x_index, df_synthetic_fuels['METHANE_TO_METHANOL'].values, '-D', linewidth=3, markersize=5, label='Methane to methanol')
         plt.plot(x_index, df_synthetic_fuels['BIOMASS_TO_METHANOL'].values, '-D', linewidth=3, markersize=5, label='Biomass methanolation')
-        plt.plot(x_index, df_synthetic_fuels['HABER_BOSCH'].values, '-D', linewidth=3, markersize=5, label='Haber bosch')
+        plt.plot(x_index, df_synthetic_fuels['HABER_BOSCH'].values, '-D', linewidth=3, markersize=5, label='Haber Bosch')
         plt.plot(x_index, df_synthetic_fuels['METHANOL_TO_HVC'].values, '-D', linewidth=3, markersize=5, label='Methanol to HVC')
         plt.xlabel(xlabel, fontsize=15)
         plt.ylabel('Installed capacity [GW]', rotation=90, fontsize=15)
@@ -359,6 +359,51 @@ if __name__ == '__main__':
         plt.tight_layout()
         plt.savefig(dir_plot+ '/f-synthetic-fuels-line-' + pdf + '.pdf')
         plt.show()
+
+        # Installed storage capacity for different scenarios.
+        plt.figure()
+        plt.plot(x_index, df_thermal_storage['TS_DEC_HP_ELEC'].values, '-D', linewidth=3, markersize=5, label='TS DEC HP')
+        plt.plot(x_index, df_thermal_storage['TS_DEC_ADVCOGEN_GAS'].values, '-D', linewidth=3, markersize=5, label='TS DEC FC CHP gas')
+        plt.plot(x_index, df_thermal_storage['TS_DEC_BOILER_GAS'].values, '-D', linewidth=3, markersize=5, label='TS DEC boiler gas')
+        plt.plot(x_index, df_thermal_storage['TS_DHN_SEASONAL'].values, '-D', linewidth=3, markersize=5, label='TS DHN')
+        plt.plot(x_index, df_other_storage['GAS_STORAGE'].values, '-P', linewidth=3, markersize=5, label='Gas')
+        plt.plot(x_index, df_other_storage['AMMONIA_STORAGE'].values, '-P', linewidth=3, markersize=5, label='Ammonia')
+        plt.plot(x_index, df_other_storage['METHANOL_STORAGE'].values, '-P', linewidth=3, markersize=5, label='Methanol')
+        plt.plot(x_index, df_elec_storage['PHS'].values, '-+', linewidth=3, markersize=5, label='PHS')
+        plt.plot(x_index, df_elec_storage['BATT_LI'].values, '-+', linewidth=3, markersize=5, label='LI Batteries')
+        plt.plot(x_index, df_elec_storage['BEV_BATT'].values, '-+', linewidth=3, markersize=5, label='BEV batteries')
+        plt.xlabel(xlabel, fontsize=15)
+        plt.ylabel('Installed capacity [GW]', rotation=90, fontsize=15)
+        plt.gca().invert_xaxis()
+        plt.xticks(fontsize=15)
+        plt.yticks(fontsize=15)
+        plt.legend(fontsize=15)
+        plt.tight_layout()
+        plt.savefig(dir_plot+ '/f-storages-line-' + pdf + '.pdf')
+        plt.show()
+
+        # # Installed storage capacity for different scenarios.
+        # plt.figure()
+        # plt.plot(x_index, df_thermal_storage['TS_DEC_HP_ELEC'].values, '-D', linewidth=3, markersize=5, label='TS DEC HP')
+        # plt.plot(x_index, df_thermal_storage['TS_DEC_ADVCOGEN_GAS'].values, '-D', linewidth=3, markersize=5, label='TS DEC FC CHP gas')
+        # plt.plot(x_index, df_thermal_storage['TS_DEC_BOILER_GAS'].values, '-D', linewidth=3, markersize=5, label='TS DEC boiler gas')
+        # plt.plot(x_index, df_thermal_storage['TS_DHN_SEASONAL'].values, '-D', linewidth=3, markersize=5, label='TS DHN')
+        # plt.plot(x_index, df_other_storage['GAS_STORAGE'].values, '-P', linewidth=3, markersize=5, label='Gas')
+        # plt.plot(x_index, df_other_storage['AMMONIA_STORAGE'].values, '-P', linewidth=3, markersize=5, label='Ammonia')
+        # plt.plot(x_index, df_other_storage['METHANOL_STORAGE'].values, '-P', linewidth=3, markersize=5, label='Methanol')
+        # plt.plot(x_index, df_elec_storage['PHS'].values, '-+', linewidth=3, markersize=5, label='PHS')
+        # plt.plot(x_index, df_elec_storage['BATT_LI'].values, '-+', linewidth=3, markersize=5, label='LI Batteries')
+        # plt.plot(x_index, df_elec_storage['BEV_BATT'].values, '-+', linewidth=3, markersize=5, label='BEV batteries')
+        # plt.xlabel(xlabel, fontsize=15)
+        # plt.ylabel('Installed capacity [GW]', rotation=90, fontsize=15)
+        # plt.gca().invert_xaxis()
+        # plt.xticks(fontsize=15)
+        # plt.yticks(fontsize=15)
+        # plt.legend(fontsize=15)
+        # plt.tight_layout()
+        # plt.savefig(dir_plot+ '/f-storages-line-' + pdf + '.pdf')
+        # plt.show()
+
 
 
     ##############

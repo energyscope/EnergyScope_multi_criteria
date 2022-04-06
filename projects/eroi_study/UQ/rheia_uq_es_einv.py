@@ -8,21 +8,22 @@ To be used in RHEIA library.
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
 import rheia.UQ.uncertainty_quantification as rheia_uq
 import rheia.POST_PROCESS.post_process as rheia_pp
 
-batch = 3
-pol_order = 1
+gwp_tot = 56900 # 56900
+batch = 1
+pol_order = 2
+case = 'ES_einv_order_2_'+str(gwp_tot) # ES_einv_order_1_56900, ES_einv_order_1_28500, ES_einv_order_2_56900, ES_einv_order_2_28500
 
-dict_uq = {'case': 'ES_einv',
+dict_uq = {'case': case,
                     'pol order': pol_order,
                     'objective names': ['EROI', 'cost'],
                     'objective of interest': 'EROI',
                     'results dir': 'batch_' + str(batch),
                     'sampling method': 'SOBOL',
                     'create only samples': False,
-                    'draw pdf cdf': [True, 1000],
+                    'draw pdf cdf': [True, 100000],
                     }
 
 if __name__ == '__main__':
@@ -45,8 +46,26 @@ if __name__ == '__main__':
 
     loo = my_post_process_uq.get_loo(dict_uq['results dir'], objective)
 
+    eroi_mean = my_post_process_uq.get_mean_std(dict_uq['results dir'], objective)[0]
+    eroi_std = my_post_process_uq.get_mean_std(dict_uq['results dir'], objective)[1]
+
+    if case == 'ES_einv_order_2_56900':
+        eroi_determnistic = 6.2
+    elif case == 'ES_einv_order_2_28500':
+        eroi_determnistic = 4.4
+
     x_pdf, y_pdf = my_post_process_uq.get_pdf(dict_uq['results dir'], objective)
-    plt.plot(x_pdf, y_pdf)
-    plt.xlabel(objective)
-    plt.ylabel('probability density')
+    plt.plot(x_pdf, y_pdf,  linewidth=3)
+    plt.ylim(0, 1)
+    plt.vlines(x=eroi_mean, ymin=-1, ymax=1, colors='r', label='PCE %.1f -/+ %.1f [2*std]'%(eroi_mean, 2*eroi_std), linewidth=3)
+    plt.vlines(x=eroi_determnistic, ymin=-1, ymax=1, colors='g', label='deterministic: '+str(eroi_determnistic), linewidth=3)
+    # plt.vlines(x=eroi_mean + 2*eroi_std, ymin=-1, ymax=1, colors='k', label='mean + 2*std', linestyles=':', linewidth=3)
+    # plt.vlines(x=eroi_mean - 2*eroi_std, ymin=-1, ymax=1, colors='k', label='mean - 2*std', linestyles=':', linewidth=3)
+    plt.xlabel(objective, fontsize=15)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.legend(fontsize=15)
+    plt.ylabel('probability density', fontsize=15)
+    plt.tight_layout()
+    plt.savefig(my_post_process_uq.result_path + '/' + dict_uq['results dir'] +'/eroi-pdf-'+str(gwp_tot)+'.pdf')
     plt.show()

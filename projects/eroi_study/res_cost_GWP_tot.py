@@ -131,18 +131,16 @@ if __name__ == '__main__':
     plot_stacked_bar(df_data=df_EI_cat.drop(index=['Export']).transpose(), xlabel='GWP total [MtC02/y]',  ylabel='[TWh]', ylim=600, pdf_name=dir_plot+'/EI-categories-'+pdf+'.pdf')
 
     # Renewable RES: biofuel + biomass + non-biomass
-    RES_renewable = ['AMMONIA_RE', 'H2_RE', 'BIOETHANOL', 'BIODIESEL', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS',
-                     'WOOD',
-                     'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO']
+    RES_renewable = ['AMMONIA_RE', 'H2_RE', 'BIOETHANOL', 'BIODIESEL', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS', 'WOOD',  'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO']
     df_EI_RES_RE = retrieve_non_zero_val(df=df_EI.loc[RES_renewable].drop(columns=['Subcategory']).transpose())
     new_cols = list(df_EI_RES_RE.columns)
-    for item_old, item_new in zip(['METHANOL_RE', 'GAS_RE', 'AMMONIA_RE', 'H2_RE', 'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO'], ['METHANOL_SYN', 'GAS_SYN', 'AMMONIA_SYN', 'H2_SYN', 'HYDRO', 'SOLAR', 'WIND', 'GEO']):
+    for item_old, item_new in zip(['BIODIESEL', 'WET_BIOMASS','WOOD','METHANOL_RE', 'GAS_RE', 'AMMONIA_RE', 'H2_RE', 'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO'], ['Biodiesel', 'Wet biomass','Wood','Methanol-RE', 'Gas-RE', 'Ammonia-RE', 'H2-RE', 'Hydro', 'Solar', 'Wind', 'Geo']):
         new_cols = replace_item_in_list(l=new_cols, item_old=item_old, item_new=item_new)
     df_EI_RES_RE.columns = new_cols
     # https://matplotlib.org/stable/tutorials/colors/colormaps.html
     colors = plt.cm.tab20b(np.linspace(0, 1, 10))
     df_EI_RES_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_RE[['AMMONIA_SYN', 'METHANOL_SYN', 'GAS_SYN','WET_BIOMASS', 'WOOD', 'HYDRO', 'SOLAR', 'WIND', 'H2_SYN', 'BIODIESEL']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
+    plot_stacked_bar(df_data=df_EI_RES_RE[['Ammonia-RE', 'Methanol-RE', 'Gas-RE','Wet biomass', 'Wood', 'Hydro', 'Solar', 'Wind', 'H2-RE', 'Biodiesel']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
 
 
     # Non renewable RES: Fossil fuel + Other non-renewable
@@ -151,10 +149,12 @@ if __name__ == '__main__':
     colors = plt.cm.tab20c(np.linspace(0, 1, 10))
     df_EI_RES_non_RE = retrieve_non_zero_val(df=df_EI.loc[RES_non_renewable].drop(columns=['Subcategory']).transpose())
     new_cols = list(df_EI_RES_non_RE.columns)
-    new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
+    for item_old, item_new in zip(['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE', 'METHANOL', 'URANIUM'], ['LFO', 'DIESEL', 'Coal', 'GASOLINE', 'NG', 'Elec. import', 'Ammonia', 'H2', 'Waste', 'Methanol', 'URANIUM']):
+        new_cols = replace_item_in_list(l=new_cols, item_old=item_old, item_new=item_new)
+    # new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
     df_EI_RES_non_RE.columns = new_cols
     df_EI_RES_non_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_non_RE[['GAS', 'ELECTRICITY_IMPORT', 'AMMONIA', 'WASTE', 'LFO', 'COAL']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=350, pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
+    plot_stacked_bar(df_data=df_EI_RES_non_RE[['NG', 'Elec. import', 'Ammonia', 'Waste', 'LFO', 'Coal']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=350, pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
 
 
     ####################################################################################################################

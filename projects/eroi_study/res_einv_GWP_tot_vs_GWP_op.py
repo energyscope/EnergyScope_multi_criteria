@@ -81,20 +81,18 @@ def fec_plots(df_fec_data: pd.DataFrame, pdf: str, dir_plot: str):
     """
     FEC PLOTS
     """
-    plot_stacked_bar(df_data=df_fec_data.transpose(), xlabel='p (%)',  ylabel='(TWh)', ylim=520,
-                     pdf_name=dir_plot + '/fec-details-' + pdf + '.pdf')
+    xlabel= 'Yearly emissions [MtC02/y]'
+    plot_stacked_bar(df_data=df_fec_data.transpose(), xlabel=xlabel,  ylabel='[TWh]', ylim=520, pdf_name=dir_plot + '/fec-details-' + pdf + '.pdf')
+
     # FEC detailed by EUD
     heat_list = ['HEAT_HIGH_T', 'HEAT_LOW_T_DHN', 'HEAT_LOW_T_DECEN']
-    plot_stacked_bar(df_data=df_fec_data.loc[heat_list].transpose(), xlabel='p (%)',  ylabel='(TWh)', ylim=205,
-                     pdf_name=dir_plot + '/fec-details-heat-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_fec_data.loc[heat_list].transpose(), xlabel=xlabel,  ylabel='[TWh]', ylim=205, pdf_name=dir_plot + '/fec-details-heat-' + pdf + '.pdf')
 
     mob_list = ['MOB_PUBLIC', 'MOB_PRIVATE', 'MOB_FREIGHT_RAIL', 'MOB_FREIGHT_BOAT', 'MOB_FREIGHT_ROAD']
-    plot_stacked_bar(df_data=df_fec_data.loc[mob_list].transpose(), xlabel='p (%)', ylabel='(TWh)', ylim=100,
-                     pdf_name=dir_plot + '/fec-details-mob-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_fec_data.loc[mob_list].transpose(), xlabel=xlabel, ylabel='[TWh]', ylim=100, pdf_name=dir_plot + '/fec-details-mob-' + pdf + '.pdf')
 
     non_energy_list = ['HVC', 'AMMONIA', 'METHANOL', 'ELECTRICITY']
-    plot_stacked_bar(df_data=df_fec_data.loc[non_energy_list].transpose(), xlabel='p (%)', ylabel='(TWh)', ylim=200,
-                     pdf_name=dir_plot + '/fec-details-non-E-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_fec_data.loc[non_energy_list].transpose(), xlabel=xlabel, ylabel='[TWh]', ylim=200,    pdf_name=dir_plot + '/fec-details-non-E-' + pdf + '.pdf')
 
 
 def primary_energy_plots(df_EI_1: pd.DataFrame, df_EI_2: pd.DataFrame, pdf_1: str, pdf_2: str, dir_plot: str):

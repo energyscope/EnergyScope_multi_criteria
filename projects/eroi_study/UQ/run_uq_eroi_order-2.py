@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     if n_other_parameters == len(other_l1) + len(other_l2) + len(other_l3):
         # loop on all sampled parameters
-        for sample_i in range(0, len(df_samples)):
+        for sample_i in range(3810, len(df_samples)):
             print('run %s in progress' % (sample_i))
 
             # Load configuration into a dict

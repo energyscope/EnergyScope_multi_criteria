@@ -89,17 +89,17 @@ if __name__ == '__main__':
     # EROI, FEC, Einv_tot, and GWP_tot
     # \alpha^0 = \text{GWP}_{op}^0
     # x_gwp_tot_index = df_GWP.sum(axis=1).values
-    label1 = 'min Ein' #
-    label2 = 'min Cost' #
+    label1 = 'EROI maximization' #
+    label2 = 'Cost minimization' #
     x_einv_index = df_GWP_einv.sum(axis=1).values
     x_cost_index = df_GWP_cost.sum(axis=1).values
-    plot_two_series(df_data_1=df_res_einv['EROI'], df_data_2=df_res_cost['EROI'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/eroi_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[1.5, 10], ylabel='EROI [-]', xlabel='GWP_tot [MtC02/y]', x_index_2=x_cost_index)
-    plot_two_series(df_data_1=df_res_einv['FEC'], df_data_2=df_res_cost['FEC'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/fec_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[300, 480], ylabel='FEC [TWh/y]', xlabel='GWP_tot [MtC02/y]', x_index_2=x_cost_index)
-    plot_two_series(df_data_1=df_res_einv['Einv'], df_data_2=df_res_cost['Einv'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/einv_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[30, 180], ylabel=r'$Einv{tot}$ [TWh/y]', xlabel='GWP_tot [MtC02/y]', x_index_2=x_cost_index)
-    plot_two_series(df_data_1=df_GWP_einv.sum(axis=1), df_data_2=df_GWP_cost.sum(axis=1), label_1=label1, label_2=label2, pdf_name=dir_plot+'/gwp_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[0, 105], ylabel=r'$GWP_{tot}$ [MtC02/y]', xlabel='GWP_tot [MtC02/y]', x_index_2=x_cost_index)
-    plot_two_series(df_data_1=df_GWP_einv['GWP_cons'], df_data_2=df_GWP_cost['GWP_cons'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/gwp_const_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[0, 10], ylabel=r'$GWP_{const}$ [MtC02/y]', xlabel='GWP_tot [MtC02/y]', x_index_2=x_cost_index)
-    plot_two_series(df_data_1=df_GWP_einv['GWP_op'], df_data_2=df_GWP_cost['GWP_op'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/gwp_op_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[0, 100], ylabel=r'$GWP_{op}$ [MtC02/y]', xlabel='GWP_tot [MtC02/y]', x_index_2=x_cost_index)
-    plot_two_series(df_data_1=df_cost_einv.sum(axis=1), df_data_2=df_cost_cost.sum(axis=1), label_1=label1, label_2=label2, pdf_name=dir_plot+'/cost_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[40, 100], ylabel='[bEUR/y]', xlabel='GWP_tot [MtC02/y]', x_index_2=x_cost_index)
+    plot_two_series(df_data_1=df_res_einv['EROI'], df_data_2=df_res_cost['EROI'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/cost-vs-eroi_eroi_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[1.5, 10], ylabel='EROI [-]', xlabel='Yearly emissions [MtC02-eq./y]', x_index_2=x_cost_index)
+    plot_two_series(df_data_1=df_res_einv['FEC'], df_data_2=df_res_cost['FEC'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/cost-vs-eroi_fec_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[300, 480], ylabel='FEC [TWh/y]', xlabel='Yearly emissions [MtC02-eq./y]', x_index_2=x_cost_index)
+    plot_two_series(df_data_1=df_res_einv['Einv'], df_data_2=df_res_cost['Einv'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/cost-vs-eroi_einv_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[30, 180], ylabel=r'$Einv{tot}$ [TWh/y]', xlabel='Yearly emissions [MtC02-eq./y]', x_index_2=x_cost_index)
+    plot_two_series(df_data_1=df_GWP_einv.sum(axis=1), df_data_2=df_GWP_cost.sum(axis=1), label_1=label1, label_2=label2, pdf_name=dir_plot+'/cost-vs-eroi_gwp_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[0, 105], ylabel=r'$GWP_{tot}$ [MtC02/y]', xlabel='Yearly emissions [MtC02-eq./y]', x_index_2=x_cost_index)
+    plot_two_series(df_data_1=df_GWP_einv['GWP_cons'], df_data_2=df_GWP_cost['GWP_cons'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/cost-vs-eroi_gwp_const_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[0, 10], ylabel=r'$GWP_{const}$ [MtC02/y]', xlabel='Yearly emissions [MtC02-eq./y]', x_index_2=x_cost_index)
+    plot_two_series(df_data_1=df_GWP_einv['GWP_op'], df_data_2=df_GWP_cost['GWP_op'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/cost-vs-eroi_gwp_op_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[0, 100], ylabel=r'$GWP_{op}$ [MtC02/y]', xlabel='Yearly emissions [MtC02-eq./y]', x_index_2=x_cost_index)
+    plot_two_series(df_data_1=df_cost_einv.sum(axis=1), df_data_2=df_cost_cost.sum(axis=1), label_1=label1, label_2=label2, pdf_name=dir_plot+'/cost-vs-eroi_cost_'+ str(domestic_RE_share)+'.pdf', x_index=x_einv_index, ylim=[40, 100], ylabel='[bEUR/y]', xlabel='Yearly emissions [MtC02-eq./y]', x_index_2=x_cost_index)
 
 
     # plot_one_serie(df_data=df_cost.sum(axis=1), label='Cost', pdf_name=dir_plot + '/cost_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[40, 100], ylabel='[bEUR/y]')

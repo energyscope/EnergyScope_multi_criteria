@@ -1,30 +1,30 @@
 # -*- coding: utf-8 -*-
 """
 This script quantifies the impact of uncertain parameters on the model output.
-To be used in RHEIA library.
 
 @author: Jonathan Dumas
 """
 
 import matplotlib.pyplot as plt
 import pandas as pd
+
 import rheia.UQ.uncertainty_quantification as rheia_uq
 import rheia.POST_PROCESS.post_process as rheia_pp
 
-gwp_tot = 56900 # 56900
+gwp_tot = 85400 # 85400, 56900, 28500, 19000
 batch = 1
 pol_order = 2
-case = 'ES_einv_order_2_'+str(gwp_tot) # ES_einv_order_1_56900, ES_einv_order_1_28500, ES_einv_order_2_56900, ES_einv_order_2_28500
+case = 'ES_einv_order_'+str(pol_order)+'_'+str(gwp_tot) # ES_einv_order_1_56900, ES_einv_order_1_28500, ES_einv_order_2_56900, ES_einv_order_2_28500
 
 dict_uq = {'case': case,
-                    'pol order': pol_order,
-                    'objective names': ['EROI', 'cost'],
-                    'objective of interest': 'EROI',
-                    'results dir': 'batch_' + str(batch),
-                    'sampling method': 'SOBOL',
-                    'create only samples': False,
-                    'draw pdf cdf': [True, 100000],
-                    }
+           'pol order': pol_order,
+           'objective names': ['EROI', 'cost'],
+           'objective of interest': 'EROI',
+           'results dir': 'batch_' + str(batch),
+           'sampling method': 'SOBOL',
+           'create only samples': False,
+           'draw pdf cdf': [True, 100000],
+           }
 
 if __name__ == '__main__':
 
@@ -53,6 +53,11 @@ if __name__ == '__main__':
         eroi_determnistic = 6.2
     elif case == 'ES_einv_order_2_28500':
         eroi_determnistic = 4.4
+    elif case == 'ES_einv_order_2_19000':
+        eroi_determnistic = 3.9
+    elif case == 'ES_einv_order_2_85400':
+        eroi_determnistic = 7.9
+
 
     x_pdf, y_pdf = my_post_process_uq.get_pdf(dict_uq['results dir'], objective)
     plt.plot(x_pdf, y_pdf,  linewidth=3)

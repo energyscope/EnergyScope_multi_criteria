@@ -17,7 +17,7 @@ from sys import platform
 
 from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
 from energyscope.postprocessing import get_total_einv
-from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import fec_plots, primary_energy_plots, \
+from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import primary_energy_plots, \
     plot_asset_capacities_by_tech
 from projects.eroi_study.utils_plot import plot_two_series, plot_stacked_bar, plot_one_serie
 from projects.eroi_study.utils_res import compute_fec, get_gwp, compute_einv_details, compute_primary_energy, \
@@ -25,9 +25,43 @@ from projects.eroi_study.utils_res import compute_fec, get_gwp, compute_einv_det
     res_assets_capacity, gwp_breakdown, gwp_const_per_category, cost_computation
 
 
+def fec_plots(df_fec_data: pd.DataFrame, pdf: str, dir_plot: str):
+    """
+    FEC PLOTS
+    """
+    xlabel= 'Yearly emissions [MtC02/y]'
+    plot_stacked_bar(df_data=df_fec_data.transpose(), xlabel=xlabel,  ylabel='[TWh]', ylim=520, pdf_name=dir_plot + '/fec-details-' + pdf + '.pdf')
+
+    # FEC detailed by EUD
+    heat_list = ['HEAT_HIGH_T', 'HEAT_LOW_T_DHN', 'HEAT_LOW_T_DECEN']
+    df_fec_data_heat = df_fec_data.loc[heat_list].transpose().copy()
+    df_fec_data_heat = rename_columns(df=df_fec_data_heat, old_col=heat_list, new_col=['Heat high T.', 'Heat low T. DHN', 'Heat low T. DEC'])
+    plot_stacked_bar(df_data=df_fec_data_heat, xlabel=xlabel,  ylabel='[TWh]', ylim=205, pdf_name=dir_plot + '/fec-details-heat-' + pdf + '.pdf')
+
+    mob_list = ['MOB_PUBLIC', 'MOB_PRIVATE', 'MOB_FREIGHT_RAIL', 'MOB_FREIGHT_BOAT', 'MOB_FREIGHT_ROAD']
+    df_fec_data_mob = df_fec_data.loc[mob_list].transpose().copy()
+    df_fec_data_mob = rename_columns(df=df_fec_data_mob, old_col=mob_list, new_col=['Mob. public', 'Mob. private', 'Mob. freight rail', 'Mob. freight boat', 'Mob. freight road'])
+    plot_stacked_bar(df_data=df_fec_data_mob, xlabel=xlabel, ylabel='[TWh]', ylim=100, pdf_name=dir_plot + '/fec-details-mob-' + pdf + '.pdf')
+
+    non_energy_list = ['HVC', 'AMMONIA', 'METHANOL', 'ELECTRICITY']
+    df_fec_data_non_energy = df_fec_data.loc[non_energy_list].transpose().copy()
+    df_fec_data_non_energy = rename_columns(df=df_fec_data_non_energy, old_col=non_energy_list, new_col=['HVC', 'Ammonia', 'Methanol', 'Electricity'])
+    plot_stacked_bar(df_data=df_fec_data_non_energy, xlabel=xlabel, ylabel='[TWh]', ylim=200,    pdf_name=dir_plot + '/fec-details-non-E-' + pdf + '.pdf')
+
+
+def rename_columns(df: pd.DataFrame, old_col: list, new_col: list):
+    """
+    Rename columns of a pd.DataFrame.
+    """
+    new_cols = list(df.columns)
+    for item_old, item_new in zip(old_col, new_col):
+        new_cols = replace_item_in_list(l=new_cols, item_old=item_old, item_new=item_new)
+    df.columns = new_cols
+    return df
+
 def replace_item_in_list(l: list, item_old: str, item_new: str):
     """
-    Replace a specific item into a list
+    Replace a specific item into a list.
     """
     for i in range(len(l)):
         if l[i] == item_old:
@@ -128,42 +162,33 @@ if __name__ == '__main__':
 
     ####################################################################################################################
     # FEC
+    df_fec_details.columns = np.round(x_gwp_tot_index, 1)
     fec_plots(df_fec_data=df_fec_details, pdf=pdf, dir_plot=dir_plot)
 
     ####################################################################################################################
     # PRIMARY ENERGY
-    new_list = list(df_EI_cat.index)
-    for item_old, item_new in zip(['Biofuel', 'Non-biomass', 'Other non-renewable', 'Fossil fuel'], ['Synthetic fuels', 'Wind+Solar', 'Waste+Methanol+Ammonia', 'Fossil fuels']):
-        new_cols = replace_item_in_list(l=new_list, item_old=item_old, item_new=item_new)
-    df_EI_cat.index = new_list
+
+    df_EI_cat = rename_columns(df=df_EI_cat, old_col=['Biofuel', 'Non-biomass', 'Other non-renewable', 'Fossil fuel'], new_col=['RE-fuels', 'Wind+Solar', 'non-RE', 'Fossil'])
     df_EI_cat.columns = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_cat.drop(index=['Export']).transpose(), xlabel='GWP total [MtC02/y]',  ylabel='[TWh]', ylim=600, pdf_name=dir_plot+'/EI-categories-'+pdf+'.pdf')
+    # Waste+Methanol+Ammonia = other non-RE
+    plot_stacked_bar(df_data=df_EI_cat.drop(index=['Export']).transpose(), xlabel='Yearly emissions [MtC02/y]',  ylabel='[TWh]', ylim=600, pdf_name=dir_plot+'/EI-categories-'+pdf+'.pdf')
 
     # Renewable RES: biofuel + biomass + non-biomass
-    RES_renewable = ['AMMONIA_RE', 'H2_RE', 'BIOETHANOL', 'BIODIESEL', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS',
-                     'WOOD',
-                     'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO']
+    RES_renewable = ['AMMONIA_RE', 'H2_RE', 'BIOETHANOL', 'BIODIESEL', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS','WOOD', 'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO']
     df_EI_RES_RE = retrieve_non_zero_val(df=df_EI.loc[RES_renewable].drop(columns=['Subcategory']).transpose())
-    new_cols = list(df_EI_RES_RE.columns)
-    for item_old, item_new in zip(['METHANOL_RE', 'GAS_RE', 'AMMONIA_RE', 'H2_RE', 'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO'], ['METHANOL_SYN', 'GAS_SYN', 'AMMONIA_SYN', 'H2_SYN', 'HYDRO', 'SOLAR', 'WIND', 'GEO']):
-        new_cols = replace_item_in_list(l=new_cols, item_old=item_old, item_new=item_new)
-    df_EI_RES_RE.columns = new_cols
+    df_EI_RES_RE = rename_columns(df=df_EI_RES_RE, old_col=['WET_BIOMASS', 'WOOD', 'METHANOL_RE', 'GAS_RE', 'AMMONIA_RE', 'H2_RE', 'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO'], new_col=['Wet biomass', 'Wood', 'Methanol-RE', 'Gas-RE', 'Ammonia-RE', 'H2-RE', 'Hydro', 'Solar', 'Wind', 'Geo'])
     # https://matplotlib.org/stable/tutorials/colors/colormaps.html
     colors = plt.cm.tab20b(np.linspace(0, 1, 10))
     df_EI_RES_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_RE[['AMMONIA_SYN', 'METHANOL_SYN', 'GAS_SYN', 'WET_BIOMASS', 'WOOD',
-       'HYDRO', 'SOLAR', 'WIND']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
+    plot_stacked_bar(df_data=df_EI_RES_RE[['Ammonia-RE', 'Methanol-RE', 'Gas-RE', 'Wet biomass', 'Wood', 'Hydro', 'Solar', 'Wind']], xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
 
     # Non renewable RES: Fossil fuel + Other non-renewable
-    RES_non_renewable = ['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE',
-                         'METHANOL', 'URANIUM']
+    RES_non_renewable = ['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE', 'METHANOL', 'URANIUM']
     colors = plt.cm.tab20c(np.linspace(0, 1, 10))
     df_EI_RES_non_RE = retrieve_non_zero_val(df=df_EI.loc[RES_non_renewable].drop(columns=['Subcategory']).transpose())
-    new_cols = list(df_EI_RES_non_RE.columns)
-    new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
-    df_EI_RES_non_RE.columns = new_cols
+    df_EI_RES_non_RE = rename_columns(df=df_EI_RES_non_RE, old_col=['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE', 'METHANOL', 'URANIUM'], new_col=['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'NG', 'Elec. import', 'Ammonia', 'H2', 'Waste', 'Methanol', 'URANIUM'])
     df_EI_RES_non_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_non_RE, xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=350, pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
+    plot_stacked_bar(df_data=df_EI_RES_non_RE, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=350, pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
 
 
     ####################################################################################################################
@@ -173,41 +198,45 @@ if __name__ == '__main__':
 
     # Einv_op by RESOURCES subcategories: Other non-renewable, Fossil fuel, Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
     df_Einv_RES_cat.columns = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_Einv_RES_cat.transpose(), xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-res-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_Einv_RES_cat.transpose(), xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-res-'+pdf+'.pdf')
 
     # Einv_op classed by RESOURCES (RE and non-RE)
     df_einv_op_filtered = retrieve_non_zero_val(df=df_Einv_op.transpose())
     df_einv_op_filtered.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_einv_op_filtered, xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-details-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_einv_op_filtered, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-details-'+pdf+'.pdf')
 
     # Einv_op by RE-RESOURCES
     df_einv_op_RE_filtered = retrieve_non_zero_val(df=df_Einv_op.loc[RES_renewable].transpose())
     df_einv_op_RE_filtered.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_einv_op_RE_filtered, xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-re-res-'+pdf+'.pdf')
+    df_einv_op_RE_filtered = rename_columns(df=df_einv_op_RE_filtered, old_col=['AMMONIA_RE', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS', 'WOOD'], new_col=['Ammonia-RE', 'Methanol-RE', 'Gas-RE', 'Wet biomass', 'Wood'])
+    plot_stacked_bar(df_data=df_einv_op_RE_filtered, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-re-res-'+pdf+'.pdf')
 
     # Einv_op by NON-RE-RESOURCES
     df_einv_op_non_RE_filtered = retrieve_non_zero_val(df=df_Einv_op.loc[RES_non_renewable].transpose())
     df_einv_op_non_RE_filtered.index = np.round(x_gwp_tot_index, 1)
-    new_cols = list(df_einv_op_non_RE_filtered.columns)
-    new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
-    df_einv_op_non_RE_filtered.columns = new_cols
-    plot_stacked_bar(df_data=df_einv_op_non_RE_filtered, xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=30, pdf_name=dir_plot+'/einv-op-non-re-res-'+pdf+'.pdf')
+    df_einv_op_non_RE_filtered = rename_columns(df=df_einv_op_non_RE_filtered, old_col=['GAS', 'ELECTRICITY', 'AMMONIA', 'WASTE', 'METHANOL'], new_col=['NG', 'Elec. import', 'Ammonia', 'Waste', 'Methanol'])
+    plot_stacked_bar(df_data=df_einv_op_non_RE_filtered, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=30, pdf_name=dir_plot+'/einv-op-non-re-res-'+pdf+'.pdf')
 
     # 2. Einv_const by TECHNOLOGIES categories: electricity, mobility, heat, ...
     df_Einv_TECH_cat.columns =np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_Einv_TECH_cat.drop(index=['Infrastructure']).transpose(), xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=35, pdf_name=dir_plot+'/einv-tech-'+pdf+'.pdf')
+    df_Einv_TECH_cat = rename_columns(df=df_Einv_TECH_cat.transpose(), old_col=['Electricity', 'Heat', 'Mobility', 'Infrastructure', 'Synthetic fuels', 'Storage'], new_col=['Electricity', 'Heat', 'Mobility', 'Infrastructure', 'RE fuels','Storage'])
+    plot_stacked_bar(df_data=df_Einv_TECH_cat.drop(columns=['Infrastructure']), xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=35, pdf_name=dir_plot+'/einv-tech-'+pdf+'.pdf')
 
     # Einv_const classed by categories of technologies: 'Electricity', 'Heat', 'Mobility', 'Infrastructure', 'Synthetic fuels', 'Storage'
     Einv_const_dict['Electricity'].index = np.round(x_gwp_tot_index, 1)
     ymax = Einv_const_dict['Electricity'].sum(axis=1).max() * 1.05
     elec_tech = list(Einv_const_dict['Electricity'].max(axis=0)[Einv_const_dict['Electricity'].max(axis=0) > 0.1].index)
-    plot_stacked_bar(df_data=Einv_const_dict['Electricity'][elec_tech], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-elec-'+pdf+'.pdf')
+    df_einv_constr_elec_tech = Einv_const_dict['Electricity'][elec_tech].copy()
+    df_einv_constr_elec_tech = rename_columns(df=df_einv_constr_elec_tech, old_col=['CCGT', 'PV', 'WIND_ONSHORE', 'WIND_OFFSHORE'], new_col=['CCGT', 'PV', 'Onshore wind', 'Offshore wind'])
+    plot_stacked_bar(df_data=df_einv_constr_elec_tech, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-elec-'+pdf+'.pdf')
 
     Einv_const_dict['Mobility'].index = np.round(x_gwp_tot_index, 1)
     ymax = Einv_const_dict['Mobility'].sum(axis=1).max() * 1.05
     # select only the mobility technologies with Einv_const > 0.5 GWh/y
     mobility_tech = list(Einv_const_dict['Mobility'].max(axis=0)[Einv_const_dict['Mobility'].max(axis=0) > 0.5].index)
-    plot_stacked_bar(df_data=Einv_const_dict['Mobility'][mobility_tech], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-mob-'+pdf+'.pdf')
+    df_einv_constr_mob_tech = Einv_const_dict['Mobility'][mobility_tech].copy()
+    df_einv_constr_mob_tech = rename_columns(df=df_einv_constr_mob_tech, old_col=['CAR_NG', 'CAR_BEV', 'TRUCK_ELEC', 'TRUCK_NG'], new_col=['NG cars', 'Elec. cars', 'Elec. trucks', 'NG trucks'])
+    plot_stacked_bar(df_data=df_einv_constr_mob_tech, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-mob-'+pdf+'.pdf')
 
 
     ##############################################################################################################
@@ -228,20 +257,22 @@ if __name__ == '__main__':
     df_3.name = 'Mobility'
     df_4 = df_gwp_const_by_cat[['Electricity', 'Synthetic fuels']]
     df_gwp_const_concat = pd.concat([df_1, df_2, df_3, df_4], axis=1)
-    plot_stacked_bar(df_data=df_gwp_const_concat, xlabel='p [%]', ylabel='[MtC02/y]', ylim=9, pdf_name=dir_plot + '/gwp_const-breakdown-' + pdf + '.pdf')
+    df_gwp_const_concat.index = np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(df_data=df_gwp_const_concat, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[MtC02-eq./y]', ylim=9, pdf_name=dir_plot + '/gwp_const-breakdown-' + pdf + '.pdf')
 
     # GHG emissions breakdown by resources
     df_gwp_op_filtered = retrieve_non_zero_val(df=df_gwp_op.transpose())
     new_cols = list(df_gwp_op_filtered.columns)
     new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
     df_gwp_op_filtered.columns = new_cols
-    plot_stacked_bar(df_data=df_gwp_op_filtered, xlabel='p [%]', ylabel='[MtC02/y]', ylim=100, pdf_name=dir_plot + '/gwp_op-breakdown-' + pdf + '.pdf')
+    df_gwp_op_filtered.index = np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(df_data=df_gwp_op_filtered, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[MtC02-eq./y]', ylim=100, pdf_name=dir_plot + '/gwp_op-breakdown-' + pdf + '.pdf')
 
 
     ####################################################################################################################
     # Plot assets installed capacities with stacked bars
     df_assets.columns = np.round(x_gwp_tot_index, 1)
-    plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='[MtC02/y]')
+    plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='[MtC02-eq./y]')
 
     ####################################################################################################################
     # Plot assets installed capacities with lines

@@ -78,4 +78,5 @@ if __name__ == '__main__':
         print('run %s in progress' % (sample_i))
         cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
         remove_pickle(cs)
-        shutil.rmtree(f"{cs}/output/hourly_data/")
+        if os.path.isdir(f"{cs}/output/hourly_data/"):
+            shutil.rmtree(f"{cs}/output/hourly_data/")

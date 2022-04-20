@@ -20,7 +20,6 @@ if __name__ == '__main__':
 
     cwd = os.getcwd()
     print("Current working directory: {0}".format(cwd))
-    # batch 1 repartir de run 265
     for batch in [1, 2, 3, 4, 5]:
         dir_name = 'einv_uq_'+str(batch) + '_gwp_' + str(gwp_tot_max)
 

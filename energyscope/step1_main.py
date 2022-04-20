@@ -8,7 +8,7 @@ Contains functions to perform step1 of EnergyScope
 """
 
 import os
-import platform
+from sys import platform
 from pathlib import Path
 import csv
 import logging

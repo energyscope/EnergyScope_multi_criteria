@@ -9,15 +9,25 @@ import pandas as pd
 import numpy as np
 
 gwp_tot_max = 19000 # ktCO2/y, 85400, 28500, 56900, 19000
-
+new = True
 if __name__ == '__main__':
 
     dir_name = 'comparison'
 
     # Second-order PCE results
-    df_param_order_2_19000 = pd.read_csv('sobol_res_19000/full_pce_order_2_EROI_Sobol_indices.csv', index_col=0)['Total-order Sobol indices']
-    df_param_order_2_28500 = pd.read_csv('sobol_res_28500/full_pce_order_2_EROI_Sobol_indices.csv', index_col=0)['Total-order Sobol indices']
-    df_param_order_2_56900 = pd.read_csv('sobol_res_56900/full_pce_order_2_EROI_Sobol_indices.csv', index_col=0)['Total-order Sobol indices']
+    if new:
+        path = '-new'
+        eroi_mean = [8.4, 6.89, 4.74, 4.22]
+        eroi_std = [0.75, 0.67, 0.55, 0.45]
+    else:
+        path = ''
+        eroi_mean = [8.4, 6.81, 4.70, 4.21]
+        eroi_std = [0.75, 0.51, 0.43, 0.41]
+
+    df_param_order_2_19000 = pd.read_csv('sobol_res_19000/full_pce_order_2_EROI_Sobol_indices'+path+'.csv', index_col=0)['Total-order Sobol indices']
+    df_param_order_2_28500 = pd.read_csv('sobol_res_28500/full_pce_order_2_EROI_Sobol_indices'+path+'.csv', index_col=0)['Total-order Sobol indices']
+    df_param_order_2_56900 = pd.read_csv('sobol_res_56900/full_pce_order_2_EROI_Sobol_indices'+path+'.csv', index_col=0)['Total-order Sobol indices']
+    # df_param_order_2_85400 = pd.read_csv('sobol_res_85400/full_pce_order_2_EROI_Sobol_indices'+path+'.csv', index_col=0)['Total-order Sobol indices']
     df_param_order_2_85400 = pd.read_csv('sobol_res_85400/full_pce_order_2_EROI_Sobol_indices.csv', index_col=0)['Total-order Sobol indices']
 
     critical_19000 =  list(df_param_order_2_19000[df_param_order_2_19000 > 1 / len(df_param_order_2_19000)].index)
@@ -41,9 +51,10 @@ if __name__ == '__main__':
     df_param_critical_85400_evolution['28.5'] = round(100* df_param_order_2_28500.loc[critical_85400_top_5], 1).values
     df_param_critical_85400_evolution['19.0'] = np.array([2., 0., 6.6, 2.1, 0.3])
 
+    color_list = ['gray', 'orange', 'red', 'brown', 'blue']
     plt.figure()
-    for param, label in zip(critical_28500_top_5, [r'$e_{op}^{Gas-RE}$', r'$e_{constr}^{Elec. cars}$', r'$f_{max}^{NUC}$', r'${avail}^{Wood}$', r'$\%_{public,max}$']):
-        plt.plot(x_index, df_param_critical_28500_evolution.transpose()[param].values, '-D', markersize=5, label=label)
+    for param, label, c  in zip(critical_28500_top_5, [r'$e_{op}^{Gas-RE}$', r'$e_{constr}^{Elec. \ cars}$', r'$f_{max}^{NUC}$', r'${avail}^{Wood}$', r'$\%_{public,max}$'], color_list):
+        plt.plot(x_index, df_param_critical_28500_evolution.transpose()[param].values, '-D', markersize=5, label=label, color=c)
     plt.xlabel('Yearly emissions [MtC02-eq./y]', fontsize=15)
     plt.ylabel('%', rotation=180, fontsize=15)
     plt.gca().invert_xaxis()
@@ -51,12 +62,13 @@ if __name__ == '__main__':
     plt.yticks(fontsize=15)
     plt.legend(fontsize=15, ncol=2)
     plt.tight_layout()
-    plt.savefig(dir_name+'/critical-parameters-28500-evol.pdf')
+    plt.savefig(dir_name+'/critical-parameters-28500-evol'+path+'.pdf')
     plt.show()
 
+    color_list = ['black', 'gray', 'orange', 'blue', 'green']
     plt.figure()
-    for param, label in zip(critical_85400_top_5, [r'$e_{constr}^{NG cars}$', r'$e_{op}^{Gas}$', r'$e_{constr}^{Elec. cars}$', r'$\%_{public,max}$', r'$e_{op}^{Wet biomass}$']):
-        plt.plot(x_index, df_param_critical_85400_evolution.transpose()[param].values, '-D', markersize=5, label=label)
+    for param, label, c in zip(critical_85400_top_5, [r'$e_{constr}^{NG \ cars}$', r'$e_{op}^{Gas}$', r'$e_{constr}^{Elec. cars}$', r'$\%_{public,max}$', r'$e_{op}^{Wet \ biomass}$'], color_list):
+        plt.plot(x_index, df_param_critical_85400_evolution.transpose()[param].values, '-D', markersize=5, label=label, color=c)
     plt.xlabel('Yearly emissions [MtC02-eq./y]', fontsize=15)
     plt.ylabel('%', rotation=180, fontsize=15)
     plt.gca().invert_xaxis()
@@ -64,12 +76,9 @@ if __name__ == '__main__':
     plt.yticks(fontsize=15)
     plt.legend(fontsize=15, ncol=2)
     plt.tight_layout()
-    plt.savefig(dir_name+'/critical-parameters-85400-evol.pdf')
+    plt.savefig(dir_name+'/critical-parameters-85400-evol'+path+'.pdf')
     plt.show()
 
-    x_index = [85.4, 56.9, 28.5, 19]
-    eroi_mean = [8.4, 6.8, 4.7, 4.2]
-    eroi_std = [0.75, 0.51, 0.43, 0.41]
     eroi_deterministic = [7.9, 6.2, 4.4, 3.9]
     plt.figure()
     plt.plot(x_index, eroi_mean, '-D', markersize=10, label='EROI mean with uncertainties')
@@ -81,5 +90,5 @@ if __name__ == '__main__':
     plt.yticks(fontsize=15)
     plt.legend(fontsize=15)
     plt.tight_layout()
-    plt.savefig(dir_name+'/eroi-statistics.pdf')
+    plt.savefig(dir_name+'/eroi-statistics'+path+'.pdf')
     plt.show()

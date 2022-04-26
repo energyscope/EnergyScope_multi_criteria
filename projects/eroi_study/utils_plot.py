@@ -53,7 +53,7 @@ def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: s
     plt.close()
 
 
-def plot_stacked_bar(df_data: pd.DataFrame, xlabel:str, ylabel: str, ylim: float, pdf_name: str, colors=plt.cm.tab20(np.linspace(0, 1, 10))):
+def plot_stacked_bar(df_data: pd.DataFrame, xlabel:str, ylabel: str, ylim: float, pdf_name: str, colors=plt.cm.tab20(np.linspace(0, 1, 10)), ncol: int=2):
     """
     Stacked bar plot of a pd.DataFrame.
     """
@@ -64,7 +64,7 @@ def plot_stacked_bar(df_data: pd.DataFrame, xlabel:str, ylabel: str, ylim: float
     plt.ylabel(ylabel, fontsize=15)
     plt.xlabel(xlabel, fontsize=15)
     plt.ylim(0, ylim)
-    plt.legend(fontsize=15, ncol=2)
+    plt.legend(fontsize=15, ncol=ncol)
     plt.tight_layout()
     plt.savefig(pdf_name)
     plt.close()

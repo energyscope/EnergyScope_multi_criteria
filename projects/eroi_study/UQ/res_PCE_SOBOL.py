@@ -11,7 +11,7 @@ from matplotlib.ticker import StrMethodFormatter, NullFormatter, ScalarFormatter
 import pandas as pd
 import numpy as np
 
-gwp_tot_max = 19000 # ktCO2/y, 85400, 28500, 56900, 19000
+gwp_tot_max = 85400 # ktCO2/y, 85400, 28500, 56900, 19000
 new = True
 
 if __name__ == '__main__':
@@ -160,4 +160,5 @@ if __name__ == '__main__':
     plt.savefig(dir_name+'/second-order-total-order-sobol-indices-'+str(gwp_tot_max)+'.pdf')
     plt.show()
 
+    print('%s critical second-order parameters' % (len(df_param_order_2[df_param_order_2 > 1 / len(df_param_order_2)])))
     print(100 * df_param_order_2[df_param_order_2 > 1 / len(df_param_order_2)].round(3))

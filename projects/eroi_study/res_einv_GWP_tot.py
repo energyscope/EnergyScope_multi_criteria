@@ -15,14 +15,105 @@ import matplotlib.pyplot as plt
 
 from sys import platform
 
-from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
-from energyscope.postprocessing import get_total_einv
-from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import primary_energy_plots, \
-    plot_asset_capacities_by_tech
+from energyscope.utils import make_dir, load_config
 from projects.eroi_study.utils_plot import plot_two_series, plot_stacked_bar, plot_one_serie
 from projects.eroi_study.utils_res import compute_fec, get_gwp, compute_einv_details, compute_primary_energy, \
     eroi_computation, res_details, gwp_computation, retrieve_non_zero_val, retrieve_einv_const_by_categories, \
     res_assets_capacity, gwp_breakdown, gwp_const_per_category, cost_computation
+
+def plot_asset_capacities_by_tech(df_assets: pd.DataFrame, pdf: str, user_data: str, dir_plot: str,
+                                  xlabel: str = 'p (%)'):
+    """
+    Stacked bar plot of asset installed capacities by technology subcategories such as electricity, heat high temperature, etc.
+    :param df_assets: data of asset installed capacities for all scenarios.
+    :param pdf: pdf name.
+    :param user_data: user_data path.
+    """
+
+    # Retrieve the list of technologies
+    df_aux_tech = pd.read_csv(user_data + "/aux_technologies.csv", index_col=0)
+
+    # Retrieve the list subcategory of technologies
+    tech_subcategory_list = list(dict.fromkeys(list(df_aux_tech['Subcategory'])))
+    tech_by_subcategory = dict()
+    for cat in tech_subcategory_list:
+        tech_by_subcategory[cat] = list(df_aux_tech[df_aux_tech['Subcategory'] == cat].index)
+
+    # Retrieve for each technology subcategory the corresponding assets
+    df_elec_tech = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Electricity']].transpose())
+    df_elec_tech = rename_columns(df=df_elec_tech,
+                                  old_col=['CCGT', 'PV', 'WIND_ONSHORE', 'WIND_OFFSHORE', 'HYDRO_RIVER'],
+                                  new_col=['CCGT', 'PV', 'Wind onshore', 'Wind offshore', 'Hydro'])
+    df_elec_storage = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Electricity storage']].transpose())
+    df_elec_storage = rename_columns(df=df_elec_storage, old_col=['BATT_LI', 'BEV_BATT', 'PHS'],
+                                     new_col=['Elec. battery', 'BEV', 'PHS'])
+    df_thermal_storage = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Thermal storage']].transpose())
+    df_thermal_storage = rename_columns(df=df_thermal_storage,
+                                        old_col=['TS_DEC_HP_ELEC', 'TS_DEC_ADVCOGEN_GAS', 'TS_DEC_BOILER_GAS',
+                                                 'TS_DHN_SEASONAL'],
+                                        new_col=['DEC elec. HP', 'DEC FC CHP gas', 'DEC gas boiler', 'DHN seasonal'])
+    df_other_storage = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Other storage']].transpose())
+    df_other_storage = rename_columns(df=df_other_storage,
+                                      old_col=['GAS_STORAGE', 'AMMONIA_STORAGE', 'METHANOL_STORAGE'],
+                                      new_col=['Gas', 'Ammonia', 'Methanol'])
+    df_synthetic_fuels = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Synthetic fuels']].transpose())
+    df_synthetic_fuels = rename_columns(df=df_synthetic_fuels,
+                                        old_col=['SMR', 'METHANE_TO_METHANOL', 'BIOMASS_TO_METHANOL', 'HABER_BOSCH',
+                                                 'METHANOL_TO_HVC'],
+                                        new_col=['Steam methane reforming', 'Methane to methanol',
+                                                 'Biomass to methanol', 'H2 to ammonia',
+                                                 'Methanol to HVC'])
+
+    plot_stacked_bar(df_data=df_elec_tech, xlabel=xlabel, ylabel='[GW]', ylim=90,
+                     pdf_name=dir_plot + '/f-elec-' + pdf + '.pdf', ncol=1)
+    plot_stacked_bar(df_data=df_elec_storage, xlabel=xlabel, ylabel='[GWh]', ylim=150,
+                     pdf_name=dir_plot + '/f-elec-storage-' + pdf + '.pdf', ncol=1)
+    plot_stacked_bar(df_data=df_thermal_storage, xlabel=xlabel, ylabel='[GWh]', ylim=1300,
+                     pdf_name=dir_plot + '/f-thermal-storage-' + pdf + '.pdf', ncol=1)
+    plot_stacked_bar(df_data=df_other_storage, xlabel=xlabel, ylabel='[GWh]', ylim=45000,
+                     pdf_name=dir_plot + '/f-other-storage-' + pdf + '.pdf', ncol=1)
+    plot_stacked_bar(df_data=df_synthetic_fuels, xlabel=xlabel, ylabel='[GW]', ylim=20,
+                     pdf_name=dir_plot + '/f-synthetic-fuels-' + pdf + '.pdf', ncol=1)
+
+    df_heat_low_DEC = retrieve_non_zero_val(
+        df=df_assets.loc[tech_by_subcategory['Heat low temperature decentralised']].transpose())
+    df_heat_low_DEC = rename_columns(df=df_heat_low_DEC, old_col=['DEC_HP_ELEC', 'DEC_ADVCOGEN_GAS', 'DEC_BOILER_GAS'],
+                                     new_col=['DEC HP', 'DEC gas FC', 'DEC gas boiler'])
+    df_heat_low_DHN = retrieve_non_zero_val(
+        df=df_assets.loc[tech_by_subcategory['Heat low temperature centralised']].transpose())
+    df_heat_low_DHN = rename_columns(df=df_heat_low_DHN,
+                                     old_col=['DHN_HP_ELEC', 'DHN_COGEN_GAS', 'DHN_COGEN_BIO_HYDROLYSIS',
+                                              'DHN_BOILER_GAS', 'DHN_SOLAR'],
+                                     new_col=['DHN HP', 'DHN gas CHP', 'DHN wet biomass CHP', 'DHN gas boiler',
+                                              'DHN solar thermal'])
+    df_heat_high_T = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Heat high temperature']].transpose())
+    df_heat_high_T = rename_columns(df=df_heat_high_T,
+                                    old_col=['IND_COGEN_GAS', 'IND_BOILER_GAS', 'IND_BOILER_WASTE', 'IND_DIRECT_ELEC'],
+                                    new_col=['I gas CHP', 'I gas boiler', 'I waste boiler', 'I elec.'])
+
+    plot_stacked_bar(df_data=df_heat_low_DEC, xlabel=xlabel, ylabel='[GW]', ylim=35,
+                     pdf_name=dir_plot + '/f-heat-low-DEC-' + pdf + '.pdf', ncol=1)
+    plot_stacked_bar(df_data=df_heat_low_DHN, xlabel=xlabel, ylabel='[GW]', ylim=28,
+                     pdf_name=dir_plot + '/f-heat-low-DHN-' + pdf + '.pdf', ncol=1)
+    plot_stacked_bar(df_data=df_heat_high_T, xlabel=xlabel, ylabel='[GW]', ylim=25,
+                     pdf_name=dir_plot + '/f-heat-high-T-' + pdf + '.pdf', ncol=1)
+
+    df_mob_private = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Passenger private']].transpose())
+    df_mob_private = rename_columns(df=df_mob_private, old_col=['CAR_NG', 'CAR_BEV'], new_col=['Gas car', 'Elec. car'])
+    df_mob_public = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Passenger public']].transpose())
+    df_mob_public = rename_columns(df=df_mob_public, old_col=['TRAMWAY_TROLLEY', 'BUS_COACH_CNG_STOICH', 'TRAIN_PUB'],
+                                   new_col=['Tram or metro', 'Gas bus', 'Train'])
+    df_mob_freight = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Freight']].transpose())
+    df_mob_freight = rename_columns(df=df_mob_freight,
+                                    old_col=['TRAIN_FREIGHT', 'BOAT_FREIGHT_NG', 'TRUCK_ELEC', 'TRUCK_NG'],
+                                    new_col=['Train', 'Gas boat', 'Elec. truck', 'Gas truck'])
+
+    plot_stacked_bar(df_data=df_mob_private, xlabel=xlabel, ylabel='[GW]', ylim=220,
+                     pdf_name=dir_plot + '/f-mob-private-' + pdf + '.pdf', ncol=1)
+    plot_stacked_bar(df_data=df_mob_public, xlabel=xlabel, ylabel='[GW]', ylim=40,
+                     pdf_name=dir_plot + '/f-mob-public-' + pdf + '.pdf', ncol=1)
+    plot_stacked_bar(df_data=df_mob_freight, xlabel=xlabel, ylabel='[GW]', ylim=95,
+                     pdf_name=dir_plot + '/f-freight-' + pdf + '.pdf', ncol=1)
 
 
 def fec_plots(df_fec_data: pd.DataFrame, pdf: str, dir_plot: str):
@@ -235,7 +326,7 @@ if __name__ == '__main__':
     # select only the mobility technologies with Einv_const > 0.5 GWh/y
     mobility_tech = list(Einv_const_dict['Mobility'].max(axis=0)[Einv_const_dict['Mobility'].max(axis=0) > 0.5].index)
     df_einv_constr_mob_tech = Einv_const_dict['Mobility'][mobility_tech].copy()
-    df_einv_constr_mob_tech = rename_columns(df=df_einv_constr_mob_tech, old_col=['CAR_NG', 'CAR_BEV', 'TRUCK_ELEC', 'TRUCK_NG'], new_col=['NG cars', 'Elec. cars', 'Elec. trucks', 'NG trucks'])
+    df_einv_constr_mob_tech = rename_columns(df=df_einv_constr_mob_tech, old_col=['CAR_NG', 'CAR_BEV', 'TRUCK_ELEC', 'TRUCK_NG'], new_col=['Gas car', 'Elec. car', 'Elec. truck', 'Gas truck'])
     plot_stacked_bar(df_data=df_einv_constr_mob_tech, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-mob-'+pdf+'.pdf')
 
 
@@ -262,9 +353,8 @@ if __name__ == '__main__':
 
     # GHG emissions breakdown by resources
     df_gwp_op_filtered = retrieve_non_zero_val(df=df_gwp_op.transpose())
-    new_cols = list(df_gwp_op_filtered.columns)
-    new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
-    df_gwp_op_filtered.columns = new_cols
+    df_gwp_op_filtered = rename_columns(df=df_gwp_op_filtered, old_col=['AMMONIA', 'ELECTRICITY', 'GAS', 'METHANOL', 'WASTE', 'WET_BIOMASS',
+       'WOOD'], new_col=['Ammonia', 'Elec. import', 'NG', 'Methanol', 'Waste', 'Wet biomass','Wood'])
     df_gwp_op_filtered.index = np.round(x_gwp_tot_index, 1)
     plot_stacked_bar(df_data=df_gwp_op_filtered, xlabel='Yearly emissions [MtC02-eq./y]', ylabel='[MtC02-eq./y]', ylim=100, pdf_name=dir_plot + '/gwp_op-breakdown-' + pdf + '.pdf')
 
@@ -272,13 +362,14 @@ if __name__ == '__main__':
     ####################################################################################################################
     # Plot assets installed capacities with stacked bars
     df_assets.columns = np.round(x_gwp_tot_index, 1)
-    plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='[MtC02-eq./y]')
+    plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='Yearly emissions [MtC02]')
+
 
     ####################################################################################################################
     # Plot assets installed capacities with lines
-    plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='Yearly emissions [MtC02]')
+    # plot_asset_capacities_by_tech_line(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='Yearly emissions [MtC02]')
 
-    def plot_asset_capacities_by_tech(df_assets: pd.DataFrame, pdf: str, user_data:str, dir_plot:str, xlabel:str='p (%)'):
+    def plot_asset_capacities_by_tech_line(df_assets: pd.DataFrame, pdf: str, user_data:str, dir_plot:str, xlabel:str='p (%)'):
         """
         Line plot of asset installed capacities by technology subcategories such as electricity, heat high temperature, etc.
         :param df_assets: data of asset installed capacities for all scenarios.

@@ -11,7 +11,7 @@ from matplotlib.ticker import StrMethodFormatter, NullFormatter, ScalarFormatter
 import pandas as pd
 import numpy as np
 
-gwp_tot_max = 85400 # ktCO2/y, 85400, 28500, 56900, 19000
+gwp_tot_max = 42700 # ktCO2/y, 85400, 42700, 28500, 56900, 19000
 new = True
 
 if __name__ == '__main__':

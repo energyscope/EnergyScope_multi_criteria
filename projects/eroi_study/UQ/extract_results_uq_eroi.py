@@ -52,25 +52,40 @@ if __name__ == '__main__':
     #     extract_results_step2(cs)
 
     # first-order PCE extraction
-    df_samples = pd.read_csv('data_samples/samples.csv', index_col=0)
-    M_var = len(df_samples.columns)
-    n_samples = 2 * (M_var + 1)
-
-    for batch in [5]:
-        dir_name = 'einv_uq_'+str(batch) + '_gwp_' + str(gwp_tot_max)
-
-        # loop on all sampled parameters to extract results from pickle files
-        for sample_i in range(150, len(df_samples)):
-        # for sample_i in range(0, n_samples+1):
-            print('batch %s run %s in progress' % (batch, sample_i))
-            cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
-            extract_results_step2(cs)
+    # df_samples = pd.read_csv('data_samples/samples.csv', index_col=0)
+    # M_var = len(df_samples.columns)
+    # n_samples = 2 * (M_var + 1)
+    #
+    # for batch in [1]:
+    #     dir_name = 'einv_uq_'+str(batch) + '_gwp_' + str(gwp_tot_max)
+    #
+    #     # loop on all sampled parameters to extract results from pickle files
+    #     for sample_i in range(0, n_samples):
+    #     # for sample_i in range(0, n_samples+1):
+    #         print('batch %s run %s in progress' % (batch, sample_i))
+    #         cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
+    #         extract_results_step2(cs)
 
 
     # Compute EROI first-order PCE
     # loop on all sampled parameters to compute EROI
-    # for batch in [1, 2, 3, 4, 5]:j+j1288X
-
+    # for batch in [1, 2, 3, 4, 5]:
+    #     dir_name = 'einv_uq_'+str(batch)+'_gwp_' + str(gwp_tot_max)
+    #     res_list = []
+    #     for sample_i in range(0, n_samples):
+    #         cs = f"{config['case_studies_dir']}/{dir_name + '/sample_' + str(sample_i)}"
+    #         # es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
+    #
+    #         # Compute the FEC from the year_balance.csv
+    #         cost_val = get_cost(cs=cs) / 1000  # bEUR/y
+    #         df_year_balance = pd.read_csv(f"{cs}/output/year_balance.csv", index_col=0)
+    #         fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
+    #         fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
+    #         einv = get_total_einv(cs) / 1000  # TWh
+    #         print('batch %s run %s EROI %.2f cost %.2f [bEUR/y]' % (batch, sample_i, fec_tot_val / einv, cost_val.sum()))
+    #         res_list.append([fec_tot_val / einv, cost_val.sum()])
+    #     df_res = pd.DataFrame(data=np.asarray(res_list), columns=['EROI', 'cost'],index=[i for i in range(0, n_samples)])
+    #     df_concat = pd.concat([df_samples, df_res], axis=1).dropna()
     #     df_concat.to_csv('data_samples/res-samples-' +str(gwp_tot_max)+ '-' + str(batch) + '.csv', sep=' ', index=False)
 
 

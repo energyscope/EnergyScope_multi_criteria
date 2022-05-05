@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 from energyscope.utils import load_config
 
-gwp_tot_max = 85400 # 85400, 56900, 28500, 19000 ktCO2/y -> constraint on the GWP_tot
+gwp_tot_max = 42700 # 85400, 56900, 42700, 28500, 19000 ktCO2/y -> constraint on the GWP_tot
 
 if __name__ == '__main__':
 
@@ -70,6 +70,10 @@ if __name__ == '__main__':
         other_l1 = ['import_capacity'] # ['import_capacity', 'i_rate']
         other_l2 = ['share_mobility_public_max'] # ['share_mobility_public_max', 'share_freight_train_max', 'share_freight_boat_max','share_heat_dhn_max']
         other_l3 = ['ELECTRICITY']  # ['ELECTRICITY', 'HEAT_LOW_T_DHN']
+    elif gwp_tot_max == 42700:
+        other_l1 = [] # ['import_capacity', 'i_rate']
+        other_l2 = ['share_mobility_public_max', 'share_freight_boat_max'] # ['share_mobility_public_max', 'share_freight_train_max', 'share_freight_boat_max','share_heat_dhn_max']
+        other_l3 = ['ELECTRICITY']  # ['ELECTRICITY', 'HEAT_LOW_T_DHN']
 
     if n_other_parameters != len(other_l1) + len(other_l2) + len(other_l3):
         print('ERROR: define manually the other parameters')
@@ -77,6 +81,8 @@ if __name__ == '__main__':
 
     # loop on all sampled parameters
     for sample_i in range(0, len(df_samples)):
+    # for sample_i in range(2450, 2470):
+
         print('run %s in progress' % (sample_i))
 
         # Load configuration into a dict

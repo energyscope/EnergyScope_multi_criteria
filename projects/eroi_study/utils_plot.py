@@ -16,7 +16,7 @@ def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: li
     Plot one time serie: EROI, FEC, Einv, GWP, etc.
     """
     plt.figure()
-    plt.plot(x_index, df_data.values, '-Dk', linewidth=3, markersize=10, label=label)
+    plt.plot(x_index, df_data.values, ':Dk', linewidth=3, markersize=10, label=label)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
@@ -31,7 +31,7 @@ def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: li
 
 
 def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: str, label_2: str, pdf_name: str,
-                    x_index: list, ylim: list, ylabel: str, xlabel:str, x_index_2: list=None):
+                    x_index: list, ylim: list, ylabel: str, xlabel:str, x_index_2: list=None, fontsize:int=15):
     """
     Compare two time series: EROI, FEC, Einv, GWP, etc.
     """
@@ -39,15 +39,16 @@ def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: s
         x_index_2 = x_index
 
     plt.figure()
-    plt.plot(x_index, df_data_1.values, '-Dk', linewidth=3, markersize=10, label=label_1)
-    plt.plot(x_index_2, df_data_2.values, '-Pb', linewidth=3, markersize=10, label=label_2)
+    plt.plot(x_index, df_data_1.values, ':Dk', linewidth=3, markersize=10, label=label_1)
+    plt.plot(x_index_2, df_data_2.values, ':Pb', linewidth=3, markersize=10, label=label_2)
     plt.gca().invert_xaxis()
-    plt.xticks(fontsize=15)
-    plt.yticks(fontsize=15)
-    plt.ylabel(ylabel, fontsize=15)
-    plt.xlabel(xlabel=xlabel, fontsize=15)
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(fontsize=fontsize)
+    plt.ylabel(ylabel, fontsize=fontsize)
+    plt.xlabel(xlabel=xlabel, fontsize=fontsize)
+    # plt.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
     plt.ylim(ylim[0], ylim[1])
-    plt.legend(fontsize=15)
+    plt.legend(fontsize=fontsize)
     plt.tight_layout()
     plt.savefig(pdf_name)
     plt.close()

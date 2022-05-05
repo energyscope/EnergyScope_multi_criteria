@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 
 gwp_tot_max = 42700 # ktCO2/y, 85400, 42700, 28500, 56900, 19000
-new = True
+new = False
 
 if __name__ == '__main__':
 
@@ -45,6 +45,8 @@ if __name__ == '__main__':
     elif gwp_tot_max == 19000:
         y_ticks = [0.1, 100/len(param_list_order_1), 10, 80]
     elif gwp_tot_max == 85400:
+        y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 30]
+    elif gwp_tot_max == 42700:
         y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 30]
 
     plt.figure()
@@ -139,6 +141,8 @@ if __name__ == '__main__':
         y_ticks = [0.1, 1, 100/42, 5, 10, 80]
     elif gwp_tot_max == 85400:
         y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 40]
+    elif gwp_tot_max == 42700:
+        y_ticks = [0.01, 0.1, 100 / len(param_list_order_1), 5, 10, 30]
 
     plt.figure()
     # plt.plot(df_param_order_2.values, '*', markersize=10, label='Second-order PCE')

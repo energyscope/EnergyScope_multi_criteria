@@ -41,7 +41,7 @@ def remove_pickle(case_study_dir: str) -> None:
     pickle.dump(empty_list, openfile)
     openfile.close()
 
-gwp_tot_max = 85400  # ktCO2/y -> constraint on the GWP_tot
+gwp_tot_max = 42700  # ktCO2/y -> constraint on the GWP_tot
 
 
 if __name__ == '__main__':
@@ -66,15 +66,15 @@ if __name__ == '__main__':
     #         cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
     #         remove_pickle(cs)
 
-    # Clean pickle second order PCE
+    # # Clean pickle second order PCE
     # df_samples = pd.read_csv('data_samples/samples-order-2-'+ str(gwp_tot_max)+'.csv', index_col=0)
     #
     # # Load configuration into a dict
     # config = load_config(config_fn='config_uq.yaml')
     # dir_name = 'einv_uq_order_2_gwp_' + str(gwp_tot_max)
-    #
-    # # loop on all sampled parameters to extract results from pickle files
-    # for sample_i in range(0, len(df_samples)):
+
+    # loop on all sampled parameters to extract results from pickle files
+    # for sample_i in range(0, 2470):
     #     print('run %s in progress' % (sample_i))
     #     cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
     #     remove_pickle(cs)

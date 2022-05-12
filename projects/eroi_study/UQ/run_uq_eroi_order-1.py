@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 from energyscope.utils import load_config
 
-gwp_tot_max = 42700 # ktCO2/y -> constraint on the GWP_tot, 85400, 56900, 42700, 28500, 19000
+gwp_tot_max = 100300 # ktCO2/y -> constraint on the GWP_tot, 100300, 85400, 56900, 42700, 28500, 19000
 new = True
 if __name__ == '__main__':
 

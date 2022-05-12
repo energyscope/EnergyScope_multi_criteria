@@ -11,7 +11,7 @@ from matplotlib.ticker import StrMethodFormatter, NullFormatter, ScalarFormatter
 import pandas as pd
 import numpy as np
 
-gwp_tot_max = 42700 # ktCO2/y, 85400, 42700, 28500, 56900, 19000
+gwp_tot_max = 100300 # ktCO2/y, 100300, 85400, 42700, 28500, 56900, 19000
 new = False
 
 if __name__ == '__main__':
@@ -48,6 +48,8 @@ if __name__ == '__main__':
         y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 30]
     elif gwp_tot_max == 42700:
         y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 30]
+    elif gwp_tot_max == 100300:
+        y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 50]
 
     plt.figure()
     # for col in df_res.columns:
@@ -143,6 +145,8 @@ if __name__ == '__main__':
         y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 40]
     elif gwp_tot_max == 42700:
         y_ticks = [0.01, 0.1, 100 / len(param_list_order_1), 5, 10, 30]
+    elif gwp_tot_max == 100300:
+        y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 40]
 
     plt.figure()
     # plt.plot(df_param_order_2.values, '*', markersize=10, label='Second-order PCE')

@@ -64,15 +64,15 @@ def plot_asset_capacities_by_tech(df_assets: pd.DataFrame, pdf: str, user_data: 
                                                  'Biomass to methanol', 'H2 to ammonia',
                                                  'Methanol to HVC'])
 
-    plot_stacked_bar(df_data=df_elec_tech, xlabel=xlabel, ylabel='[GW]', ylim=90,
+    plot_stacked_bar(df_data=df_elec_tech, xlabel=xlabel, ylabel='Capacity [GWe]', ylim=90,
                      pdf_name=dir_plot + '/f-elec-' + pdf + '.pdf', ncol=1)
-    plot_stacked_bar(df_data=df_elec_storage, xlabel=xlabel, ylabel='[GWh]', ylim=150,
+    plot_stacked_bar(df_data=df_elec_storage, xlabel=xlabel, ylabel='Capacity [GWh]', ylim=150,
                      pdf_name=dir_plot + '/f-elec-storage-' + pdf + '.pdf', ncol=1)
-    plot_stacked_bar(df_data=df_thermal_storage, xlabel=xlabel, ylabel='[GWh]', ylim=1300,
+    plot_stacked_bar(df_data=df_thermal_storage, xlabel=xlabel, ylabel='Capacity [GWh]', ylim=1300,
                      pdf_name=dir_plot + '/f-thermal-storage-' + pdf + '.pdf', ncol=1)
-    plot_stacked_bar(df_data=df_other_storage, xlabel=xlabel, ylabel='[GWh]', ylim=45000,
+    plot_stacked_bar(df_data=df_other_storage, xlabel=xlabel, ylabel='Capacity [GWh]', ylim=45000,
                      pdf_name=dir_plot + '/f-other-storage-' + pdf + '.pdf', ncol=1)
-    plot_stacked_bar(df_data=df_synthetic_fuels, xlabel=xlabel, ylabel='[GW]', ylim=20,
+    plot_stacked_bar(df_data=df_synthetic_fuels, xlabel=xlabel, ylabel='Capacity [GW]', ylim=20,
                      pdf_name=dir_plot + '/f-synthetic-fuels-' + pdf + '.pdf', ncol=1)
 
     df_heat_low_DEC = retrieve_non_zero_val(
@@ -91,11 +91,11 @@ def plot_asset_capacities_by_tech(df_assets: pd.DataFrame, pdf: str, user_data: 
                                     old_col=['IND_COGEN_GAS', 'IND_BOILER_GAS', 'IND_BOILER_WASTE', 'IND_DIRECT_ELEC'],
                                     new_col=['I gas CHP', 'I gas boiler', 'I waste boiler', 'I elec.'])
 
-    plot_stacked_bar(df_data=df_heat_low_DEC, xlabel=xlabel, ylabel='[GW]', ylim=35,
+    plot_stacked_bar(df_data=df_heat_low_DEC, xlabel=xlabel, ylabel='Capacity [GW]', ylim=35,
                      pdf_name=dir_plot + '/f-heat-low-DEC-' + pdf + '.pdf', ncol=1)
-    plot_stacked_bar(df_data=df_heat_low_DHN, xlabel=xlabel, ylabel='[GW]', ylim=28,
+    plot_stacked_bar(df_data=df_heat_low_DHN, xlabel=xlabel, ylabel='Capacity [GW]', ylim=28,
                      pdf_name=dir_plot + '/f-heat-low-DHN-' + pdf + '.pdf', ncol=1)
-    plot_stacked_bar(df_data=df_heat_high_T, xlabel=xlabel, ylabel='[GW]', ylim=25,
+    plot_stacked_bar(df_data=df_heat_high_T, xlabel=xlabel, ylabel='Capacity [GW]', ylim=25,
                      pdf_name=dir_plot + '/f-heat-high-T-' + pdf + '.pdf', ncol=1)
 
     df_mob_private = retrieve_non_zero_val(df=df_assets.loc[tech_by_subcategory['Passenger private']].transpose())
@@ -108,11 +108,11 @@ def plot_asset_capacities_by_tech(df_assets: pd.DataFrame, pdf: str, user_data: 
                                     old_col=['TRAIN_FREIGHT', 'BOAT_FREIGHT_NG', 'TRUCK_ELEC', 'TRUCK_NG'],
                                     new_col=['Train', 'Gas boat', 'Elec. truck', 'Gas truck'])
 
-    plot_stacked_bar(df_data=df_mob_private, xlabel=xlabel, ylabel='[GW]', ylim=220,
+    plot_stacked_bar(df_data=df_mob_private, xlabel=xlabel, ylabel='Capacity [GW]', ylim=220,
                      pdf_name=dir_plot + '/f-mob-private-' + pdf + '.pdf', ncol=1)
-    plot_stacked_bar(df_data=df_mob_public, xlabel=xlabel, ylabel='[GW]', ylim=40,
+    plot_stacked_bar(df_data=df_mob_public, xlabel=xlabel, ylabel='Capacity [GW]', ylim=40,
                      pdf_name=dir_plot + '/f-mob-public-' + pdf + '.pdf', ncol=1)
-    plot_stacked_bar(df_data=df_mob_freight, xlabel=xlabel, ylabel='[GW]', ylim=95,
+    plot_stacked_bar(df_data=df_mob_freight, xlabel=xlabel, ylabel='Capacity [GW]', ylim=95,
                      pdf_name=dir_plot + '/f-freight-' + pdf + '.pdf', ncol=1)
 
 
@@ -127,17 +127,17 @@ def fec_plots(df_fec_data: pd.DataFrame, pdf: str, dir_plot: str):
     heat_list = ['HEAT_HIGH_T', 'HEAT_LOW_T_DHN', 'HEAT_LOW_T_DECEN']
     df_fec_data_heat = df_fec_data.loc[heat_list].transpose().copy()
     df_fec_data_heat = rename_columns(df=df_fec_data_heat, old_col=heat_list, new_col=['Heat high T.', 'Heat low T. DHN', 'Heat low T. DEC'])
-    plot_stacked_bar(df_data=df_fec_data_heat, xlabel=xlabel,  ylabel='[TWh]', ylim=205, pdf_name=dir_plot + '/fec-details-heat-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_fec_data_heat, xlabel=xlabel,  ylabel='FEC [TWh]', ylim=205, pdf_name=dir_plot + '/fec-details-heat-' + pdf + '.pdf')
 
     mob_list = ['MOB_PUBLIC', 'MOB_PRIVATE', 'MOB_FREIGHT_RAIL', 'MOB_FREIGHT_BOAT', 'MOB_FREIGHT_ROAD']
     df_fec_data_mob = df_fec_data.loc[mob_list].transpose().copy()
     df_fec_data_mob = rename_columns(df=df_fec_data_mob, old_col=mob_list, new_col=['Mob. public', 'Mob. private', 'Mob. freight rail', 'Mob. freight boat', 'Mob. freight road'])
-    plot_stacked_bar(df_data=df_fec_data_mob, xlabel=xlabel, ylabel='[TWh]', ylim=100, pdf_name=dir_plot + '/fec-details-mob-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_fec_data_mob, xlabel=xlabel, ylabel='FEC [TWh]', ylim=100, pdf_name=dir_plot + '/fec-details-mob-' + pdf + '.pdf')
 
     non_energy_list = ['HVC', 'AMMONIA', 'METHANOL', 'ELECTRICITY']
     df_fec_data_non_energy = df_fec_data.loc[non_energy_list].transpose().copy()
     df_fec_data_non_energy = rename_columns(df=df_fec_data_non_energy, old_col=non_energy_list, new_col=['HVC', 'Ammonia', 'Methanol', 'Electricity'])
-    plot_stacked_bar(df_data=df_fec_data_non_energy, xlabel=xlabel, ylabel='[TWh]', ylim=200,    pdf_name=dir_plot + '/fec-details-non-E-' + pdf + '.pdf')
+    plot_stacked_bar(df_data=df_fec_data_non_energy, xlabel=xlabel, ylabel='FEC [TWh]', ylim=200,    pdf_name=dir_plot + '/fec-details-non-E-' + pdf + '.pdf')
 
 
 def rename_columns(df: pd.DataFrame, old_col: list, new_col: list):
@@ -289,29 +289,29 @@ if __name__ == '__main__':
 
     # Einv_op by RESOURCES subcategories: Other non-renewable, Fossil fuel, Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
     df_Einv_RES_cat.columns = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_Einv_RES_cat.transpose(), xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-res-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_Einv_RES_cat.transpose(), xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='Operation energy [TWh]', ylim=160, pdf_name=dir_plot+'/einv-res-'+pdf+'.pdf')
 
     # Einv_op classed by RESOURCES (RE and non-RE)
     df_einv_op_filtered = retrieve_non_zero_val(df=df_Einv_op.transpose())
     df_einv_op_filtered.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_einv_op_filtered, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-details-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_einv_op_filtered, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='Operation energy [TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-details-'+pdf+'.pdf')
 
     # Einv_op by RE-RESOURCES
     df_einv_op_RE_filtered = retrieve_non_zero_val(df=df_Einv_op.loc[RES_renewable].transpose())
     df_einv_op_RE_filtered.index = np.round(x_gwp_tot_index, 1)
     df_einv_op_RE_filtered = rename_columns(df=df_einv_op_RE_filtered, old_col=['AMMONIA_RE', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS', 'WOOD'], new_col=['Ammonia-RE', 'Methanol-RE', 'Gas-RE', 'Wet biomass', 'Wood'])
-    plot_stacked_bar(df_data=df_einv_op_RE_filtered, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='[TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-re-res-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_einv_op_RE_filtered, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='Operation energy [TWh]', ylim=160, pdf_name=dir_plot+'/einv-op-re-res-'+pdf+'.pdf')
 
     # Einv_op by NON-RE-RESOURCES
     df_einv_op_non_RE_filtered = retrieve_non_zero_val(df=df_Einv_op.loc[RES_non_renewable].transpose())
     df_einv_op_non_RE_filtered.index = np.round(x_gwp_tot_index, 1)
     df_einv_op_non_RE_filtered = rename_columns(df=df_einv_op_non_RE_filtered, old_col=['GAS', 'ELECTRICITY', 'AMMONIA', 'WASTE', 'METHANOL'], new_col=['NG', 'Elec. import', 'Ammonia', 'Waste', 'Methanol'])
-    plot_stacked_bar(df_data=df_einv_op_non_RE_filtered, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='[TWh]', ylim=30, pdf_name=dir_plot+'/einv-op-non-re-res-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_einv_op_non_RE_filtered, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='Operation energy [TWh]', ylim=30, pdf_name=dir_plot+'/einv-op-non-re-res-'+pdf+'.pdf')
 
     # 2. Einv_const by TECHNOLOGIES categories: electricity, mobility, heat, ...
     df_Einv_TECH_cat.columns =np.round(x_gwp_tot_index, 1)
     df_Einv_TECH_cat = rename_columns(df=df_Einv_TECH_cat.transpose(), old_col=['Electricity', 'Heat', 'Mobility', 'Infrastructure', 'Synthetic fuels', 'Storage'], new_col=['Electricity', 'Heat', 'Mobility', 'Infrastructure', 'RE fuels','Storage'])
-    plot_stacked_bar(df_data=df_Einv_TECH_cat.drop(columns=['Infrastructure']), xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='[TWh]', ylim=35, pdf_name=dir_plot+'/einv-tech-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_Einv_TECH_cat.drop(columns=['Infrastructure']), xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='Construction energy [TWh]', ylim=35, pdf_name=dir_plot+'/einv-tech-'+pdf+'.pdf')
 
     # Einv_const classed by categories of technologies: 'Electricity', 'Heat', 'Mobility', 'Infrastructure', 'Synthetic fuels', 'Storage'
     Einv_const_dict['Electricity'].index = np.round(x_gwp_tot_index, 1)
@@ -319,7 +319,7 @@ if __name__ == '__main__':
     elec_tech = list(Einv_const_dict['Electricity'].max(axis=0)[Einv_const_dict['Electricity'].max(axis=0) > 0.1].index)
     df_einv_constr_elec_tech = Einv_const_dict['Electricity'][elec_tech].copy()
     df_einv_constr_elec_tech = rename_columns(df=df_einv_constr_elec_tech, old_col=['CCGT', 'PV', 'WIND_ONSHORE', 'WIND_OFFSHORE'], new_col=['CCGT', 'PV', 'Onshore wind', 'Offshore wind'])
-    plot_stacked_bar(df_data=df_einv_constr_elec_tech, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-elec-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_einv_constr_elec_tech, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='Construction energy [TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-elec-'+pdf+'.pdf')
 
     Einv_const_dict['Mobility'].index = np.round(x_gwp_tot_index, 1)
     ymax = Einv_const_dict['Mobility'].sum(axis=1).max() * 1.05
@@ -327,7 +327,7 @@ if __name__ == '__main__':
     mobility_tech = list(Einv_const_dict['Mobility'].max(axis=0)[Einv_const_dict['Mobility'].max(axis=0) > 0.5].index)
     df_einv_constr_mob_tech = Einv_const_dict['Mobility'][mobility_tech].copy()
     df_einv_constr_mob_tech = rename_columns(df=df_einv_constr_mob_tech, old_col=['CAR_NG', 'CAR_BEV', 'TRUCK_ELEC', 'TRUCK_NG'], new_col=['Gas car', 'Elec. car', 'Elec. truck', 'Gas truck'])
-    plot_stacked_bar(df_data=df_einv_constr_mob_tech, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-mob-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_einv_constr_mob_tech, xlabel='Yearly emissions limit [MtC02-eq./y]', ylabel='Construction energy [TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-mob-'+pdf+'.pdf')
 
 
     ##############################################################################################################
@@ -362,7 +362,7 @@ if __name__ == '__main__':
     ####################################################################################################################
     # Plot assets installed capacities with stacked bars
     df_assets.columns = np.round(x_gwp_tot_index, 1)
-    plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='Yearly emissions [MtC02]')
+    plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot, xlabel='Yearly emissions limit [MtC02-eq./y]')
 
 
     ####################################################################################################################

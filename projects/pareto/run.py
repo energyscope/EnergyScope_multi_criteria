@@ -106,7 +106,7 @@ if __name__ == '__main__':
         data_fns = [estd_out_path, td12_out_path]
 
         # Run the model
-        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/epsilon_cost.mod"]
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/min_einv_epsilon_cost.mod"]
         cs = f"{config['case_studies_dir']}/{config['case_study_name']}/cost_epsilon_{epsilon}/"
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
                          dump_res_only=True)
@@ -138,14 +138,14 @@ if __name__ == '__main__':
 
     # Get epsilon necessary condition
     technologies_to_minimize = ["DEC_HP_ELEC", "DEC_THHP_GAS", "DHN_HP_ELEC"]  # - Heat Pumps
-    # ["WIND_ONSHORE", "WIND_OFFSHORE", "PV"]  # - Local RES
-    # ["GAS"]  # - GAS
-    run_name = 'hps'
-
-    # Pairs (dev cost, dev einv)
-    epsilons_pairs = [(2.5/100, 40/100), (2.5/100, 30/100), (2.5/100, 20/100),
-                      (5/100, 30/100), (5/100, 20/100), (5/100, 10/100),
-                      (7.5/100, 20/100), (7.5/100, 10/100)]
+    res_to_minimize = {'locals': ["WOOD", "WET_BIOMASS", "WASTE", "RES_WIND", "RES_SOLAR", "RES_HYDRO", "RES_GEO"],
+                       'imports': ["ELECTRICITY", "METHANOL", "AMMONIA", "H2", "COAL", "GAS", "LFO", "DIESEL", "GASOLINE",
+                             "BIODIESEL", "BIOETHANOL", "H2_RE", "GAS_RE", "AMMONIA_RE", "METHANOL", "METHANOL_RE"]}
+    run_name = 'locals'
+    # Pairs (dev cost, dev einv, dev gwp)
+    epsilons_tuples = [(5/100, 40/100), (2.5/100, 30/100), (2.5/100, 20/100),
+                       (5/100, 30/100), (5/100, 20/100), (5/100, 10/100),
+                       (7.5/100, 20/100), (7.5/100, 10/100)]
     epsilons_pairs = []
     for epsilon_pair in epsilons_pairs:
 

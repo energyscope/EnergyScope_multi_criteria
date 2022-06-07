@@ -11,7 +11,8 @@ from matplotlib.ticker import StrMethodFormatter, NullFormatter, ScalarFormatter
 import pandas as pd
 import numpy as np
 
-gwp_tot_max = 19000 # ktCO2/y, 85400, 28500, 56900, 19000
+gwp_tot_max = 100300 # ktCO2/y, 100300, 85400, 42700, 28500, 56900, 19000
+new = False
 
 if __name__ == '__main__':
 
@@ -45,6 +46,10 @@ if __name__ == '__main__':
         y_ticks = [0.1, 100/len(param_list_order_1), 10, 80]
     elif gwp_tot_max == 85400:
         y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 30]
+    elif gwp_tot_max == 42700:
+        y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 30]
+    elif gwp_tot_max == 100300:
+        y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 50]
 
     plt.figure()
     # for col in df_res.columns:
@@ -96,15 +101,34 @@ if __name__ == '__main__':
 
     param_list_order_1 = json.load(open('data_samples/param_list.json'))
 
+    # Build the json with the parameters short-listed for second-order PCE
     param_list_order_2 = dict()
     df_param = pd.DataFrame([key.split('-') for key in param_sel_one])
-    for key in list(param_list_order_1.keys()):
+    for key in ['avail', 'c_pt', 'einv_constr', 'einv_op', 'f_max', 'other']:
         param_list_order_2[key] = [key +'-'+ l for l in list(df_param[1][df_param[0] == key].values)]
+    param_list_order_2['demand'] = []
+    for l in param_list_order_1['demand']:
+        if l in param_sel_one:
+            param_list_order_2['demand'].append(l)
 
-    json.dump(param_list_order_2, open('data_samples/param_list_order_2-'+str(gwp_tot_max)+'.json', "w"), sort_keys=True, indent=4)
+    # Check if the count is ok
+    count_tot = 0
+    for key, item in param_list_order_2.items():
+        count_tot+=len(item)
+        print(key, len(item))
+    if count_tot == len(param_sel_one):
+        print('ok: count_tot %s vs len(param_sel_one) %s' %(count_tot, len(param_sel_one)))
+        json.dump(param_list_order_2, open('data_samples/param_list_order_2-' + str(gwp_tot_max) + '.json', "w"),
+                  sort_keys=True, indent=4)
+    else:
+        print('ERROR: count_tot %s vs len(param_sel_one) %s' %(count_tot, len(param_sel_one)))
 
     # Second-order PCE results
-    df_param_order_2 = pd.read_csv(dir_name+'/full_pce_order_2_EROI_Sobol_indices.csv', index_col=0)['Total-order Sobol indices']
+    if new:
+        df_param_order_2 = pd.read_csv(dir_name+'/full_pce_order_2_EROI_Sobol_indices-new.csv', index_col=0)['Total-order Sobol indices']
+    else:
+        df_param_order_2 = pd.read_csv(dir_name+'/full_pce_order_2_EROI_Sobol_indices.csv', index_col=0)['Total-order Sobol indices']
+
 
     # Retrieve parameters from second-order PCE which have at least one total Sobol indice > 1 / nb parameters
     second_order_params =  list(df_param_order_2[df_param_order_2 > 1 / len(df_param_order_2)].index)
@@ -117,6 +141,12 @@ if __name__ == '__main__':
         y_ticks = [0.1, 1, 100/42, 5, 10, 70]
     elif gwp_tot_max == 19000:
         y_ticks = [0.1, 1, 100/42, 5, 10, 80]
+    elif gwp_tot_max == 85400:
+        y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 40]
+    elif gwp_tot_max == 42700:
+        y_ticks = [0.01, 0.1, 100 / len(param_list_order_1), 5, 10, 30]
+    elif gwp_tot_max == 100300:
+        y_ticks = [0.01, 0.1, 100/len(param_list_order_1), 5, 10, 40]
 
     plt.figure()
     # plt.plot(df_param_order_2.values, '*', markersize=10, label='Second-order PCE')
@@ -138,4 +168,5 @@ if __name__ == '__main__':
     plt.savefig(dir_name+'/second-order-total-order-sobol-indices-'+str(gwp_tot_max)+'.pdf')
     plt.show()
 
+    print('%s critical second-order parameters' % (len(df_param_order_2[df_param_order_2 > 1 / len(df_param_order_2)])))
     print(100 * df_param_order_2[df_param_order_2 > 1 / len(df_param_order_2)].round(3))

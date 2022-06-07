@@ -128,7 +128,7 @@ if __name__ == '__main__':
         new_cols = replace_item_in_list(l=new_list, item_old=item_old, item_new=item_new)
     df_EI_cat.index = new_list
     df_EI_cat.columns = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_cat.drop(index=['Export']).transpose(), xlabel='GWP total [MtC02/y]',  ylabel='[TWh]', ylim=600, pdf_name=dir_plot+'/EI-categories-'+pdf+'.pdf')
+    plot_stacked_bar(df_data=df_EI_cat.drop(index=['Export']).transpose(), xlabel='Yearly emissions limit [MtC02/y]',  ylabel='Primary energy [TWh]', ylim=600, pdf_name=dir_plot+'/EI-categories-'+pdf+'.pdf')
 
     # Renewable RES: biofuel + biomass + non-biomass
     RES_renewable = ['AMMONIA_RE', 'H2_RE', 'BIOETHANOL', 'BIODIESEL', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS', 'WOOD',  'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO']
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     # https://matplotlib.org/stable/tutorials/colors/colormaps.html
     colors = plt.cm.tab20b(np.linspace(0, 1, 10))
     df_EI_RES_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_RE[['Ammonia-RE', 'Methanol-RE', 'Gas-RE','Wet biomass', 'Wood', 'Hydro', 'Solar', 'Wind', 'H2-RE', 'Biodiesel']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
+    plot_stacked_bar(df_data=df_EI_RES_RE[['Ammonia-RE', 'Methanol-RE', 'Gas-RE','Wet biomass', 'Wood', 'Hydro', 'Solar', 'Wind', 'H2-RE', 'Biodiesel']], xlabel='Yearly emissions limit [MtC02/y]', ylabel='Primary energy [TWh]', ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
 
 
     # Non renewable RES: Fossil fuel + Other non-renewable
@@ -154,7 +154,7 @@ if __name__ == '__main__':
     # new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
     df_EI_RES_non_RE.columns = new_cols
     df_EI_RES_non_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_non_RE[['NG', 'Elec. import', 'Ammonia', 'Waste', 'LFO', 'Coal']], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=350, pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
+    plot_stacked_bar(df_data=df_EI_RES_non_RE[['NG', 'Elec. import', 'Ammonia', 'Waste', 'LFO', 'Coal']], xlabel='Yearly emissions limit [MtC02/y]', ylabel='Primary energy [TWh]', ylim=350, pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
 
 
     ####################################################################################################################

@@ -23,7 +23,7 @@ def get_total_einv(output_path: str):
     return einv.sum().sum()
 
 
-def get_asset_value(output_path: str, param: str, tech: str):
+def get_asset_value(output_path: str, param: str, tech: str, from_pickle=False):
     assets = pd.read_csv(f"{output_path}/output/assets.csv", index_col=0)
     assets.columns = [c.strip() for c in assets.columns]
     return float(assets.loc[tech, param])

@@ -5,11 +5,13 @@ import yaml
 import pandas as pd
 from sys import platform
 
+
 # TODO: remove ?
 def make_dir(path: str):
     """Create the directory if it does not exist."""
     if not os.path.isdir(path):
         os.mkdir(path)
+
 
 def load_config(config_fn: str):
     """
@@ -21,7 +23,7 @@ def load_config(config_fn: str):
     # Load parameters
     cfg = yaml.load(open(config_fn, 'r'), Loader=yaml.FullLoader)
 
-    #TODO: the user must adapt its paths
+    # TODO: the user must adapt its paths
     if platform == "linux":
         cfg['energyscope_dir'] = '/home/jdumas/PycharmProjects/EnergyScope_multi_criteria/'
         cfg['AMPL_path'] = '/home/jdumas/PycharmProjects/ampl_linux-intel64'
@@ -36,7 +38,8 @@ def load_config(config_fn: str):
 
     return cfg
 
-def get_FEC_from_sankey(case_study_dir: str, col:str):
+
+def get_fec_from_sankey(case_study_dir: str, col:str):
     """
     Compute the Final Energy Consumption (FEC) from the Sankey data.
     :param case_study_dir: path to the case study directory.

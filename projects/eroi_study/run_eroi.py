@@ -14,10 +14,11 @@ import numpy as np
 
 from sys import platform
 
-from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
+from energyscope.utils import make_dir, load_config, get_fec_from_sankey
 from energyscope.postprocessing import get_total_einv
 from projects.eroi_study.res_RE_domestic_share import compute_fec
 from projects.eroi_study.utils_res import get_gwp, get_cost
+
 
 def loop_eroi_computation(range_val, dir_name: str, GWP_op_ini: float, config: dict, GWP_tot:bool=True):
     """
@@ -117,7 +118,7 @@ if __name__ == '__main__':
     fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
     fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
     # Compute the FEC from SANKEY
-    ef = get_FEC_from_sankey(case_study_dir=cs, col=config['case_study_name'])
+    ef = get_fec_from_sankey(case_study_dir=cs, col=config['case_study_name'])
     fec_sankey = ef.sum()
     einv = get_total_einv(cs) / 1000  # TWh
     print('FEC SANKEY %.2f vs year_balance %.2f [TWh/y]' % (fec_sankey, fec_tot_val))

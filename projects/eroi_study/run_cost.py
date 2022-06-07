@@ -14,7 +14,7 @@ import numpy as np
 
 from sys import platform
 
-from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
+from energyscope.utils import make_dir, load_config, get_fec_from_sankey
 from energyscope.postprocessing import get_total_einv
 from projects.eroi_study.res_RE_domestic_share import compute_fec
 from projects.eroi_study.utils_res import get_gwp, get_cost
@@ -42,6 +42,7 @@ def loop_cost_computation(range_val, dir_name: str, GWP_op_ini: float, config: d
         mod_fns = [f"{config['ES_path']}/ESTD_model_cost.mod"]
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
         es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
+
 
 if __name__ == '__main__':
 

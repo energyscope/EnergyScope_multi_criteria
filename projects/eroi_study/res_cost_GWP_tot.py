@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 from sys import platform
 
-from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
+from energyscope.utils import make_dir, load_config, get_fec_from_sankey
 from energyscope.postprocessing import get_total_einv
 from projects.eroi_study.res_einv_GWP_tot import replace_item_in_list
 from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import fec_plots, primary_energy_plots, \
@@ -116,7 +116,6 @@ if __name__ == '__main__':
     plot_one_serie(df_data=df_res['Einv'], label='Einv', pdf_name=dir_plot + '/einv_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[30, 180], ylabel='[TWh/y]')
     plot_one_serie(df_data=df_EI.drop(columns=['Subcategory']).transpose().sum(axis=1), label='Primary energy', pdf_name=dir_plot + '/EI_tot_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[350, 550], ylabel='[TWh/y]')
 
-
     ####################################################################################################################
     # FEC
     fec_plots(df_fec_data=df_fec_details, pdf=pdf, dir_plot=dir_plot)
@@ -142,7 +141,6 @@ if __name__ == '__main__':
     df_EI_RES_RE.index = np.round(x_gwp_tot_index, 1)
     plot_stacked_bar(df_data=df_EI_RES_RE[['Ammonia-RE', 'Methanol-RE', 'Gas-RE','Wet biomass', 'Wood', 'Hydro', 'Solar', 'Wind', 'H2-RE', 'Biodiesel']], xlabel='Yearly emissions limit [MtC02/y]', ylabel='Primary energy [TWh]', ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
 
-
     # Non renewable RES: Fossil fuel + Other non-renewable
     RES_non_renewable = ['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE',
                          'METHANOL', 'URANIUM']
@@ -155,7 +153,6 @@ if __name__ == '__main__':
     df_EI_RES_non_RE.columns = new_cols
     df_EI_RES_non_RE.index = np.round(x_gwp_tot_index, 1)
     plot_stacked_bar(df_data=df_EI_RES_non_RE[['NG', 'Elec. import', 'Ammonia', 'Waste', 'LFO', 'Coal']], xlabel='Yearly emissions limit [MtC02/y]', ylabel='Primary energy [TWh]', ylim=350, pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
-
 
     ####################################################################################################################
     # Einv_tot = Einv_operation + Einv_construction
@@ -199,7 +196,6 @@ if __name__ == '__main__':
     # select only the mobility technologies with Einv_const > 0.5 GWh/y
     mobility_tech = list(Einv_const_dict['Mobility'].max(axis=0)[Einv_const_dict['Mobility'].max(axis=0) > 0.5].index)
     plot_stacked_bar(df_data=Einv_const_dict['Mobility'][mobility_tech], xlabel='GWP total [MtC02/y]', ylabel='[TWh]', ylim=ymax, pdf_name=dir_plot+'/einv_const-mob-'+pdf+'.pdf')
-
 
     ##############################################################################################################
     # GWP breakdown by resources and technologies

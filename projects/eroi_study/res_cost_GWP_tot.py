@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # Share of energies
     for p in range(100, 0, -5):
         tot_EI = df_EI[p].sum()
-        print('GWP_tot %.1f [MtCO2-eq./y]: offshore %.1f [GW] onshore %.1f [GW] PV %.1f [GW]' %(df_GWP.sum(axis=1).loc[p], df_assets[p].loc['WIND_OFFSHORE'], df_assets[p].loc['WIND_ONSHORE'], df_assets[p].loc['PV']))
+        print('GWP_tot %.1f [MtCO2-eq./y]: EROI %.1f offshore %.1f [GW] onshore %.1f [GW] PV %.1f [GW]' %(df_GWP.sum(axis=1).loc[p], df_res['EROI'].loc[p], df_assets[p].loc['WIND_OFFSHORE'], df_assets[p].loc['WIND_ONSHORE'], df_assets[p].loc['PV']))
         print('GWh: Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f' % ( df_EI[p]['GAS'] ,  df_EI[p]['METHANOL_RE'] ,  df_EI[p]['AMMONIA_RE'] ,  df_EI[p]['H2_RE'] , df_EI[p]['GAS_RE'] ,  df_EI[p]['RES_SOLAR'] ,  df_EI[p]['RES_WIND'] ,  df_EI[p]['WOOD'] ,  df_EI[p]['WET_BIOMASS'] ,   df_EI[p]['WASTE'] ))
         print('Percentage: Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f' % (100 * df_EI[p]['GAS'] / tot_EI, 100 * df_EI[p]['METHANOL_RE'] / tot_EI, 100 * df_EI[p]['AMMONIA_RE'] / tot_EI, 100 * df_EI[p]['H2_RE'] / tot_EI,100 * df_EI[p]['GAS_RE'] / tot_EI, 100 * df_EI[p]['RES_SOLAR'] / tot_EI, 100 * df_EI[p]['RES_WIND'] / tot_EI, 100 * df_EI[p]['WOOD'] / tot_EI, 100 * df_EI[p]['WET_BIOMASS'] / tot_EI,  100 * df_EI[p]['WASTE'] / tot_EI))
 

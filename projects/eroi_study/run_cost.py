@@ -43,7 +43,7 @@ def loop_cost_computation(range_val, dir_name: str, GWP_op_ini: float, config: d
         es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, [estd_out_path, td12_out_path], config['temp_dir'])
         es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
-config_name_file = 'config_2035' # config_2035, config_2035_with_nuc
+config_name_file = 'config_2035_5_6_GW_nuc' # config_2035, config_2035_2_GW_nuc, config_2035_5_6_GW_nuc
 
 if __name__ == '__main__':
 
@@ -55,8 +55,10 @@ if __name__ == '__main__':
     # Load configuration into a dict
     config = load_config(config_fn=config_name_file+'.yaml')
 
-    if config_name_file == 'config_2035_with_nuc':
-        dir_name = 'cost_GWP_tot_nuc_0'
+    if config_name_file == 'config_2035_2_GW_nuc':
+        dir_name = 'einv_GWP_tot_2_GW_nuc_0'
+    elif config_name_file == 'config_2035_5_6_GW_nuc':
+        dir_name = 'einv_GWP_tot_5_6_GW_nuc_0'
     else:
         dir_name = 'cost_GWP_tot_0'
 

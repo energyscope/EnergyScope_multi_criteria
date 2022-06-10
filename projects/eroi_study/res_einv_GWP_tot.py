@@ -162,7 +162,7 @@ def replace_item_in_list(l: list, item_old: str, item_new: str):
 
 # parameters
 domestic_RE_share = 0 # 0, 30 %
-config_name_file = 'config_2035_with_nuc' # config_2035, config_2035_with_nuc
+config_name_file = 'config_2035_5_6_GW_nuc' # config_2035, config_2035_2_GW_nuc, config_2035_5_6_GW_nuc
 
 if __name__ == '__main__':
 
@@ -185,8 +185,10 @@ if __name__ == '__main__':
     # -----------------------------------------------
 
     range_val = range(100, 0, -5)
-    if config_name_file == 'config_2035_with_nuc':
-        dir = f"{config['case_studies_dir']}/{'einv_GWP_tot_nuc_' + str(domestic_RE_share)}"
+    if config_name_file == 'config_2035_2_GW_nuc':
+        dir = f"{config['case_studies_dir']}/{'einv_GWP_tot_2_GW_nuc_' + str(domestic_RE_share)}"
+    elif config_name_file == 'config_2035_5_6_GW_nuc':
+        dir = f"{config['case_studies_dir']}/{'einv_GWP_tot_5_6_GW_nuc_' + str(domestic_RE_share)}"
     else:
         dir = f"{config['case_studies_dir']}/{'einv_GWP_tot_' + str(domestic_RE_share)}"
 
@@ -238,15 +240,19 @@ if __name__ == '__main__':
     # PLOT
     # -----------------------------------------------
     ####################################################################################################################
-    if config_name_file == 'config_2035_with_nuc':
-        dir_plot = 'einv_GWP_tot_nuc_' + str(domestic_RE_share)
+    if config_name_file == 'config_2035_2_GW_nuc':
+        dir_plot = 'einv_GWP_tot_2_GW_nuc_' + str(domestic_RE_share)
+    elif config_name_file == 'config_2035_5_6_GW_nuc':
+        dir_plot = 'einv_GWP_tot_5_6_GW_nuc_' + str(domestic_RE_share)
     else:
         dir_plot = 'einv_GWP_tot_' + str(domestic_RE_share)
 
     make_dir(cwd+'/export/')
     make_dir(cwd+'/export/'+dir_plot+'/')
-    if config_name_file == 'config_2035_with_nuc':
-        dir_plot = cwd + '/export/einv_GWP_tot_nuc_' + str(domestic_RE_share)
+    if config_name_file == 'config_2035_2_GW_nuc':
+        dir_plot = cwd + '/export/einv_GWP_tot_2_GW_nuc_' + str(domestic_RE_share)
+    elif config_name_file == 'config_2035_5_6_GW_nuc':
+        dir_plot = cwd + '/export/einv_GWP_tot_5_6_GW_nuc_' + str(domestic_RE_share)
     else:
         dir_plot = cwd + '/export/einv_GWP_tot_' + str(domestic_RE_share)
     pdf = 'gwp-tot-' + str(domestic_RE_share)
@@ -255,6 +261,8 @@ if __name__ == '__main__':
     # EROI, FEC, Einv_tot, and GWP_tot
     # \alpha^0 = \text{GWP}_{op}^0
     x_gwp_tot_index = df_GWP.sum(axis=1).values
+    df_eroi = df_res['EROI'].copy()
+    df_eroi.index = x_gwp_tot_index
     plot_one_serie(df_data=df_cost.sum(axis=1), label='Cost', pdf_name=dir_plot + '/cost_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[40, 100], ylabel='[bEUR/y]')
     plot_one_serie(df_data=df_res['EROI'], label='EROI', pdf_name=dir_plot + '/eroi_custom_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[1, 10], ylabel='[-]', yticks_val=[3,5,7,9])
     plot_one_serie(df_data=df_res['EROI'], label='EROI', pdf_name=dir_plot + '/eroi_' + str(domestic_RE_share) + '.pdf', x_index=x_gwp_tot_index, ylim=[2.5, 10], ylabel='[-]')

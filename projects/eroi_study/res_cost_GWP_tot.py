@@ -27,7 +27,7 @@ from projects.eroi_study.utils_res import compute_fec, get_gwp, compute_einv_det
 
 # parameters
 domestic_RE_share = 0 # 0, 30 %
-config_name_file = 'config_2035' # config_2035, config_2035_with_nuc
+config_name_file = 'config_2035' # config_2035, config_2035_2_GW_nuc, config_2035_5_6_GW_nuc
 
 if __name__ == '__main__':
 
@@ -50,7 +50,13 @@ if __name__ == '__main__':
     # -----------------------------------------------
 
     range_val = range(100, 0, -5)
-    dir = f"{config['case_studies_dir']}/{'cost_GWP_tot_' + str(domestic_RE_share)}"
+    if config_name_file == 'config_2035_2_GW_nuc':
+        dir = f"{config['case_studies_dir']}/{'cost_GWP_tot_2_GW_nuc_' + str(domestic_RE_share)}"
+    elif config_name_file == 'config_2035_5_6_GW_nuc':
+        dir = f"{config['case_studies_dir']}/{'cost_GWP_tot_5_6_GW_nuc_' + str(domestic_RE_share)}"
+    else:
+        dir = f"{config['case_studies_dir']}/{'cost_GWP_tot_' + str(domestic_RE_share)}"
+
     df_res, df_fec_details = eroi_computation(dir=dir, user_data=config['user_data'], range_val=range_val)
     df_Einv_op, df_Einv_RES_cat, df_Einv_TECH_cat, df_EI_cat, df_EI = res_details(range_val=range_val, all_data=all_data, dir=dir, user_data=config['user_data'])
     df_GWP = gwp_computation(dir=dir, range_val=range_val)
@@ -100,10 +106,22 @@ if __name__ == '__main__':
     # PLOT
     # -----------------------------------------------
     ####################################################################################################################
-    dir_plot = 'cost_GWP_tot_' + str(domestic_RE_share)
+    
+    if config_name_file == 'config_2035_2_GW_nuc':
+        dir_plot = 'cost_GWP_tot_2_GW_nuc_' + str(domestic_RE_share)
+    elif config_name_file == 'config_2035_5_6_GW_nuc':
+        dir_plot = 'cost_GWP_tot_5_6_GW_nuc_' + str(domestic_RE_share)
+    else:
+        dir_plot = 'cost_GWP_tot_' + str(domestic_RE_share)
+
     make_dir(cwd+'/export/')
     make_dir(cwd+'/export/'+dir_plot+'/')
-    dir_plot = cwd+'/export/cost_GWP_tot_' + str(domestic_RE_share)
+    if config_name_file == 'config_2035_2_GW_nuc':
+        dir_plot = cwd + '/export/cost_GWP_tot_2_GW_nuc_' + str(domestic_RE_share)
+    elif config_name_file == 'config_2035_5_6_GW_nuc':
+        dir_plot = cwd + '/export/cost_GWP_tot_5_6_GW_nuc_' + str(domestic_RE_share)
+    else:
+        dir_plot = cwd + '/export/cost_GWP_tot_' + str(domestic_RE_share)
     pdf = 'cost-' + str(domestic_RE_share)
 
     ####################################################################################################################

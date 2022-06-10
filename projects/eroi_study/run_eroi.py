@@ -45,7 +45,7 @@ def loop_eroi_computation(range_val, dir_name: str, GWP_op_ini: float, config: d
 
 
 DOMESTIC_RE_SHARE = 0 # (%) Domestic RE share in the primary energy mix (by default is set to 0 in the config file)
-config_name_file = 'config_2035_with_nuc' # config_2035, config_2035_with_nuc
+config_name_file = 'config_2035_5_6_GW_nuc' # config_2035, config_2035_2_GW_nuc, config_2035_5_6_GW_nuc
 
 if __name__ == '__main__':
 
@@ -58,8 +58,10 @@ if __name__ == '__main__':
     config = load_config(config_fn=config_name_file+'.yaml')
     config['system_limits']['re_be_share_primary'] = DOMESTIC_RE_SHARE
 
-    if config_name_file == 'config_2035_with_nuc':
-        dir_name = 'einv_GWP_tot_nuc_' + str(int(100 * DOMESTIC_RE_SHARE))
+    if config_name_file == 'config_2035_2_GW_nuc':
+        dir_name = 'einv_GWP_tot_2_GW_nuc_' + str(int(100 * DOMESTIC_RE_SHARE))
+    elif config_name_file == 'config_2035_5_6_GW_nuc':
+        dir_name = 'einv_GWP_tot_5_6_GW_nuc_' + str(int(100 * DOMESTIC_RE_SHARE))
     else:
         dir_name = 'einv_GWP_tot_' + str(int(100 * DOMESTIC_RE_SHARE))
 
@@ -121,12 +123,12 @@ if __name__ == '__main__':
     # 2. Run ES-TD with a constrain on the GWP_tot
     ###################################################################################################################
 
-    # # -----------------------------------------------
-    # # Min Einv
-    # # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i computed by Min Einv without contraint on GWP_tot
-    # # -----------------------------------------------
-    # # FIXME: WARNING is the case 100 is already computed, adapt the range_val to start at 95.
-    # GWP_op_ini = get_gwp(cs=f"{config['case_studies_dir']}/{'einv_GWP_tot_0/run_100'}")['GWP_op'] # the initial GWP_op is always defined with nuclear
-    # print('GWP_limit initial %.1f [MtC02/y]' %(GWP_op_ini/1000))
-    # range_val = range(95, 0, -5)
-    # loop_eroi_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config)
+    # -----------------------------------------------
+    # Min Einv
+    # s.t. GWP_tot <= p * GWP_op^i with p a percentage and GWP_op^i computed by Min Einv without contraint on GWP_tot
+    # -----------------------------------------------
+    # FIXME: WARNING is the case 100 is already computed, adapt the range_val to start at 95.
+    GWP_op_ini = get_gwp(cs=f"{config['case_studies_dir']}/{'einv_GWP_tot_0/run_100'}")['GWP_op'] # the initial GWP_op is always defined without nuclear!
+    print('GWP_limit initial %.1f [MtC02/y]' %(GWP_op_ini/1000))
+    range_val = range(95, 0, -5)
+    loop_eroi_computation(range_val=range_val, dir_name=dir_name, GWP_op_ini=GWP_op_ini, config=config)

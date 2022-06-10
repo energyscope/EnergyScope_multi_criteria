@@ -54,7 +54,7 @@ Technologies:
     WIND_ONSHORE: 1.177
     WIND_OFFSHORE: 0.692
     HYDRO_RIVER: 0.11
-    NUCLEAR: 2.0
+    NUCLEAR: 0.0
   f_max:
     NUCLEAR: 2.0
 

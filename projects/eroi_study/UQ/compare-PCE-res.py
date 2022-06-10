@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-version = "short" # short, complete
+version = "complete" # short, complete
 if __name__ == '__main__':
 
     dir_name = 'comparison'
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     plt.figure()
     for param, label, c  in zip(critical_28500_top_5, [r'$e_{op}^{Gas-RE}$', r'$e_{constr}^{Elec. \ cars}$', r'$f_{max}^{NUC}$', r'${avail}^{Wood}$', r'$\%_{max}^{public \ mob}$'], color_list_28500):
         plt.plot(x_index, df_param_critical_28500_evolution.transpose()[param].values, '-D', markersize=5, label=label, color=c)
-    plt.xlabel('Yearly emissions limit [MtC02-eq./y]', fontsize=15)
+    plt.xlabel('Yearly emissions limit [MtCO2-eq./y]', fontsize=15)
     plt.ylabel('Total-order Sobol index %', rotation=90, fontsize=15)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     plt.figure()
     for param, label, c in zip(critical_85400_top_5, [r'$e_{constr}^{NG \ cars}$', r'$e_{op}^{Gas}$', r'$e_{constr}^{Elec. cars}$', r'$\%_{max}^{public \ mob}$', r'$e_{op}^{Wet \ biomass}$'], color_list_85400):
         plt.plot(x_index, df_param_critical_85400_evolution.transpose()[param].values, '-D', markersize=5, label=label, color=c)
-    plt.xlabel('Yearly emissions limit [MtC02-eq./y]', fontsize=15)
+    plt.xlabel('Yearly emissions limit [MtCO2-eq./y]', fontsize=15)
     plt.ylabel('Total-order Sobol index %', rotation=90, fontsize=15)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     plt.plot(x_index, eroi_mean, '-D', markersize=10, label='EROI mean with uncertainties')
     plt.fill_between(x_index, np.asarray(eroi_mean) + 2 * np.asarray(eroi_std) , np.asarray(eroi_mean) - 2 * np.asarray(eroi_std) , facecolor='gray', alpha=0.5)
     plt.plot(x_index, eroi_deterministic, 'g-P', markersize=10, label='EROI with deterministic approach')
-    plt.xlabel('Yearly emissions limit [MtC02-eq./y]', fontsize=15)
+    plt.xlabel('Yearly emissions limit [MtCO2-eq./y]', fontsize=15)
     plt.ylabel('System EROI [-]', rotation=90, fontsize=15)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)

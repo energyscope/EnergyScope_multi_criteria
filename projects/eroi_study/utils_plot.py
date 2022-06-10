@@ -70,6 +70,7 @@ def plot_stacked_bar(df_data: pd.DataFrame, xlabel:str, ylabel: str, ylim: float
     plt.savefig(pdf_name)
     plt.close()
 
+
 if __name__ == '__main__':
 
     # Load configuration into a dict
@@ -96,7 +97,7 @@ if __name__ == '__main__':
     fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
     fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
     # Compute the FEC from SANKEY
-    ef = get_FEC_from_sankey(case_study_dir=cs_test, col=run)
+    ef = get_fec_from_sankey(case_study_dir=cs_test, col=run)
     fec_sankey = ef.sum()
     einv = get_total_einv(cs_test) / 1000  # TWh
     print('FEC SANKEY %.2f vs year_balance %.2f [TWh/y]' % (fec_sankey, fec_tot_val))

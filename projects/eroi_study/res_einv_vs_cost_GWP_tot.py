@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 from sys import platform
 
-from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
+from energyscope.utils import make_dir, load_config, get_fec_from_sankey
 from energyscope.postprocessing import get_total_einv
 from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import fec_plots, primary_energy_plots, \
     plot_asset_capacities_by_tech

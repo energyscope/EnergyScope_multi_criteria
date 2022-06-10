@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 from sys import platform
 
-from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
+from energyscope.utils import make_dir, load_config, get_fec_from_sankey
 from energyscope.postprocessing import get_total_einv
 from projects.eroi_study.utils_plot import plot_two_series, plot_stacked_bar
 from projects.eroi_study.utils_res import compute_fec, get_gwp, compute_einv_details, compute_primary_energy, \

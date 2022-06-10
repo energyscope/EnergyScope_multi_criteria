@@ -15,8 +15,9 @@ import matplotlib.pyplot as plt
 
 from sys import platform
 
-from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
+from energyscope.utils import make_dir, load_config, get_fec_from_sankey
 from energyscope.postprocessing import get_total_einv
+
 
 def compute_einv_res(cs: str, all_data: dict):
     """
@@ -31,6 +32,7 @@ def compute_einv_res(cs: str, all_data: dict):
     # Define the RESOURCES list
     RESOURCES = list(all_data['Resources'].index)
     return df_einv.loc[RESOURCES].copy()['Einv_op']
+
 
 def compute_einv_tech(cs: str, all_data: dict):
     """
@@ -174,6 +176,7 @@ def compute_primary_energy(cs: str, user_data: str, run: str, all_data: dict):
         primary_dict[subcat] = df_primary_energy[df_primary_energy['Subcategory'] == subcat]['RESSOURCES'].sum()
 
     return pd.DataFrame(data=primary_dict.values(), index=primary_dict.keys(), columns=[run]), df_primary_energy.sort_values(by=['Subcategory'])
+
 
 def fec_given_tech(tech: str, data: pd.DataFrame, prod_corr:float):
     """
@@ -331,6 +334,7 @@ def get_gwp(cs: str):
 
     return gwp.sum()
 
+
 def get_cost(cs: str):
     """
     Get the cost from cost_breakdown.csv.
@@ -340,6 +344,7 @@ def get_cost(cs: str):
     cost = pd.read_csv(f"{cs}/output/cost_breakdown.csv", index_col=0, sep=',')
 
     return cost.sum()
+
 
 def gwp_computation(dir: str, range_val):
     """
@@ -390,6 +395,7 @@ def gwp_breakdown(dir: str, range_val):
     df_gwp_op = pd.concat(gwp_op_list, axis=1)
     df_gwp_op.columns = [i for i in range_val]
     return df_gwp_const / 1000, df_gwp_op / 1000 # MtC02/y
+
 
 def cost_breakdown(dir: str, range_val):
     """
@@ -446,6 +452,7 @@ def gwp_const_per_category(df_gwp_const: pd.DataFrame, user_data: str):
             gwp_const_by_tech_cat[cat] = None
     return gwp_const_by_tech_cat
 
+
 def retrieve_non_zero_val(df: pd.DataFrame):
     """
     Retrieve columns of a DataFrame with 0 values for all rows.
@@ -470,6 +477,8 @@ def res_assets_capacity(range_val, dir: str):
     df_assets.index.name = ''
     df_assets.columns = [i for i in range_val]
     return df_assets.drop(index='UNITS').astype(float)
+
+
 if __name__ == '__main__':
 
     # Load configuration into a dict
@@ -496,7 +505,7 @@ if __name__ == '__main__':
     fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
     fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
     # Compute the FEC from SANKEY
-    ef = get_FEC_from_sankey(case_study_dir=cs_test, col=run)
+    ef = get_fec_from_sankey(case_study_dir=cs_test, col=run)
     fec_sankey = ef.sum()
     einv = get_total_einv(cs_test) / 1000  # TWh
     print('FEC SANKEY %.2f vs year_balance %.2f [TWh/y]' % (fec_sankey, fec_tot_val))

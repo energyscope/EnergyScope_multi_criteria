@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 from sys import platform
 
-from energyscope.utils import make_dir, load_config, get_FEC_from_sankey
+from energyscope.utils import make_dir, load_config, get_fec_from_sankey
 from energyscope.postprocessing import get_total_einv
 from projects.eroi_study.utils_plot import plot_stacked_bar, plot_two_series
 from projects.eroi_study.utils_res import compute_fec, compute_einv_details, compute_primary_energy, \
@@ -119,6 +119,7 @@ def primary_energy_plots(df_EI_1: pd.DataFrame, df_EI_2: pd.DataFrame, pdf_1: st
     df_2 = retrieve_non_zero_val(df=df_EI_2.loc[RES_non_renewable].drop(columns=['Subcategory']).transpose())
     plot_stacked_bar(df_data=df_2, xlabel='p (%)',  ylabel='(TWh)', ylim=400, pdf_name=dir_plot + '/EI-non-RE-' + pdf_2 + '.pdf')
 
+
 # parameters
 domestic_RE_share = 0 # 0, 30 %
 
@@ -198,7 +199,6 @@ if __name__ == '__main__':
     plot_two_series(df_data_1=df_GWP_1.sum(axis=1), df_data_2=df_GWP_2.sum(axis=1), label_1=label1, label_2=label2, pdf_name=dir_plot+'/gwp_'+ str(domestic_RE_share)+'.pdf', x_index=[i for i in range_val], ylim=[0, 105], ylabel=r'$GWP_{tot}$ [MtC02/y]', xlabel='p [%]')
     plot_two_series(df_data_1=df_GWP_1['GWP_cons'], df_data_2=df_GWP_2['GWP_cons'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/gwp_const_'+ str(domestic_RE_share)+'.pdf', x_index=[i for i in range_val], ylim=[0, 10], ylabel=r'$GWP_{const}$ [MtC02/y]', xlabel='p [%]')
     plot_two_series(df_data_1=df_GWP_1['GWP_op'], df_data_2=df_GWP_2['GWP_op'], label_1=label1, label_2=label2, pdf_name=dir_plot+'/gwp_op_'+ str(domestic_RE_share)+'.pdf', x_index=[i for i in range_val], ylim=[0, 100], ylabel=r'$GWP_{op}$ [MtC02/y]', xlabel='p [%]')
-
 
     # To illustrate the shift between constraining GWP_tot & GWP_op
     plt.figure()

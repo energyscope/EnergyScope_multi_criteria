@@ -60,4 +60,4 @@ options:
   solver: "/home/jdumas/PycharmProjects/ampl_linux-intel64/cplex"
   show_stats: 1
   log_file: "log.txt"
-  cplex_options: "timelimit=3600"
+  cplex_options: "timelimit=3600 baropt predual=-1 crossover=0 aggregate=-1 ordering=1 prestats=1"

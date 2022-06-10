@@ -37,6 +37,7 @@ def replace_item_in_list(l: list, item_old: str, item_new: str):
 
 # parameters
 domestic_RE_share = 0 # 0, 30 %
+config_name_file = 'config_2035' # config_2035, config_2035_with_nuc
 
 if __name__ == '__main__':
 
@@ -44,7 +45,7 @@ if __name__ == '__main__':
     print("Current working directory: {0}".format(cwd))
 
     # Load configuration into a dict
-    config = load_config(config_fn='config.yaml')
+    config = load_config(config_fn=config_name_file+'.yaml')
 
     # Loading data
     all_data = es.import_data(user_data_dir=config['user_data'], developer_data_dir=config['developer_data'])

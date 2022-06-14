@@ -4,7 +4,8 @@
 
 Create data for 2015 and 2050.
 WARNING: Einv data for 2015 and 2050 are copied from 2035.
-Other data: demand, Layers_in_out, Resources, and technologies (cost, GWP, etc) are copied from the excel files of EnergyScope_pathway-master
+Other data: demand, Layers_in_out, Resources, and technologies (cost, GWP, etc.)
+are copied from the Excel files of EnergyScope_pathway-master
 https://github.com/energyscope/EnergyScope_pathway
 """
 
@@ -29,8 +30,8 @@ if __name__ == '__main__':
     # df_test = pd.read_csv('data_pathway/Resources_2050.csv', sep=',', index_col=0)
     # df_test2 = pd.read_csv('data_pathway/Resources_2035.csv', sep=',', index_col=0)
 
-    # Load the original Technologies data from 2035
-    year = '2050' # '2015, '2050'
+    # Load the original Technologies' data from 2035
+    year = '2050'  # '2015, '2050'
     df_TECH = pd.read_csv('data_pathway/Technologies_2035.csv', sep=',', index_col=0)
     # Load the input data
     df_TECH_input = pd.read_csv('data_pathway/Technologies_'+year+'_input.csv', sep=',', index_col=0)
@@ -43,13 +44,13 @@ if __name__ == '__main__':
     df_TECH_input_reordered = pd.DataFrame(data=np.asarray(copy_list), index=tech_list, columns=df_TECH_input.columns)
     # Add the einv_constr from 2035
     df_TECH_input_reordered['einv_constr'] = df_TECH['einv_constr'].copy().values[1:]
-    # Reorder the column in the same order than the Technologies data from 2035
-    df_TECH_input_final = df_TECH_input_reordered[['c_inv',
-     'c_maint', 'gwp_constr', 'einv_constr', 'lifetime', 'c_p', 'fmin_perc',
-     'fmax_perc', 'f_min', 'f_max']].copy()
+    # Reorder the column in the same order than the Technologies' data from 2035
+    df_TECH_input_final = df_TECH_input_reordered[['c_inv', 'c_maint', 'gwp_constr', 'einv_constr', 'lifetime',
+                                                   'c_p', 'fmin_perc', 'fmax_perc', 'f_min', 'f_max']].copy()
 
-    # Build a DataFrame with the same format than 2035
-    df_TECH_copy = pd.DataFrame(index=df_TECH.iloc[1:].index, data=df_TECH.iloc[1:]['Subcategory'].copy(), columns=['Subcategory'])
+    # Build a DataFrame with the same format as 2035
+    df_TECH_copy = pd.DataFrame(index=df_TECH.iloc[1:].index, data=df_TECH.iloc[1:]['Subcategory'].copy(),
+                                columns=['Subcategory'])
     df_TECH_copy['Technologies name'] = df_TECH.iloc[1:]['Technologies name'].copy()
     df_TECH_copy['parameter name'] = df_TECH.iloc[1:]['parameter name'].copy()
     for col in df_TECH_input_final.columns:

@@ -20,26 +20,31 @@ Extensions need to be conducted by including uncertainty on:
 - einv_op and einv_const: determine relevant uncertainty intervals;
 - technologies capacity factors.
 
-Note: this script generates the design_space and stochastic_space files required by the RHEIA python library to generate samples.
+Note: this script generates the design_space and stochastic_space files required
+ by the RHEIA python library to generate samples.
 These samples are then used to run ES-TD to compute the corresponding EROI values.
 Then, the RHEIA python library is used to perform PCE using these samples to compute the Sobol indexes.
 For more information about the uncertainty quantification in ES-TD see:
-[1] Rixhon, Xavier, et al. "The Role of Electrofuels under Uncertainties for the Belgian Energy Transition." Energies 14.13 (2021): 4027.
-[2] Limpens, Gauthier. Generating energy transition pathways: application to Belgium. Diss. UCL-Université Catholique de Louvain, 2021. -> chapter 6 and appendix D.
-[3] Moret, Stefano, et al. "Characterization of input uncertainties in strategic energy planning models." Applied energy 202 (2017): 597-617.
-[4] Coppitters, Diederik. Robust design optimization of hybrid renewable energy systems. Diss. University of Plymouth, 2021.
+[1] Rixhon, Xavier, et al. "The Role of Electrofuels under Uncertainties for the Belgian Energy Transition."
+ Energies 14.13 (2021): 4027.
+[2] Limpens, Gauthier. Generating energy transition pathways: application to Belgium.
+ Diss. UCL-Université Catholique de Louvain, 2021. -> chapter 6 and appendix D.
+[3] Moret, Stefano, et al. "Characterization of input uncertainties in strategic energy planning models."
+ Applied energy 202 (2017): 597-617.
+[4] Coppitters, Diederik. Robust design optimization of hybrid renewable energy systems.
+ Diss. University of Plymouth, 2021.
 
 @author: Jonathan Dumas
 """
 
-import yaml
+# import yaml
 import os
 import json
 
 import pandas as pd
 import energyscope as es
-import numpy as np
-import matplotlib.pyplot as plt
+# import numpy as np
+# import matplotlib.pyplot as plt
 
 from energyscope.utils import load_config
 
@@ -61,7 +66,6 @@ def eff_mature_standard_tech(df: pd.DataFrame):
                      eff_IND_BOILER_WASTE, eff_DHN_BOILER_GAS, eff_DHN_BOILER_WOOD, eff_DEC_BOILER_GAS,
                      eff_DEC_BOILER_WOOD]
     return eff_tech_list, tech_list
-
 
     # # mature customized U[-20.6%, 20.6%]
     # eff_CAR_GASOLINE = -1/all_data['Layers_in_out'].loc['CAR_GASOLINE']['GASOLINE']
@@ -108,7 +112,7 @@ def eff_mature_standard_tech(df: pd.DataFrame):
     # eff_H2_ELECTROLYSIS_heat_low_T = 1/all_data['Layers_in_out'].loc['H2_ELECTROLYSIS']['HEAT_LOW_T_DHN']
 
 
-def res_avaiv_params(data: pd.DataFrame):
+def res_avail_params(data: pd.DataFrame):
     """
     Define the uncertainty parameters related to availability or resources.
     U[-32.1%, 32.1%]: wood, wet biomass, and waste.
@@ -128,7 +132,8 @@ def res_avaiv_params(data: pd.DataFrame):
 def res_einv_op_params(data: pd.DataFrame):
     """
     Define the uncertainty parameters related to einv_op of resources.
-    FIXME: set by default to U[-25%, 25%] -> a study similar to the one conducted in the Ph.D. thesis of S. Moret must be conducted.
+    FIXME: set by default to U[-25%, 25%] -> a study similar to the one conducted
+        in the Ph.D. thesis of S. Moret must be conducted.
     """
     l = ['ELECTRICITY', 'GASOLINE', 'DIESEL', 'BIOETHANOL', 'BIODIESEL', 'LFO', 'GAS', 'GAS_RE', 'WOOD', 'WET_BIOMASS',
          'URANIUM', 'WASTE', 'H2', 'H2_RE', 'AMMONIA', 'METHANOL', 'AMMONIA_RE', 'METHANOL_RE']
@@ -142,27 +147,29 @@ def res_einv_op_params(data: pd.DataFrame):
     df_stochastic['val'] = df_stochastic['val'] * 0.25
     return df_design, df_stochastic
 
+
 def res_einv_constr_params(data: pd.DataFrame):
     """
     Define the uncertainty parameters related to einv_constr of technologies.
-    FIXME: set by default U[-25%, 25%] -> a study similar to the one conducted in the Ph.D. thesis of S. Moret must be conducted.
+    FIXME: set by default U[-25%, 25%] -> a study similar to the one conducted
+        in the Ph.D. thesis of S. Moret must be conducted.
     Note: the storage and CCS technologies are not taken into account.
     """
-    l =['AMMONIA_TO_H2', 'BATT_LI', 'BIOMASS_TO_HVC', 'BIOMASS_TO_METHANOL',
-     'BIOMETHANATION', 'BIO_HYDROLYSIS', 'BOAT_FREIGHT_DIESEL', 'BOAT_FREIGHT_METHANOL', 'BOAT_FREIGHT_NG',
-     'BUS_COACH_CNG_STOICH', 'BUS_COACH_DIESEL', 'BUS_COACH_FC_HYBRIDH2', 'BUS_COACH_HYDIESEL', 'CAR_BEV', 'CAR_DIESEL',
-     'CAR_FUEL_CELL', 'CAR_GASOLINE', 'CAR_HEV', 'CAR_METHANOL', 'CAR_NG', 'CAR_PHEV', 'CCGT', 'CCGT_AMMONIA', 'DEC_ADVCOGEN_GAS',
-    'DEC_ADVCOGEN_H2', 'DEC_BOILER_GAS', 'DEC_BOILER_OIL',
-     'DEC_BOILER_WOOD', 'DEC_COGEN_GAS', 'DEC_COGEN_OIL', 'DEC_DIRECT_ELEC', 'DEC_HP_ELEC', 'DEC_SOLAR', 'DEC_THHP_GAS',
-     'DHN_BOILER_GAS', 'DHN_BOILER_OIL', 'DHN_BOILER_WOOD', 'DHN_COGEN_BIO_HYDROLYSIS', 'DHN_COGEN_GAS',
-     'DHN_COGEN_WASTE', 'DHN_COGEN_WET_BIOMASS', 'DHN_COGEN_WOOD', 'DHN_DEEP_GEO', 'DHN_HP_ELEC', 'DHN_SOLAR',
-     'GASIFICATION_SNG', 'GAS_TO_HVC', 'GEOTHERMAL', 'H2_BIOMASS',
-     'H2_ELECTROLYSIS', 'HABER_BOSCH', 'HYDRO_RIVER', 'IND_BOILER_COAL', 'IND_BOILER_GAS',
-     'IND_BOILER_OIL', 'IND_BOILER_WASTE', 'IND_BOILER_WOOD', 'IND_COGEN_GAS', 'IND_COGEN_WASTE', 'IND_COGEN_WOOD',
-     'IND_DIRECT_ELEC', 'METHANE_TO_METHANOL', 'METHANOL_TO_HVC', 'NUCLEAR',
-     'OIL_TO_HVC', 'PHS', 'PV', 'PYROLYSIS_TO_FUELS', 'PYROLYSIS_TO_LFO', 'SMR', 'SYN_METHANATION', 'SYN_METHANOLATION',
-     'TRAIN_FREIGHT', 'TRAIN_PUB', 'TRAMWAY_TROLLEY', 'TRUCK_DIESEL', 'TRUCK_ELEC', 'TRUCK_FUEL_CELL', 'TRUCK_METHANOL',
-     'TRUCK_NG', 'WIND_OFFSHORE', 'WIND_ONSHORE']
+    l = ['AMMONIA_TO_H2', 'BATT_LI', 'BIOMASS_TO_HVC', 'BIOMASS_TO_METHANOL',
+         'BIOMETHANATION', 'BIO_HYDROLYSIS', 'BOAT_FREIGHT_DIESEL', 'BOAT_FREIGHT_METHANOL', 'BOAT_FREIGHT_NG',
+         'BUS_COACH_CNG_STOICH', 'BUS_COACH_DIESEL', 'BUS_COACH_FC_HYBRIDH2', 'BUS_COACH_HYDIESEL', 'CAR_BEV',
+         'CAR_DIESEL', 'CAR_FUEL_CELL', 'CAR_GASOLINE', 'CAR_HEV', 'CAR_METHANOL', 'CAR_NG', 'CAR_PHEV', 'CCGT',
+         'CCGT_AMMONIA', 'DEC_ADVCOGEN_GAS', 'DEC_ADVCOGEN_H2', 'DEC_BOILER_GAS', 'DEC_BOILER_OIL', 'DEC_BOILER_WOOD',
+         'DEC_COGEN_GAS', 'DEC_COGEN_OIL', 'DEC_DIRECT_ELEC', 'DEC_HP_ELEC', 'DEC_SOLAR', 'DEC_THHP_GAS',
+         'DHN_BOILER_GAS', 'DHN_BOILER_OIL', 'DHN_BOILER_WOOD', 'DHN_COGEN_BIO_HYDROLYSIS', 'DHN_COGEN_GAS',
+         'DHN_COGEN_WASTE', 'DHN_COGEN_WET_BIOMASS', 'DHN_COGEN_WOOD', 'DHN_DEEP_GEO', 'DHN_HP_ELEC', 'DHN_SOLAR',
+         'GASIFICATION_SNG', 'GAS_TO_HVC', 'GEOTHERMAL', 'H2_BIOMASS',
+         'H2_ELECTROLYSIS', 'HABER_BOSCH', 'HYDRO_RIVER', 'IND_BOILER_COAL', 'IND_BOILER_GAS',
+         'IND_BOILER_OIL', 'IND_BOILER_WASTE', 'IND_BOILER_WOOD', 'IND_COGEN_GAS', 'IND_COGEN_WASTE', 'IND_COGEN_WOOD',
+         'IND_DIRECT_ELEC', 'METHANE_TO_METHANOL', 'METHANOL_TO_HVC', 'NUCLEAR',
+         'OIL_TO_HVC', 'PHS', 'PV', 'PYROLYSIS_TO_FUELS', 'PYROLYSIS_TO_LFO', 'SMR', 'SYN_METHANATION',
+         'SYN_METHANOLATION', 'TRAIN_FREIGHT', 'TRAIN_PUB', 'TRAMWAY_TROLLEY', 'TRUCK_DIESEL', 'TRUCK_ELEC',
+         'TRUCK_FUEL_CELL', 'TRUCK_METHANOL', 'TRUCK_NG', 'WIND_OFFSHORE', 'WIND_ONSHORE']
 
     df_design = pd.DataFrame(data=['par'] * len(l), index=['einv_constr-' + i for i in l], columns=['type'])
     df_design['val'] = 0.0
@@ -173,6 +180,7 @@ def res_einv_constr_params(data: pd.DataFrame):
     df_stochastic['type'] = 'absolute Uniform'
     df_stochastic['val'] = df_stochastic['val'] * 0.25
     return df_design, df_stochastic
+
 
 def res_demand_params(data: pd.DataFrame):
     """
@@ -211,7 +219,8 @@ def res_demand_params(data: pd.DataFrame):
 
     # specific case of the transportation
     cat = 'TRANSPORTATION'
-    df_design = pd.DataFrame(data=['par'] * len(l_TRANSPORTATION), index=[cat + '-' + i for i in l_TRANSPORTATION], columns=['type'])
+    df_design = pd.DataFrame(data=['par'] * len(l_TRANSPORTATION), index=[cat + '-' + i for i in l_TRANSPORTATION],
+                             columns=['type'])
     df_design['val'] = 0.0
     for res in l_TRANSPORTATION:
         df_design.at[cat + '-' + res, 'val'] = data.at[res, cat]
@@ -223,6 +232,7 @@ def res_demand_params(data: pd.DataFrame):
     df_stochastic_list.append(df_stochastic)
 
     return pd.concat(df_design_list, axis=0), pd.concat(df_stochastic_list, axis=0)
+
 
 def tech_fmax_params(data: pd.DataFrame):
     """
@@ -242,10 +252,14 @@ def tech_fmax_params(data: pd.DataFrame):
     df_stochastic['type'] = 'absolute Uniform'
     df_stochastic['val'] = df_stochastic['val'] * 0.241
 
-    df2_design = pd.DataFrame([['par', 2.8], ['par', 1.0], ['par', 1.0]], columns=['type', 'val'], index=['f_max-NUCLEAR', 'f_max-GEOTHERMAL', 'f_max-DHN_DEEP_GEO'])
-    df2_stochastic = pd.DataFrame([['absolute Uniform', 2.8], ['absolute Uniform', 1.0], ['absolute Uniform', 1.0]], columns=['type', 'val'], index=['f_max-NUCLEAR', 'f_max-GEOTHERMAL', 'f_max-DHN_DEEP_GEO'])
+    df2_design = pd.DataFrame([['par', 2.8], ['par', 1.0], ['par', 1.0]], columns=['type', 'val'],
+                              index=['f_max-NUCLEAR', 'f_max-GEOTHERMAL', 'f_max-DHN_DEEP_GEO'])
+    df2_stochastic = pd.DataFrame([['absolute Uniform', 2.8], ['absolute Uniform', 1.0], ['absolute Uniform', 1.0]],
+                                  columns=['type', 'val'],
+                                  index=['f_max-NUCLEAR', 'f_max-GEOTHERMAL', 'f_max-DHN_DEEP_GEO'])
 
     return df_design.append(df2_design), df_stochastic.append(df2_stochastic)
+
 
 def tech_cpt_params(data: pd.DataFrame):
     """
@@ -263,6 +277,7 @@ def tech_cpt_params(data: pd.DataFrame):
     df_stochastic['val'] = df_stochastic['val'] * 0.111
 
     return df_design, df_stochastic
+
 
 def other_params(config: dict):
     """
@@ -308,33 +323,37 @@ def other_params(config: dict):
     return pd.concat([df_design1, df_design2, df_design3], axis=0), pd.concat(
         [df_stochastic1, df_stochastic2, df_stochastic3], axis=0)
 
+
 if __name__ == '__main__':
 
     cwd = os.getcwd()
     print("Current working directory: {0}".format(cwd))
 
     # Load configuration into a dict
-    config = load_config(config_fn='config_uq.yaml')
+    config_ = load_config(config_fn='config_uq.yaml')
 
     # Loading data
-    all_data = es.import_data(user_data_dir=config['user_data'], developer_data_dir=config['developer_data'])
+    all_data = es.import_data(user_data_dir=config_['user_data'], developer_data_dir=config_['developer_data'])
     # Modify the minimum capacities of some technologies using the configuration file
-    for tech in config['Technologies']['f_min']:
-        all_data['Technologies']['f_min'].loc[tech] = config['Technologies']['f_min'][tech]
+    for tech in config_['Technologies']['f_min']:
+        all_data['Technologies']['f_min'].loc[tech] = config_['Technologies']['f_min'][tech]
 
     # Build the list of uncertain parameters
-    df_design_res_av, df_stochastic_res_av = res_avaiv_params(data=all_data['Resources'])
+    df_design_res_av, df_stochastic_res_av = res_avail_params(data=all_data['Resources'])
     df_design_res_einv_op, df_stochastic_res_einv_op = res_einv_op_params(data=all_data['Resources'])
     df_design_demand, df_stochastic_demand = res_demand_params(data=all_data['Demand'])
     df_design_tech_fmax, df_stochastic_tech_fmax = tech_fmax_params(data=all_data['Technologies'])
     df_design_res_einv_constr, df_stochastic_res_einv_constr = res_einv_constr_params(data=all_data['Technologies'])
     df_design_res_c_pt, df_stochastic_res_c_pt = tech_cpt_params(data=all_data['Time_series'])
-    df_design_other, df_stochastic_other = other_params(config=config['system_limits'])
+    df_design_other, df_stochastic_other = other_params(config=config_['system_limits'])
 
-    df_design = pd.concat([df_design_res_av, df_design_res_einv_op, df_design_demand, df_design_tech_fmax, df_design_res_einv_constr, df_design_res_c_pt, df_design_other], axis=0)
-    df_stochastic = pd.concat([df_stochastic_res_av, df_stochastic_res_einv_op, df_stochastic_demand, df_stochastic_tech_fmax, df_stochastic_res_einv_constr, df_stochastic_res_c_pt, df_stochastic_other], axis=0)
-    df_design.to_csv('data_samples/design_space', sep=' ')
-    df_stochastic.to_csv('data_samples/stochastic_space', sep=' ')
+    df_design_ = pd.concat([df_design_res_av, df_design_res_einv_op, df_design_demand, df_design_tech_fmax,
+                           df_design_res_einv_constr, df_design_res_c_pt, df_design_other], axis=0)
+    df_stochastic_ = pd.concat([df_stochastic_res_av, df_stochastic_res_einv_op, df_stochastic_demand,
+                               df_stochastic_tech_fmax, df_stochastic_res_einv_constr, df_stochastic_res_c_pt,
+                               df_stochastic_other], axis=0)
+    df_design_.to_csv('data_samples/design_space', sep=' ')
+    df_stochastic_.to_csv('data_samples/stochastic_space', sep=' ')
 
     param_list = dict()
     param_list['avail'] = list(df_design_res_av.index)

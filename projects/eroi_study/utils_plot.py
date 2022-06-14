@@ -11,7 +11,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: list, ylim: list, ylabel: str, yticks_val=None):
+def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: list, ylim: list, ylabel: str,
+                   yticks_val=None):
     """
     Plot one time serie: EROI, FEC, Einv, GWP, etc.
     """
@@ -31,7 +32,7 @@ def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: li
 
 
 def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: str, label_2: str, pdf_name: str,
-                    x_index: list, ylim: list, ylabel: str, xlabel:str, x_index_2: list=None, fontsize:int=15):
+                    x_index: list, ylim: list, ylabel: str, xlabel: str, x_index_2: list = None, fontsize: int = 15):
     """
     Compare two time series: EROI, FEC, Einv, GWP, etc.
     """
@@ -54,7 +55,8 @@ def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: s
     plt.close()
 
 
-def plot_stacked_bar(df_data: pd.DataFrame, xlabel:str, ylabel: str, ylim: float, pdf_name: str, colors=plt.cm.tab20(np.linspace(0, 1, 10)), ncol: int=2):
+def plot_stacked_bar(df_data: pd.DataFrame, xlabel: str, ylabel: str, ylim: float, pdf_name: str,
+                     colors=plt.cm.tab20(np.linspace(0, 1, 10)), ncol: int = 2):
     """
     Stacked bar plot of a pd.DataFrame.
     """
@@ -103,10 +105,12 @@ if __name__ == '__main__':
     print('FEC SANKEY %.2f vs year_balance %.2f [TWh/y]' % (fec_sankey, fec_tot_val))
     print('EROI %.2f %.2f' % (fec_sankey / einv, fec_tot_val / einv))
     GWP_val = get_GWP(cs=cs_test)
-    print('GWP_cons %.1f GWP_op %.1f [ktC02/y]' %(GWP_val['GWP_constr'], GWP_val['GWP_op']))
+    print('GWP_cons %.1f GWP_op %.1f [ktC02/y]' % (GWP_val['GWP_constr'], GWP_val['GWP_op']))
 
     # Compute Einv by ressources and technologies
-    df_inv_res_by_subcat, df_inv_tech_by_cat = compute_einv_details(cs=cs_test, user_data=config['user_data'], all_data=all_data)
+    df_inv_res_by_subcat, df_inv_tech_by_cat = \
+        compute_einv_details(cs=cs_test, user_data=config['user_data'], all_data=all_data)
 
     # Primary Energy by subcategory
-    df_primary_energy_subcat, df_primary_energy = compute_primary_energy(cs=cs_test, user_data=config['user_data'], run=run, all_data=all_data)
+    df_primary_energy_subcat, df_primary_energy = \
+        compute_primary_energy(cs=cs_test, user_data=config['user_data'], run=run, all_data=all_data)

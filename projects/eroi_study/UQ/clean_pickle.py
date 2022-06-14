@@ -13,6 +13,7 @@ import pandas as pd
 
 from energyscope.utils import load_config
 
+
 def remove_pickle(case_study_dir: str) -> None:
     """
     Extract results.
@@ -20,13 +21,11 @@ def remove_pickle(case_study_dir: str) -> None:
     :param case_study_dir: path to the case study directory.
     """
 
-
     # Create AMPL environment
     # ampl_trans = amplpy.AMPL(environment=amplpy.Environment(ampl_path))
 
     # Create an empty variable
     empty_list = []
-
 
     # Load results
     openfile = open(f"{case_study_dir}/output/results.pickle", 'wb')
@@ -40,6 +39,7 @@ def remove_pickle(case_study_dir: str) -> None:
     openfile = open(f"{case_study_dir}/output/sets.pickle", 'wb')
     pickle.dump(empty_list, openfile)
     openfile.close()
+
 
 gwp_tot_max = 100300  # ktCO2/y -> constraint on the GWP_tot
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     #         remove_pickle(cs)
 
     # Clean pickle second order PCE
-    df_samples = pd.read_csv('data_samples/samples-order-2-'+ str(gwp_tot_max)+'.csv', index_col=0)
+    df_samples = pd.read_csv('data_samples/samples-order-2-' + str(gwp_tot_max) + '.csv', index_col=0)
 
     # Load configuration into a dict
     config = load_config(config_fn='config_uq.yaml')
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     # loop on all sampled parameters to extract results from pickle files
     for sample_i in range(0, len(df_samples)):
-        print('run %s in progress' % (sample_i))
+        print('run %s in progress' % sample_i)
         cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
         remove_pickle(cs)
         if os.path.isdir(f"{cs}/output/hourly_data/"):

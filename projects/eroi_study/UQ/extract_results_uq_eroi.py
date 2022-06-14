@@ -5,29 +5,30 @@ This script quantifies the impact of uncertain parameters on the model output.
 @author: Jonathan Dumas
 """
 
-import yaml
+# import yaml
 import os
-import logging
-import shutil
-import pickle
-from subprocess import CalledProcessError, run
-from typing import Dict, List
+# import logging
+# import shutil
+# import pickle
+# from subprocess import CalledProcessError, run
+# from typing import Dict, List
 
-import amplpy
+# import amplpy
 import pandas as pd
-import energyscope as es
+# import energyscope as es
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
-from sys import platform
+# from sys import platform
 
 from energyscope import get_total_einv
 from energyscope.utils import load_config
-from energyscope.step2_output_generator import extract_results_step2
-from projects.eroi_study.utils_res import get_gwp, get_cost, compute_fec
+# from energyscope.step2_output_generator import extract_results_step2
+# from energyscope.postprocessing import get_gwp
+from energyscope.postprocessing import get_cost, compute_fec
 
 
-gwp_tot_max = 100300 # ktCO2/y -> constraint on the GWP_tot, 100300, 85400, 56900, 28500, 19000
+gwp_tot_max = 100300  # ktCO2/y -> constraint on the GWP_tot, 100300, 85400, 56900, 28500, 19000
 
 if __name__ == '__main__':
 
@@ -38,7 +39,7 @@ if __name__ == '__main__':
     config = load_config(config_fn='config_uq.yaml')
 
     # second-order PCE extraction
-    df_samples = pd.read_csv('data_samples/samples-order-2-'+ str(gwp_tot_max)+'.csv', index_col=0)
+    df_samples = pd.read_csv('data_samples/samples-order-2-' + str(gwp_tot_max) + '.csv', index_col=0)
 
     # dir_name = 'einv_uq_order_2_gwp_' + str(gwp_tot_max)
     # # loop on all sampled parameters to extract results from pickle files
@@ -87,12 +88,14 @@ if __name__ == '__main__':
     #         fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
     #         fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
     #         einv = get_total_einv(cs) / 1000  # TWh
-    #         print('batch %s run %s EROI %.2f cost %.2f [bEUR/y]' % (batch, sample_i, fec_tot_val / einv, cost_val.sum()))
+    #         print('batch %s run %s EROI %.2f cost %.2f [bEUR/y]'
+    #               % (batch, sample_i, fec_tot_val / einv, cost_val.sum()))
     #         res_list.append([fec_tot_val / einv, cost_val.sum()])
     #     df_res = pd.DataFrame(data=np.asarray(res_list), columns=['EROI', 'cost'], index=df_samples_batch.index)
     #     df_concat = pd.concat([df_samples_batch, df_res], axis=1).dropna()
     #     res_tot.append(df_concat)
-    #     df_concat.to_csv('data_samples/res-samples-' +str(gwp_tot_max)+ '-' + str(batch) + '.csv', sep=' ', index=False)
+    #     df_concat.to_csv('data_samples/res-samples-' +str(gwp_tot_max)+ '-' + str(batch) + '.csv', sep=' ',
+    #                      index=False)
     # df_tot = pd.concat(res_tot, axis=0).dropna()
     # df_tot['EROI'].sort_values(ascending=False)
     # # Identify outliers that will false the PCE results: EROI mean + 3 *std
@@ -116,19 +119,20 @@ if __name__ == '__main__':
     # df_tot_filtered_final.index = [i for i in range(len(df_tot_filtered_final.index))]
     #
     # for batch in [1, 2, 3, 4, 5]:
-    #     df_tot_filtered_final.iloc[n_samples*(batch-1):n_samples*batch].to_csv('data_samples/res-samples-' +str(gwp_tot_max)+ '-' + str(batch) + '.csv', sep=' ', index=False)
+    #     df_tot_filtered_final.iloc[n_samples*(batch-1):n_samples*batch]\
+    #         .to_csv('data_samples/res-samples-' +str(gwp_tot_max)+ '-' + str(batch) + '.csv', sep=' ', index=False)
 
     # Compute EROI second-order PCE
     dir_name = 'einv_uq_order_2_gwp_' + str(gwp_tot_max)
     res_list = []
-    N_samples = 1331+1 # 2469 for 42.7, 1900 for 18.5, 1331 for 100300
+    N_samples = 1331+1  # 2469 for 42.7, 1900 for 18.5, 1331 for 100300
     # N_samples = len(df_samples)
     for sample_i in range(0, N_samples):
         cs = f"{config['case_studies_dir']}/{dir_name+'/sample_'+str(sample_i)}"
         # es.draw_sankey(sankey_dir=f"{cs}/output/sankey")
 
         # Compute the FEC from the year_balance.csv
-        cost_val = get_cost(cs=cs) /1000 # bEUR/y
+        cost_val = get_cost(cs=cs) / 1000.  # bEUR/y
         df_year_balance = pd.read_csv(f"{cs}/output/year_balance.csv", index_col=0)
         fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
         fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
@@ -137,7 +141,7 @@ if __name__ == '__main__':
         res_list.append([fec_tot_val / einv, cost_val.sum()])
     df_res = pd.DataFrame(data=np.asarray(res_list), columns=['EROI', 'cost'], index=[i for i in range(0, N_samples)])
     df_concat = pd.concat([df_samples, df_res], axis=1).dropna()
-    df_concat.to_csv('data_samples/res-samples-order-2-' +str(gwp_tot_max)+ '.csv', sep=' ', index=False)
+    df_concat.to_csv('data_samples/res-samples-order-2-' + str(gwp_tot_max) + '.csv', sep=' ', index=False)
 
     # Identify outliers that will false the PCE results: EROI mean + 3 *std
     upper_threshold = np.round(df_concat['EROI'].mean() + 3 * df_concat['EROI'].std(), 1)

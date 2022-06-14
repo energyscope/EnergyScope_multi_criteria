@@ -24,4 +24,4 @@ subject to epsilon_space_einv :
 
 # Minimize sum usage of resources
 minimize obj :
-	sum {j in RESOURCES_TO_MINIMIZE, h in HOURS, td in TYPICAL_DAYS} F_t[j, h, td];
+	sum {j in RESOURCES_TO_MINIMIZE, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [j, h, td] * t_op [h, td]);

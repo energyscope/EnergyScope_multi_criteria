@@ -54,10 +54,13 @@ Technologies:
     WIND_ONSHORE: 1.177
     WIND_OFFSHORE: 0.692
     HYDRO_RIVER: 0.11
+    NUCLEAR: 0.0
+  f_max:
+    NUCLEAR: 2.0
 
 # Run options
 options:
   solver: "/home/jdumas/PycharmProjects/ampl_linux-intel64/cplex"
   show_stats: 1
   log_file: "log.txt"
-  cplex_options: "timelimit=3600"
+  cplex_options: "timelimit=3600 baropt predual=-1 crossover=0 aggregate=-1 ordering=1 prestats=1"

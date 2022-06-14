@@ -9,17 +9,18 @@ import pandas as pd
 import numpy as np
 
 version = "short" # short, complete
+
 if __name__ == '__main__':
 
     dir_name = 'comparison'
-
-
 
     if version == "short":
         # Second-order PCE results: 85400, 56900, 28500, 19000 [ktCO2/y]
         eroi_mean = [8.43, 6.89, 4.74, 4.22]
         eroi_std = [0.76, 0.67, 0.55, 0.45]
         eroi_deterministic = [7.9, 6.2, 4.4, 3.9]
+        eroi_deterministic_with_2_GW_nuc = [8.1, 6.5, 4.5, 4.0]
+        eroi_deterministic_with_5_6_GW_nuc = [8.6, 6.9, 4.6, 4.2]
         x_index = [85.4, 56.9, 28.5, 19]
         pdf = "short"
         df_param_order_2_19000 = pd.read_csv('sobol_res_19000/full_pce_order_2_EROI_Sobol_indices.csv', index_col=0)['Total-order Sobol indices']
@@ -53,6 +54,8 @@ if __name__ == '__main__':
         eroi_mean = [8.83, 8.43, 6.89, 5.63, 4.74, 4.22]
         eroi_std = [0.86, 0.76, 0.67, 0.45, 0.55, 0.45]
         eroi_deterministic = [8.9, 7.9, 6.2, 5.2, 4.4, 3.9]
+        eroi_deterministic_with_2_GW_nuc = [9.0, 8.1, 6.5, 5.4, 4.5, 4.0]
+        eroi_deterministic_with_5_6_GW_nuc = [9.0, 8.6, 6.9, 5.6, 4.6, 4.2]
         x_index = [100.3, 85.4, 56.9, 42.7, 28.5, 19]
         pdf = "complete"
 
@@ -96,7 +99,7 @@ if __name__ == '__main__':
     plt.figure()
     for param, label, c  in zip(critical_28500_top_5, [r'$e_{op}^{Gas-RE}$', r'$e_{constr}^{Elec. \ cars}$', r'$f_{max}^{NUC}$', r'${avail}^{Wood}$', r'$\%_{max}^{public \ mob}$'], color_list_28500):
         plt.plot(x_index, df_param_critical_28500_evolution.transpose()[param].values, '-D', markersize=5, label=label, color=c)
-    plt.xlabel('Yearly emissions limit [MtC02-eq./y]', fontsize=15)
+    plt.xlabel('Yearly emissions limit [MtCO2-eq./y]', fontsize=15)
     plt.ylabel('Total-order Sobol index %', rotation=90, fontsize=15)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
@@ -110,7 +113,7 @@ if __name__ == '__main__':
     plt.figure()
     for param, label, c in zip(critical_85400_top_5, [r'$e_{constr}^{NG \ cars}$', r'$e_{op}^{Gas}$', r'$e_{constr}^{Elec. cars}$', r'$\%_{max}^{public \ mob}$', r'$e_{op}^{Wet \ biomass}$'], color_list_85400):
         plt.plot(x_index, df_param_critical_85400_evolution.transpose()[param].values, '-D', markersize=5, label=label, color=c)
-    plt.xlabel('Yearly emissions limit [MtC02-eq./y]', fontsize=15)
+    plt.xlabel('Yearly emissions limit [MtCO2-eq./y]', fontsize=15)
     plt.ylabel('Total-order Sobol index %', rotation=90, fontsize=15)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
@@ -121,10 +124,12 @@ if __name__ == '__main__':
     plt.show()
 
     plt.figure()
-    plt.plot(x_index, eroi_mean, '-D', markersize=10, label='EROI mean with uncertainties')
+    plt.plot(x_index, eroi_mean, '-D', markersize=10, label='EROI [GSA]')
     plt.fill_between(x_index, np.asarray(eroi_mean) + 2 * np.asarray(eroi_std) , np.asarray(eroi_mean) - 2 * np.asarray(eroi_std) , facecolor='gray', alpha=0.5)
-    plt.plot(x_index, eroi_deterministic, 'g-P', markersize=10, label='EROI with deterministic approach')
-    plt.xlabel('Yearly emissions limit [MtC02-eq./y]', fontsize=15)
+    plt.plot(x_index, eroi_deterministic, 'g-P', markersize=10, label='EROI [deterministic] NUC-0')
+    plt.plot(x_index, eroi_deterministic_with_2_GW_nuc, 'k-s', markersize=10, label='EROI [deterministic] NUC-2')
+    plt.plot(x_index, eroi_deterministic_with_5_6_GW_nuc, 'r-v', markersize=10, label='EROI [deterministic] NUC-5.6')
+    plt.xlabel('Yearly emissions limit [MtCO2-eq./y]', fontsize=15)
     plt.ylabel('System EROI [-]', rotation=90, fontsize=15)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)

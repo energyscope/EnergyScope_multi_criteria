@@ -11,10 +11,11 @@ import pandas as pd
 import rheia.UQ.uncertainty_quantification as rheia_uq
 import rheia.POST_PROCESS.post_process as rheia_pp
 
-gwp_tot = 85400 # 85400, 56900, 28500, 19000
+gwp_tot = 100300 # 100300, 85400, 56900, 42700, 28500, 19000
 batch = 1
 pol_order = 2
-case = 'ES_einv_order_'+str(pol_order)+'_'+str(gwp_tot) # ES_einv_order_1_56900, ES_einv_order_1_28500, ES_einv_order_2_56900, ES_einv_order_2_28500
+# case = 'ES_einv_order_'+str(pol_order)+'_'+str(gwp_tot) # ES_einv_order_1_56900, ES_einv_order_1_28500, ES_einv_order_2_56900, ES_einv_order_2_28500
+case = 'ES_einv_order_'+str(pol_order)+'_'+str(gwp_tot) + '-new'# ES_einv_order_1_56900, ES_einv_order_1_28500, ES_einv_order_2_56900, ES_einv_order_2_28500
 
 dict_uq = {'case': case,
            'pol order': pol_order,
@@ -25,7 +26,6 @@ dict_uq = {'case': case,
            'create only samples': False,
            'draw pdf cdf': [True, 100000],
            }
-
 if __name__ == '__main__':
 
     # If sampling only:
@@ -49,14 +49,18 @@ if __name__ == '__main__':
     eroi_mean = my_post_process_uq.get_mean_std(dict_uq['results dir'], objective)[0]
     eroi_std = my_post_process_uq.get_mean_std(dict_uq['results dir'], objective)[1]
 
-    if case == 'ES_einv_order_2_56900':
+    if gwp_tot == 56900:
         eroi_determnistic = 6.2
-    elif case == 'ES_einv_order_2_28500':
+    elif gwp_tot == 28500:
         eroi_determnistic = 4.4
-    elif case == 'ES_einv_order_2_19000':
+    elif gwp_tot == 19000:
         eroi_determnistic = 3.9
-    elif case == 'ES_einv_order_2_85400':
+    elif gwp_tot == 85400:
         eroi_determnistic = 7.9
+    elif gwp_tot == 42700:
+        eroi_determnistic = 5.2
+    elif gwp_tot == 100300:
+        eroi_determnistic = 8.9
 
 
     x_pdf, y_pdf = my_post_process_uq.get_pdf(dict_uq['results dir'], objective)

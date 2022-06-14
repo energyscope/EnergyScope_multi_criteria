@@ -22,7 +22,7 @@ def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: li
     plt.yticks(fontsize=15)
     plt.yticks(yticks_val)
     plt.ylabel(ylabel, fontsize=15)
-    plt.xlabel('Yearly emissions [MtC02-eq./y]', fontsize=15)
+    plt.xlabel('Yearly emissions [MtCO2-eq./y]', fontsize=15)
     plt.ylim(ylim[0], ylim[1])
     plt.legend(fontsize=15)
     plt.tight_layout()

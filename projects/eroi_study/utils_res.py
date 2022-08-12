@@ -15,7 +15,8 @@ import numpy as np
 
 # from sys import platform
 # from energyscope.utils import make_dir
-from energyscope.utils import load_config, get_fec_from_sankey
+from energyscope.utils import get_fec_from_sankey
+from projects.eroi_study.utils import load_config
 from energyscope.postprocessing import get_total_einv, get_cost, get_gwp, compute_fec, \
     compute_einv_details, compute_primary_energy, compute_einv_tech, compute_einv_res
 
@@ -66,11 +67,11 @@ def retrieve_einv_const_by_categories(range_val, all_data: dict, dir_name: str, 
     return tech_classed_by_cat
 
 
-def eroi_computation(dir_name: str, user_data: str, range_val):
+def eroi_computation(dir_name: str, user_data_dir: str, range_val):
     """
     EROI, Einv, and FEC computation for several case studies.
     :param dir_name: directory to the case studies.
-    :param user_data: FIXME: complete
+    :param user_data_dir: FIXME: complete
     :param range_val: GWP_ini values.
     :return: results into pd.DataFrame.
     """
@@ -79,11 +80,11 @@ def eroi_computation(dir_name: str, user_data: str, range_val):
     for run in ['run_' + str(i) for i in range_val]:
         dir_temp = dir_name + '/' + run
         df_year_balance = pd.read_csv(dir_temp + "/output/year_balance.csv", index_col=0)
-        fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=user_data)
-        fec_temp = sum(fec_tot.values())
+        fec_details, fec_tot = compute_fec(year_balance=df_year_balance, user_data_dir=user_data_dir)
+        fec_temp = sum(fec_tot.values)
         einv_temp = get_total_einv(dir_temp)
         eroi_temp = fec_temp / einv_temp
-        fec_tot_list.append(pd.DataFrame(data=fec_tot.values(), index=fec_tot.keys(), columns=[run]))
+        fec_tot_list.append(pd.DataFrame(data=fec_tot.values, index=fec_tot.keys(), columns=[run]))
         eroi_list.append([eroi_temp, fec_temp / 1000, einv_temp / 1000])
     df_fec_details = pd.concat(fec_tot_list, axis=1) / 1000  # TWh
     df_fec_details.columns = [i for i in range_val]
@@ -186,11 +187,11 @@ def gwp_breakdown(dir_name: str, range_val):
         gwp = pd.read_csv(f"{dir_temp}/output/gwp_breakdown.csv", index_col=0, sep=',')
         gwp_const_list.append(gwp['GWP_constr'])
         gwp_op_list.append(gwp['GWP_op'])
-    df_gwp_const = pd.concat(gwp_const_list, axis=1)
-    df_gwp_const.columns = [i for i in range_val]
-    df_gwp_op = pd.concat(gwp_op_list, axis=1)
-    df_gwp_op.columns = [i for i in range_val]
-    return df_gwp_const / 1000, df_gwp_op / 1000  # MtC02/y
+    gwp_const_df = pd.concat(gwp_const_list, axis=1)
+    gwp_const_df.columns = [i for i in range_val]
+    gwp_op_df = pd.concat(gwp_op_list, axis=1)
+    gwp_op_df.columns = [i for i in range_val]
+    return gwp_const_df / 1000, gwp_op_df / 1000  # MtC02/y
 
 
 def cost_breakdown(dir_name: str, range_val):
@@ -218,16 +219,16 @@ def cost_breakdown(dir_name: str, range_val):
     return df_cost_inv / 1000, df_cost_maint / 1000, df_cost_op / 1000  # bEUR/y
 
 
-def gwp_const_per_category(df_gwp_const: pd.DataFrame, user_data: str):
+def gwp_const_per_category(gwp_const_df: pd.DataFrame, user_data_dir: str):
     """
     Build a dict with technology categories as keys.
     In each category a pd.DataFrame lists the GWP_const of the corresponding technologies for several scenarios.
-    :param df_gwp_const: GWP_const raw data for several scenarios.
-    :param user_data: path to user_data.
+    :param gwp_const_df: GWP_const raw data for several scenarios.
+    :param user_data_dir: path to user_data.
     :return: dict.
     """
 
-    df_aux_tech = pd.read_csv(user_data + "/aux_technologies.csv", index_col=0)
+    df_aux_tech = pd.read_csv(user_data_dir + "/aux_technologies.csv", index_col=0)
 
     # Retrieve the list subcategory of technologies
     tech_subcategory_list = list(dict.fromkeys(list(df_aux_tech['Subcategory'])))
@@ -240,8 +241,8 @@ def gwp_const_per_category(df_gwp_const: pd.DataFrame, user_data: str):
     for cat in tech_by_subcategory.keys():
         temp_list = []
         for tech in tech_by_subcategory[cat]:
-            if tech in list(df_gwp_const.columns):
-                temp_list.append(df_gwp_const[tech])
+            if tech in list(gwp_const_df.columns):
+                temp_list.append(gwp_const_df[tech])
         if len(temp_list) > 0:
             gwp_const_by_tech_cat[cat] = pd.concat(temp_list, axis=1)
         else:

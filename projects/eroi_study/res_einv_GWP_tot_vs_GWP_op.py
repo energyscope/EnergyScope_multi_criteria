@@ -18,12 +18,13 @@ import matplotlib.pyplot as plt
 # from sys import platform
 
 # from energyscope.utils import get_fec_from_sankey
-from energyscope.utils import make_dir, load_config
+from energyscope.utils import make_dir
 # from energyscope.postprocessing import get_total_einv, compute_einv_details, compute_primary_energy
 from energyscope.postprocessing import compute_fec
 from projects.eroi_study.utils_plot import plot_stacked_bar, plot_two_series
 from projects.eroi_study.utils_res import eroi_computation, res_details, gwp_computation, retrieve_non_zero_val,\
     retrieve_einv_const_by_categories, res_assets_capacity
+from projects.eroi_study.utils import load_config
 
 
 def res_by_sub_cat(res_list: list, res_subcat: pd.DataFrame):

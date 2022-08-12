@@ -46,7 +46,7 @@ import energyscope as es
 # import numpy as np
 # import matplotlib.pyplot as plt
 
-from energyscope.utils import load_config
+from projects.eroi_study.utils import load_config
 
 
 def eff_mature_standard_tech(df: pd.DataFrame):

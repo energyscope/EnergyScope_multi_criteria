@@ -14,8 +14,9 @@ import numpy as np
 
 # from sys import platform
 
-from energyscope.utils import make_dir, load_config, get_fec_from_sankey
+from energyscope.utils import make_dir, get_fec_from_sankey
 from energyscope.postprocessing import get_total_einv, get_gwp, get_cost, compute_fec
+from projects.eroi_study.utils import load_config
 
 
 def loop_eroi_computation(range_val, dir_name: str, gwp_op_ini: float, config: dict):

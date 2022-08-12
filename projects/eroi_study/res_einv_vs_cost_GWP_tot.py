@@ -17,7 +17,7 @@ import energyscope as es
 # from sys import platform
 
 # from energyscope.utils import get_fec_from_sankey
-from energyscope.utils import make_dir, load_config
+from energyscope.utils import make_dir
 # from energyscope.postprocessing import get_total_einv, compute_fec, get_gwp, \
 #     compute_einv_details, compute_primary_energy
 # from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import fec_plots, primary_energy_plots, \
@@ -28,6 +28,7 @@ from projects.eroi_study.utils_plot import plot_two_series
 #     res_assets_capacity, gwp_const_per_category
 from projects.eroi_study.utils_res import eroi_computation, res_details, gwp_computation, \
     gwp_breakdown, cost_computation
+from projects.eroi_study.utils import load_config
 
 
 # TODO: define in two files -> move to utils ?

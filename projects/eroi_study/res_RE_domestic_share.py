@@ -16,11 +16,12 @@ import energyscope as es
 # from sys import platform
 
 # from energyscope.utils import get_fec_from_sankey
-from energyscope.utils import make_dir, load_config
+from energyscope.utils import make_dir
 # from energyscope.postprocessing import get_gwp, get_total_einv, compute_fec, \
 #     compute_einv_details, compute_primary_energy
 from projects.eroi_study.utils_plot import plot_two_series, plot_stacked_bar
 from projects.eroi_study.utils_res import eroi_computation, res_details, gwp_computation
+from projects.eroi_study.utils import load_config
 
 GWP = 'GWP_op'  # 'GWP_tot', 'GWP_op'
 

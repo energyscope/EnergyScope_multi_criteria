@@ -289,7 +289,7 @@ if __name__ == '__main__':
 
     # Compute the FEC from the year_balance.csv
     df_year_balance_ = pd.read_csv(f"{cs_test_}/output/year_balance.csv", index_col=0)
-    fec_details_, fec_tot_ = compute_fec(data=df_year_balance_, user_data=config_['user_data'])
+    fec_details_, fec_tot_ = compute_fec(year_balance=df_year_balance_, user_data_dir=config_['user_data'])
     fec_tot_val_ = sum(fec_tot_.values()) / 1000  # TWh
     # Compute the FEC from SANKEY
     ef_ = get_fec_from_sankey(case_study_dir=cs_test_, col=run_)

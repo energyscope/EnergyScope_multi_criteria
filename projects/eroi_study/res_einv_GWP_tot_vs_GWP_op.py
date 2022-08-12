@@ -195,13 +195,13 @@ if __name__ == '__main__':
     # When GWP_tot <= p * gwp_limit
     # Use fec_details DataFrame to identify the technologies that satisfy the different EDU and the FEC related
     df_year_balance_100 = pd.read_csv(dir_2 + '/run_100/' + "/output/year_balance.csv", index_col=0)
-    fec_details_100, fec_tot_100 = compute_fec(data=df_year_balance_100, user_data=config['user_data'])
+    fec_details_100, fec_tot_100 = compute_fec(year_balance=df_year_balance_100, user_data_dir=config['user_data'])
 
     df_year_balance_10 = pd.read_csv(dir_2 + '/run_10/' + "/output/year_balance.csv", index_col=0)
-    fec_details_10, fec_tot_10 = compute_fec(data=df_year_balance_10, user_data=config['user_data'])
+    fec_details_10, fec_tot_10 = compute_fec(year_balance=df_year_balance_10, user_data_dir=config['user_data'])
 
     df_year_balance_5 = pd.read_csv(dir_2 + '/run_5/' + "/output/year_balance.csv", index_col=0)
-    fec_details_5, fec_tot_5 = compute_fec(data=df_year_balance_5, user_data=config['user_data'])
+    fec_details_5, fec_tot_5 = compute_fec(year_balance=df_year_balance_5, user_data_dir=config['user_data'])
 
     # Compare technologies that produce electricity between p = 5 and 10 %
     # For instance, when p = 5  -> CCGT mainly produced electricity for the case where GWP_tot is constrained

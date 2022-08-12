@@ -438,9 +438,10 @@ def print_estd(out_path: str, data: dict, system_limits: dict):
     print_df('param loss_network ', loss_network_df, out_path)
 
 
+# TODO: the name of this function should be changed
 def print_12td(out_path: str, time_series: pd.DataFrame, step1_output_path: str, nbr_td: int = 12):
-    """
-    Create the ESTD_12TD.dat file from timeseries and STEP1 results.
+    f"""
+    Create the ESTD_{nbr_td}TD.dat file from timeseries and STEP1 results.
 
     :param out_path: path to the directory to create the .dat file.
     :param time_series: pd.DataFrame with the timeseries of interest (PV, Solar, Wind, ...).
@@ -457,7 +458,9 @@ def print_12td(out_path: str, time_series: pd.DataFrame, step1_output_path: str,
                   'Passanger mobility (%_pass)': 'param mob_pass_time_series :',  # TODO: change to 'Passenger' ?
                   'Freight mobility (%_freight)': 'param mob_freight_time_series :'}
     # for resources timeseries that have only 1 tech linked to it
-    res_params = {'PV': 'PV', 'Wind_onshore': 'WIND_ONSHORE', 'Wind_offshore': 'WIND_OFFSHORE',
+    res_params = {'PV': 'PV',
+                  'Wind_onshore': 'WIND_ONSHORE',
+                  'Wind_offshore': 'WIND_OFFSHORE',
                   'Hydro_river': 'HYDRO_RIVER'}
     # for resources timeseries that have several techs linked to it
     res_mult_params = {'Solar': ['DHN_SOLAR', 'DEC_SOLAR']}

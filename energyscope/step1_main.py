@@ -22,7 +22,7 @@ from energyscope.amplpy_aux import get_results
 import energyscope as es
 
 
-def print_step1_data(nbr_td: int, output_fn: str) -> None:
+def print_step1_data(nbr_td: int, input_fn: str, output_fn: str) -> None:
     """
     Convert time-series in CSV format to ampl-friendly format
 
@@ -30,11 +30,12 @@ def print_step1_data(nbr_td: int, output_fn: str) -> None:
     ----------
     nbr_td : int
         Number of selected time steps
+    input_fn: str
+        Input file name
     output_fn: str
         Output file name
     """
 
-    input_fn = os.path.join(Path(__file__).parents[1], "Data/step1_input.csv")
     data = pd.read_csv(input_fn, index_col=0)
     data_header = data.loc[["Type", "Weights", "Norm"]]
     data = data.loc[[str(i) for i in range(1, 366)]].astype(float)
@@ -80,7 +81,7 @@ def print_step1_out(ampl_trans: amplpy.AMPL, step1_out_fn: str) -> None:
     out.to_csv(step1_out_fn, header=False, index=False, sep='\t')
 
 
-def run_step1(nbr_td: int, ampl_path: str, solver_path: str) -> None:
+def run_step1(nbr_td: int, data_path: str, ampl_path: str, solver_path: str) -> None:
     """
     Run Step 1 of EnergyScope TD (i.e. time series aggregation) with a given number of time steps
 
@@ -88,6 +89,8 @@ def run_step1(nbr_td: int, ampl_path: str, solver_path: str) -> None:
     ----------
     nbr_td : int
         Number of selected time-steps
+    data_path: str
+        Path to Data directory
     ampl_path: str
         Path to AMPL
     solver_path: str
@@ -108,8 +111,9 @@ def run_step1(nbr_td: int, ampl_path: str, solver_path: str) -> None:
     ampl_trans.read(model_fn)
 
     # Convert data in appropriate format and add them to the environment
+    input_fn = os.path.join(data_path, "step1_input.csv")
     data_fn = os.path.join(Path(__file__).parents[0], f'step1_io/data_td_{nbr_td}.dat')
-    print_step1_data(nbr_td, data_fn)
+    print_step1_data(nbr_td, input_fn, data_fn)
     ampl_trans.readData(data_fn)
 
     # Solve
@@ -135,9 +139,11 @@ def config_path():
 
     return ampl_path_, cplex_path_
 
+
 if __name__ == '__main__':
 
     # WARNING: the user must adapt its CPLEX and AMPL paths into the function config_path()
     ampl_path_, cplex_path_ = config_path()
     nbr_td_ = 12
-    run_step1(nbr_td_, ampl_path_, cplex_path_)
+    data_path = os.path.join(Path(__file__).parents[1], "Data")
+    run_step1(nbr_td_, data_path, ampl_path_, cplex_path_)

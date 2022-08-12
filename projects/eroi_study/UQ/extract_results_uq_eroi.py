@@ -85,7 +85,7 @@ if __name__ == '__main__':
     #         # Compute the FEC from the year_balance.csv
     #         cost_val = get_cost(cs=cs) / 1000  # bEUR/y
     #         df_year_balance = pd.read_csv(f"{cs}/output/year_balance.csv", index_col=0)
-    #         fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
+    #         fec_details, fec_tot = compute_fec(year_balance=df_year_balance, user_data_dir=config['user_data'])
     #         fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
     #         einv = get_total_einv(cs) / 1000  # TWh
     #         print('batch %s run %s EROI %.2f cost %.2f [bEUR/y]'
@@ -134,7 +134,7 @@ if __name__ == '__main__':
         # Compute the FEC from the year_balance.csv
         cost_val = get_cost(cs=cs) / 1000.  # bEUR/y
         df_year_balance = pd.read_csv(f"{cs}/output/year_balance.csv", index_col=0)
-        fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config['user_data'])
+        fec_details, fec_tot = compute_fec(year_balance=df_year_balance, user_data_dir=config['user_data'])
         fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
         einv = get_total_einv(cs) / 1000  # TWh
         print('run %s EROI %.2f cost %.2f [bEUR/y]' % (sample_i, fec_tot_val / einv, cost_val.sum()))

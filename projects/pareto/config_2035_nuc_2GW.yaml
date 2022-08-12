@@ -4,7 +4,7 @@ energyscope_dir: '/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria'
 # Path from main directory to energyscope subdirectories and files
 # Case studies directory and name of case study
 case_studies_dir: 'case_studies'
-case_study_name: 'gwp_constraint_35000'
+case_study_name: 'gwp_constraint_35000_nuc2'
 # Folders containing the csv data files
 user_data: 'Data_v2/User_data'
 developer_data: 'Data_v2/Developer_data'
@@ -60,12 +60,15 @@ Technologies:
     WIND_ONSHORE: 1.177
     WIND_OFFSHORE: 0.692
     HYDRO_RIVER: 0.11
+    NUCLEAR: 0.0
+  f_max:
+    NUCLEAR: 2.0
 
 # Run options
 options:
   solver: "/home/duboisa1/ampl_linux-intel64/cplex"
   show_stats: 1
   log_file: "log.txt"
-  cplex_options: "timelimit=3600 bardisplay=1 display=1"
-  # cplex_options: "timelimit=3600 crossover=0 bardisplay=1 display=1 feasibility=1e-3 optimality=1e-3"
+  # cplex_options: "timelimit=3600 bardisplay=1 display=1"
+  cplex_options: "timelimit=3600 crossover=0 bardisplay=1 display=1 feasibility=1e-3 optimality=1e-3"
   # cplex_options: "timelimit=3600 baropt predual=-1 crossover=0 aggregate=-1 ordering=1 prestats=1 bardisplay=1 display=1"

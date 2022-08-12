@@ -4,7 +4,7 @@ energyscope_dir: '/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria'
 # Path from main directory to energyscope subdirectories and files
 # Case studies directory and name of case study
 case_studies_dir: 'case_studies'
-case_study_name: 'gwp_constraint_35000'
+case_study_name: 'gwp_constraint_35000_no_endo'
 # Folders containing the csv data files
 user_data: 'Data_v2/User_data'
 developer_data: 'Data_v2/Developer_data'
@@ -60,6 +60,16 @@ Technologies:
     WIND_ONSHORE: 1.177
     WIND_OFFSHORE: 0.692
     HYDRO_RIVER: 0.11
+
+# max potential of some resources
+Resources:
+  avail:
+    RES_SOLAR: 0
+    RES_WIND: 0
+    RES_HYDRO: 0
+    WASTE: 0
+    WET_BIOMASS: 0
+    WOOD: 0
 
 # Run options
 options:

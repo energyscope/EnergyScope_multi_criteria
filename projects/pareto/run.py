@@ -37,9 +37,17 @@ if __name__ == '__main__':
     # Modify the minimum capacities of some technologies
     for tech in config['Technologies']['f_min']:
         all_data['Technologies']['f_min'].loc[tech] = config['Technologies']['f_min'][tech]
+    # Modify the maximal capacities of some technologies
+    if 'f_max' in config['Technologies']:
+        for tech in config['Technologies']['f_max']:
+            all_data['Technologies']['f_max'].loc[tech] = config['Technologies']['f_max'][tech]
+    # Modify the maximal potential of some resources
+    if 'Resources' in config and 'avail' in config['Resources']:
+        for res in config['Resources']['avail']:
+            all_data['Resources']['avail'].loc[res] = config['Resources']['avail'][res]
 
     # New optimal solution run
-    if 1:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
+    if 0:  # not os.path.isdir(f"{config['case_studies_dir']}/{config['case_study_name']}"):
 
         # Empty temp dir
         empty_temp(config['temp_dir'])
@@ -61,7 +69,7 @@ if __name__ == '__main__':
         # Display sankey
         # es.draw_sankey(f"{cs}output/sankey")
 
-    if 1:
+    if 0:
         empty_temp(config['temp_dir'])
 
         # Optimal solution in terms of EINV
@@ -80,6 +88,22 @@ if __name__ == '__main__':
         # Example to print the sankey from this script
         # es.draw_sankey(f"{cs}output/sankey")
 
+    if 0:
+        empty_temp(config['temp_dir'])
+
+        # Optimal solution in terms of EINV
+        estd_out_path = f"{config['temp_dir']}/ESTD_data.dat"
+        es.print_estd(estd_out_path, all_data, config["system_limits"])
+        td12_out_path = f"{config['temp_dir']}/ESTD_12TD.dat"
+        es.print_12td(td12_out_path, all_data['Time_series'], config["step1_output"])
+        data_fns = [estd_out_path, td12_out_path]
+
+        mod_fns = [f"{config['model_path']}/main.mod", f"{config['model_path']}/optimal_gwp.mod"]
+        cs = f"{config['case_studies_dir']}/{config['case_study_name']}/gwp/"
+        es.run_step2_new(cs, config['AMPL_path'], config['options'], mod_fns, data_fns, config['temp_dir'],
+                         dump_res_only=True)
+        es.extract_results_step2(cs[:-1])
+
     # Get optimal cost
     opt_cost = es.get_total_cost(f"{config['case_studies_dir']}/{config['case_study_name']}/cost")
     # Get optimal einv
@@ -87,7 +111,7 @@ if __name__ == '__main__':
 
     # Get approximation of pareto front minimizing einv with constraint on cost
     # epsilons = [0.003125, 0.00625, 0.0125, 0.025, 0.05, 0.1, 0.15]
-    epsilons = []
+    epsilons = []  # [0.0025, 0.005, 0.01, 0.025, 0.05, 0.075]
     for epsilon in epsilons:
 
         print("Run for epsilon", epsilon)

@@ -110,7 +110,7 @@ if __name__ == '__main__':
     GWP_val = get_gwp(cs=cs_)
     cost_val = get_cost(cs=cs_) / 1000.  # bEUR/y
     df_year_balance = pd.read_csv(f"{cs_}/output/year_balance.csv", index_col=0)
-    fec_details, fec_tot = compute_fec(data=df_year_balance, user_data=config_['user_data'])
+    fec_details, fec_tot = compute_fec(year_balance=df_year_balance, user_data_dir=config_['user_data'])
     fec_tot_val = sum(fec_tot.values()) / 1000  # TWh
     # Compute the FEC from SANKEY
     ef = get_fec_from_sankey(case_study_dir=cs_, col=config_['case_study_name'])

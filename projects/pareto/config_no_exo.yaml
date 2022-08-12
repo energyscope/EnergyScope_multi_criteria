@@ -4,7 +4,7 @@ energyscope_dir: '/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria'
 # Path from main directory to energyscope subdirectories and files
 # Case studies directory and name of case study
 case_studies_dir: 'case_studies'
-case_study_name: 'gwp_constraint_35000'
+case_study_name: 'gwp_constraint_35000_no_exo'
 # Folders containing the csv data files
 user_data: 'Data_v2/User_data'
 developer_data: 'Data_v2/Developer_data'
@@ -61,11 +61,38 @@ Technologies:
     WIND_OFFSHORE: 0.692
     HYDRO_RIVER: 0.11
 
+# max potential of some resources
+Resources:
+  avail:
+    # AMMONIA: 0
+    # COAL: 0
+    # DIESEL: 0
+    # ELECTRICITY: 0
+    # GAS: 0
+    # GASOLINE: 0
+    # H2: 0
+    # LFO: 0
+    # METHANOL: 0
+    # Synthetic fuels
+    AMMONIA_RE: 0
+    BIODIESEL: 0
+    BIOETHANOL: 0
+    GAS_RE: 0
+    H2_RE: 0
+    METHANOL_RE: 0
+    # RES endogenous
+    # RES_SOLAR: 0
+    # RES_WIND: 0
+    # RES_HYDRO: 0
+    # WASTE: 0
+    # WET_BIOMASS: 0
+    # WOOD: 0
+
 # Run options
 options:
   solver: "/home/duboisa1/ampl_linux-intel64/cplex"
   show_stats: 1
   log_file: "log.txt"
-  cplex_options: "timelimit=3600 bardisplay=1 display=1"
-  # cplex_options: "timelimit=3600 crossover=0 bardisplay=1 display=1 feasibility=1e-3 optimality=1e-3"
+  # cplex_options: "timelimit=3600 bardisplay=1 display=1"
+  cplex_options: "timelimit=3600 crossover=0 bardisplay=1 display=1 feasibility=1e-3 optimality=1e-3"
   # cplex_options: "timelimit=3600 baropt predual=-1 crossover=0 aggregate=-1 ordering=1 prestats=1 bardisplay=1 display=1"

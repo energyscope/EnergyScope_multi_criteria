@@ -71,11 +71,11 @@ if __name__ == '__main__':
     opt_gwp = es.get_total_gwp(f"{config['case_studies_dir']}/{config['case_study_name']}/gwp")
 
     # Minimizing einv with constraint on cost
-    runs = {'run1': ('einv', 'cost', opt_cost, [0.003125, 0.00625, 0.0125, 0.025, 0.05, 0.1, 0.15]),
-            'run2': ('gwp', 'cost', opt_cost, [0.0125, 0.025, 0.05, 0.1, 0.15, 0.2, 0.25]),
-            'run3': ('gwp', 'einv', opt_einv, [0.05, 0.1, 0.25, 0.5, 0.75, 1.00, 1.25]),
+    runs = {# 'run1': ('einv', 'cost', opt_cost, [0.003125, 0.00625, 0.0125, 0.025, 0.05, 0.1, 0.15]),
+            'run2': ('gwp', 'cost', opt_cost, [0.05, 0.1, 0.2, 0.4]),
+            'run3': ('gwp', 'einv', opt_einv, [0.025, 0.05, 0.1, 0.2]),
             }
-    runs = {}
+    # runs = {}
     for run_name in runs.keys():
         print(run_name)
         minimized_obj, constrained_obj, optimal_constrained_obj, epsilons = runs[run_name]
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         (10/100, 20/100, 100/100), (10/100, 20/100, 200/100),
         (10/100, 40/100, 100/100), (10/100, 40/100, 200/100)
     ]
-    # epsilons_tuples = []
+    epsilons_tuples = []
     for epsilons_tuple in epsilons_tuples:
 
         epsilon_cost, epsilon_einv, epsilon_gwp = epsilons_tuple

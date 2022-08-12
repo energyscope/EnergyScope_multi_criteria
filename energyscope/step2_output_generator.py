@@ -181,8 +181,8 @@ def save_assets(results: Dict[str, pd.DataFrame], parameters: Dict[str, pd.DataF
                                    'fmin_perc', 'f_perc', 'fmax_perc', 'c_p', 'c_p_max', 'tau', 'gwp_constr'],
                           dtype=float)
     assets.index.name = 'TECHNOLOGIES'
-    assets.loc['UNITS'] = ['[MCHCapitalf/GW]', '[MCHCapitalf/GW]', '[y]', '[GW or GWh]', '[GW or GWh]', '[GW or GWh]',
-                           '[0-1]', '[0-1]', '[0-1]', '[0-1]', '[0-1]', '[-]', '[ktCO2-eq./GW or GWh]']
+    assets.loc['UNITS'] = ['[MCHCapitalf]', '[MCHCapitalf/y]', '[y]', '[GW or GWh]', '[GW or GWh]', '[GW or GWh]',
+                           '[0-1]', '[0-1]', '[0-1]', '[0-1]', '[0-1]', '[-]', '[ktCO2-eq.]']
 
     # End use type technologies
     for eut in sets['END_USES_TYPES']:
@@ -385,18 +385,20 @@ def save_results(results: Dict[str, pd.DataFrame], parameters: Dict[str, pd.Data
 
     logging.info('Saving breakdowns')
     save_breakdowns(results, parameters, sets, output_dir)
-    logging.info('Saving technology-resource matrices')
-    save_tech_res_matrices(results, parameters, sets, output_dir)
-    logging.info('Saving losses')
-    save_losses(results, parameters, sets, output_dir)
-    logging.info('Saving assets')
-    save_assets(results, parameters, sets, output_dir)
     logging.info('Saving year balance')
     save_year_balance(results, parameters, sets, output_dir)
-    logging.info('Saving layers')
-    save_layers(results, parameters, sets, f"{output_dir}hourly_data/")
-    logging.info('Saving energy stored')
-    save_energy_stored(results, parameters, sets, f"{output_dir}hourly_data/")
+    # logging.info('Saving assets')
+    # save_assets(results, parameters, sets, output_dir)
+    if 0:
+
+        logging.info('Saving technology-resource matrices')
+        save_tech_res_matrices(results, parameters, sets, output_dir)
+        logging.info('Saving losses')
+        save_losses(results, parameters, sets, output_dir)
+        logging.info('Saving layers')
+        save_layers(results, parameters, sets, f"{output_dir}hourly_data/")
+        logging.info('Saving energy stored')
+        save_energy_stored(results, parameters, sets, f"{output_dir}hourly_data/")
 
 
 def extract_results_step2(case_study_dir: str) -> None:
@@ -420,6 +422,28 @@ def extract_results_step2(case_study_dir: str) -> None:
     save_results(results, parameters, sets, f"{case_study_dir}/output/")
 
     logging.info("Creating Sankey diagram input file")
-    generate_sankey_file(results, parameters, sets, f"{case_study_dir}/output/sankey/")
+    # generate_sankey_file(results, parameters, sets, f"{case_study_dir}/output/sankey/")
 
     logging.info('End of run')
+
+
+if __name__ == '__main__':
+    output_dir_ = "/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria/case_studies/gwp_constraint_35000/"
+    run_name_ = "locals"
+    print(output_dir_, run_name_)
+
+    # extract_results_step2(f"{output_dir_}cost")
+    # extract_results_step2(f"{output_dir_}einv")
+    extract_results_step2(f"{output_dir_}gwp")
+    exit()
+
+    epsilons = [0.05, 0.07]  # [0.0025, 0.005, 0.01, 0.025, 0.05, 0.075]
+    for epsilon in epsilons:
+        extract_results_step2(f"{output_dir_}cost_epsilon_{epsilon}")
+
+    exit()
+    epsilon_tuples = [(0.01, 0.01), (0.02, 0.02)]
+    epsilons = [0.0025, 0.005, 0.01, 0.025, 0.05, 0.075]
+    for epsilon in epsilons:
+        for epsilon_cost, epsilon_einv in epsilon_tuples:
+            extract_results_step2(f"{output_dir_}{run_name_}_def2_{epsilon_cost}_{epsilon_einv}_{epsilon}")

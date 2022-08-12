@@ -105,20 +105,20 @@ def run_step2_new(case_study_dir: str, ampl_path: str, solver_options: Dict,
     sets = get_sets(ampl_trans)
 
     # Dump results into a pickle file
-    if dump_res_only:
-        logging.info("Only dump results")
-        with open(f"{temp_dir}/output/results.pickle", 'wb') as handle:
-            pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"{temp_dir}/output/parameters.pickle", 'wb') as handle:
-            pickle.dump(parameters, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"{temp_dir}/output/sets.pickle", 'wb') as handle:
-            pickle.dump(sets, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    else:
-        logging.info("Saving results")
-        save_results(results, parameters, sets, f"{temp_dir}/output/")
+    # if dump_res_only:
+    # logging.info("Only dump results")
+    with open(f"{temp_dir}/output/results.pickle", 'wb') as handle:
+        pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open(f"{temp_dir}/output/parameters.pickle", 'wb') as handle:
+        pickle.dump(parameters, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open(f"{temp_dir}/output/sets.pickle", 'wb') as handle:
+        pickle.dump(sets, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # else:
+    logging.info("Saving results")
+    save_results(results, parameters, sets, f"{temp_dir}/output/")
 
-        logging.info("Creating Sankey diagram input file")
-        generate_sankey_file(results, parameters, sets, f"{temp_dir}/output/sankey/")
+    logging.info("Creating Sankey diagram input file")
+    generate_sankey_file(results, parameters, sets, f"{temp_dir}/output/sankey/")
 
     # Copy temporary results to case studies directory
     shutil.copytree(temp_dir, case_study_dir)

@@ -5,6 +5,8 @@ This script provides postprocessing functions.
 @author: Antoine Dubois, Jonathan Dumas
 """
 
+from typing import Dict
+
 import pandas as pd
 
 
@@ -84,23 +86,23 @@ def get_resource_used(output_path: str, res: str):
     return resources_breakdown.loc[res, 'Used']
 
 
-def fec_given_tech(tech: str, data: pd.DataFrame, prod_corr: float):
+def fec_given_tech(tech: str, year_balance: pd.DataFrame, prod_corr: float):
     """
     Compute the FEC related to a given EUD and TECHNO.
     :param tech: technology type to satisfy this EUD type such as IND_COGEN_GAS if EUD = HEAT_HIGH_T
-    :param data: dataframe with the year_balance.csv
+    :param year_balance: DataFrame generated from the file year_balance.csv, index is list of technologies
     :param prod_corr: FIXME: complete
     return: FEC value
     """
 
-    # get the inputs for a given technology: electricity, gas, H2, etc.
-    inputs_tech = data.loc[tech][data.loc[tech] < 0].copy()
-    # get the outputs for a given technology: electricity, heat high T, heat low T FHN, etc.
-    outputs_tech = data.loc[tech][data.loc[tech] > 0].copy()
+    # Get the inputs for a given technology: electricity, gas, H2, etc.
+    inputs_tech = year_balance.loc[tech][year_balance.loc[tech] < 0].copy()
+    # Get the outputs for a given technology: electricity, heat high T, heat low T FHN, etc.
+    outputs_tech = year_balance.loc[tech][year_balance.loc[tech] > 0].copy()
     if outputs_tech.sum() == 0:
         return
     else:
-        # remove C02 emissions
+        # Remove C02 emissions
         outputs_labels = list(outputs_tech.index)
         for lab in ['CO2_ATM', 'CO2_INDUSTRY', 'CO2_CAPTURED']:
             if lab in outputs_labels:
@@ -114,49 +116,76 @@ def fec_given_tech(tech: str, data: pd.DataFrame, prod_corr: float):
         return (prod_corr / outputs_tech.sum()) * (-inputs_tech.sum())
 
 
-def compute_fec(data: pd.DataFrame, user_data: str):
+def compute_fec(year_balance: pd.DataFrame, user_data_dir: str) -> (Dict, Dict):
     """
     Compute the system FEC for a given simulation in GWh.
-    :param data: year_balance.csv
-    :param user_data: FIXME: complete
+
+    :param year_balance: DataFrame generated from the file year_balance.csv, index is list of technologies
+    :param user_data_dir: Path to the directory containing User Data
+
     :return FEC detailed by EUD and technologies into fec_details dict, and FEC aggregated by EUD into fec_tot dict.
-    Assumption: FEC ELECTRICITY = EUF ELECTRICITY
+
+    Assumption: FEC ELECTRICITY = EUD ELECTRICITY
     See the FEC computation details for a given EUD in the function fec_given_tech(eud=eud, tech=tech, data=data)
     """
+    # EUD types except ELECTRICITY
     eud_types = ['HEAT_HIGH_T', 'HEAT_LOW_T_DHN', 'HEAT_LOW_T_DECEN', 'MOB_PUBLIC', 'MOB_PRIVATE', 'MOB_FREIGHT_RAIL',
                  'MOB_FREIGHT_BOAT', 'MOB_FREIGHT_ROAD', 'HVC', 'AMMONIA', 'METHANOL']
 
-    df_aux_res = pd.read_csv(user_data + "/aux_resources.csv", index_col=0)
-    resources = list(df_aux_res.index)
-    fec_details = dict()
-    fec_tot = dict()
-    prod_tech_eud = dict()
+    # Get list of resources
+    # TODO: maybe directly pass the list of resources ? or call a function that gives them
+    resources = list(pd.read_csv(user_data_dir + "/aux_resources.csv", index_col=0).index)
+
+    # fec_details = dict()  #
+    fec_details_df = pd.DataFrame()
+    # fec_tot = dict()
     for eud in eud_types:
-        fec_eud = []
-        # list of tech that produced this eud
-        prod_tech_eud[eud] = data[eud].drop(index=['END_USES_DEMAND'])[data[eud] > 0]
-        prod_sum = prod_tech_eud[eud].sum()
-        # total consumption of this energy
-        conso_sum = -data[eud].drop(index=['END_USES_DEMAND'])[data[eud] < 0].sum()
+        # Series with as index the technologies/resource producing the eud given as key and the associated
+        # production of this technology/resource
+        # TODO: why not drop END_USES_DEMAND from the start as it is never used
+        prod_eud = year_balance[eud].drop(index=['END_USES_DEMAND'])[year_balance[eud] > 0]
+        # Total production for this eud
+        prod_sum = prod_eud.sum()
+        # Total consumption of this eud
+        conso_sum = -year_balance[eud].drop(index=['END_USES_DEMAND'])[year_balance[eud] < 0].sum()
         # Note: conso_eud + eud = prod_sum
+        # -> see appendix B of The energy return on investment of whole-energy systems: application to Belgium.
         # We calculate the FEC of the eud and not of conso_eud + eud! -> a correction factor is required
-        for tech in list(prod_tech_eud[eud].index):
-            # correction factor to calculate the FEC corresponding at the consumption of the eud
-            corr_factor = prod_tech_eud[eud][tech] / prod_sum
-            prod_corr = prod_tech_eud[eud][tech] - conso_sum * corr_factor
-            if tech not in resources:
-                fec_tech_corr = fec_given_tech(tech=tech, data=data, prod_corr=prod_corr)
-                # fec_tech = fec_given_tech(tech=tech, data=data, prod_corr=prod_tech_EUD[eud][tech])
+        fec_eud = []
+        for tech_or_res in list(prod_eud.index):
+            # Correction factor to calculate the FEC corresponding to the consumption of the eud
+            corr_factor = prod_eud[tech_or_res] / prod_sum
+            # Note: if consumption = 0, then prod_corr is the same as the non-corrected eud
+            prod_corr = prod_eud[tech_or_res] - conso_sum * corr_factor
+            # Use directly the corrected production if it is a resource and apply a transformation if it is a tech
+            if tech_or_res not in resources:
+                fec_corr = fec_given_tech(tech=tech_or_res, year_balance=year_balance, prod_corr=prod_corr)
+                # TODO: remove ?
+                # fec_tech = fec_given_tech(tech=tech, year_balance=year_balance, prod_corr=prod_tech_eud[tech])
             else:
-                fec_tech_corr = prod_corr
-                # fec_tech = prod_tech_EUD[eud][tech]
+                fec_corr = prod_corr
+                # fec_tech = prod_tech_eud[tech] # TODO: remove ?
             # print('%s %s %.1f %.1f %.1f' %(eud, tech, fec_tech, fec_tech_corr, corr_factor))
-            fec_eud.append([tech, fec_tech_corr])
-        fec_details[eud] = pd.DataFrame(fec_eud)
-        fec_tot[eud] = pd.DataFrame(fec_eud)[1].sum()
-    fec_details['ELECTRICITY'] = data['ELECTRICITY'].loc['END_USES_DEMAND']
-    fec_tot['ELECTRICITY'] = data['ELECTRICITY'].loc['END_USES_DEMAND']
-    return fec_details, fec_tot
+            fec_eud.append([tech_or_res, fec_corr])
+
+        # TODO: c'est un peu degeu de faire comme ça non ?
+        # fec_details[eud] = pd.DataFrame(fec_eud).round(3)
+        # fec_tot[eud] = pd.DataFrame(fec_eud)[1].sum().round(3)
+        fec_details_df = fec_details_df.append(pd.DataFrame(fec_eud, index=[eud]*len(fec_eud)))
+
+    fec_details_df.loc['ELECTRICITY'] = ['ELECTRICITY', year_balance.loc['END_USES_DEMAND', 'ELECTRICITY']]
+    fec_details_df = fec_details_df.reset_index()
+    fec_details_df.columns = ['eud', 'tech', 'value']
+    fec_details_df = fec_details_df.set_index(['eud', 'tech'])
+    fec_details_df = fec_details_df.round(3)
+
+    # Add electricity
+    # TODO: surtout que ELECTRICITY est pas save de la même manière
+    # fec_details['ELECTRICITY'] = year_balance.loc['END_USES_DEMAND', 'ELECTRICITY']
+    # fec_tot['ELECTRICITY'] = year_balance.loc['END_USES_DEMAND', 'ELECTRICITY']
+
+    # return fec_details, fec_tot
+    return fec_details_df, fec_details_df.groupby('eud').sum().squeeze()
 
 
 def compute_einv_details(cs: str, user_data: str, all_data: dict):

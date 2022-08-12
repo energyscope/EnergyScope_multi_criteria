@@ -142,7 +142,7 @@ def step1_excel_to_csv(input_fn, dev_data_dir: str, output_dir: str):
     user_data_weights.index = [change_name_dict[c] if c in change_name_dict else c for c in user_data_weights.index]
     variables = user_data_weights.index
 
-    time_series = pd.read_csv(f"{dev_data_dir}/Time_series.csv", index_col=0)#, usecols=range(121), nrows=368)
+    time_series = pd.read_csv(f"{dev_data_dir}/Time_series.csv", index_col=0)  # , usecols=range(121), nrows=368)
     time_series.columns = [c.split(" (")[0] for c in time_series.columns]
     time_series.columns = [change_name_dict[c] if c in change_name_dict else c for c in time_series.columns]
     # Keep only the variables for which there is some user-defined weight

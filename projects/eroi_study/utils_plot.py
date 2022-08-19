@@ -11,13 +11,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_one_serie(df_data: pd.DataFrame, label: str, pdf_name: str, x_index: list, ylim: list, ylabel: str,
+def plot_one_serie(df: pd.DataFrame, label: str, pdf_name: str, x_index: list, ylim: list, ylabel: str,
                    yticks_val=None):
     """
     Plot one time serie: EROI, FEC, Einv, GWP, etc.
     """
     plt.figure()
-    plt.plot(x_index, df_data.values, ':Dk', linewidth=3, markersize=10, label=label)
+    plt.plot(x_index, df.values, ':Dk', linewidth=3, markersize=10, label=label)
     plt.gca().invert_xaxis()
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
@@ -55,18 +55,21 @@ def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: s
     plt.close()
 
 
-def plot_stacked_bar(df_data: pd.DataFrame, xlabel: str, ylabel: str, ylim: float, pdf_name: str,
+def plot_stacked_bar(df: pd.DataFrame, xlabel: str, ylabel: str, ylim: float, pdf_name: str,
                      colors=plt.cm.tab20(np.linspace(0, 1, 10)), ncol: int = 2):
     """
     Stacked bar plot of a pd.DataFrame.
     """
-    plt.figure()
-    df_data.plot(kind='bar', stacked=True, color=colors)
+    # plt.figure()
+    ax = df.plot(kind='bar', stacked=True, color=colors)
     plt.xticks(fontsize=15)
+    plt.xticks(labels=[t if i % 3 == 0 else '' for i, t in enumerate(df.index)], ticks=range(0, len(df.index)))
     plt.yticks(fontsize=15)
     plt.ylabel(ylabel, fontsize=15)
     plt.xlabel(xlabel, fontsize=15)
     plt.ylim(0, ylim)
+    ax.spines.right.set_visible(False)
+    ax.spines.top.set_visible(False)
     plt.legend(fontsize=15, ncol=ncol)
     plt.tight_layout()
     plt.savefig(pdf_name)
@@ -74,6 +77,11 @@ def plot_stacked_bar(df_data: pd.DataFrame, xlabel: str, ylabel: str, ylim: floa
 
 
 if __name__ == '__main__':
+
+    from energyscope.utils import get_fec_from_sankey
+    from projects.eroi_study.utils import load_config
+    from energyscope.postprocessing import compute_fec, get_total_einv, get_gwp, \
+        compute_einv_details, compute_primary_energy
 
     # Load configuration into a dict
     config = load_config(config_fn='config.yaml')
@@ -104,7 +112,7 @@ if __name__ == '__main__':
     einv = get_total_einv(cs_test) / 1000  # TWh
     print('FEC SANKEY %.2f vs year_balance %.2f [TWh/y]' % (fec_sankey, fec_tot_val))
     print('EROI %.2f %.2f' % (fec_sankey / einv, fec_tot_val / einv))
-    GWP_val = get_GWP(cs=cs_test)
+    GWP_val = get_gwp(cs=cs_test)
     print('GWP_cons %.1f GWP_op %.1f [ktC02/y]' % (GWP_val['GWP_constr'], GWP_val['GWP_op']))
 
     # Compute Einv by ressources and technologies

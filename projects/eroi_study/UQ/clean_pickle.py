@@ -11,7 +11,7 @@ import pickle
 
 import pandas as pd
 
-from energyscope.utils import load_config
+from projects.eroi_study.utils import load_config
 
 
 def remove_pickle(case_study_dir: str) -> None:

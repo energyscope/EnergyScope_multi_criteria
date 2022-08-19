@@ -22,7 +22,7 @@ import numpy as np
 # from sys import platform
 
 from energyscope import get_total_einv
-from energyscope.utils import load_config
+from projects.eroi_study.utils import load_config
 # from energyscope.step2_output_generator import extract_results_step2
 # from energyscope.postprocessing import get_gwp
 from energyscope.postprocessing import get_cost, compute_fec

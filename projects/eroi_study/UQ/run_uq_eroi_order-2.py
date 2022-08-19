@@ -12,7 +12,7 @@ import energyscope as es
 # import numpy as np
 # import matplotlib.pyplot as plt
 
-from energyscope.utils import load_config
+from projects.eroi_study.utils import load_config
 
 gwp_tot_max = 100300  # 100300, 85400, 56900, 42700, 28500, 19000 ktCO2/y -> constraint on the GWP_tot
 

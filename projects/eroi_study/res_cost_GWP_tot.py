@@ -3,10 +3,9 @@
 Results of system Einv_tot minimization with several scenarios computed
 by constraining GWP_tot with different GHG emissions targets.
 
-@author: Jonathan Dumas
+@author: Jonathan Dumas, Antoine Dubois
 """
 
-# import yaml
 import os
 
 import pandas as pd
@@ -14,32 +13,211 @@ import energyscope as es
 import numpy as np
 import matplotlib.pyplot as plt
 
-# from sys import platform
 
-# from energyscope.utils import get_fec_from_sankey
-from energyscope.utils import make_dir, load_config
-# from energyscope.postprocessing import get_total_einv, compute_fec, get_gwp, \
-#     compute_einv_details, compute_primary_energy
-from projects.eroi_study.res_einv_GWP_tot import replace_item_in_list
-# from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import primary_energy_plots
+from energyscope.utils import make_dir, get_names, get_colors
+from projects.eroi_study.res_einv_GWP_tot import print_share_of_energies, plot_series
 from projects.eroi_study.res_einv_GWP_tot_vs_GWP_op import fec_plots, plot_asset_capacities_by_tech
-# from projects.eroi_study.utils_plot import plot_two_series
 from projects.eroi_study.utils_plot import plot_stacked_bar, plot_one_serie
 from projects.eroi_study.utils_res import eroi_computation, res_details, gwp_computation, retrieve_non_zero_val, \
     retrieve_einv_const_by_categories, res_assets_capacity, gwp_breakdown, gwp_const_per_category, \
     cost_computation, cost_breakdown
+from projects.eroi_study.utils import load_config, replace_item_in_list
 
-# parameters
-domestic_RE_share = 0  # 0, 30 %
-config_name_file = 'config_2035'  # config_2035, config_2035_2_GW_nuc, config_2035_5_6_GW_nuc
 
-if __name__ == '__main__':
+# TODO: could maybe be merged with 'plot_primary_energy' in res_einv_gwp_tot.py
+def plot_primary_energy(ei_df, ei_cat_df, res_renewable, res_non_renewable, x_gwp_tot_index,
+                        user_data_dir, save_dir, fn_suffix):
+
+    df_index = x_gwp_tot_index.astype(int)
+
+    # TODO: this is inefficient
+    # Waste+Methanol+Ammonia = other non-RE
+    new_list = list(ei_cat_df.index)
+    for item_old, item_new in zip(['Biofuel', 'Non-biomass', 'Other non-renewable', 'Fossil fuel'],
+                                  ['RE-fuels', 'Wind+Solar', 'non-RE', 'Fossil fuels']):
+        new_list = replace_item_in_list(target_list=new_list, item_old=item_old, item_new=item_new)
+    ei_cat_df.index = new_list
+    ei_cat_df = ei_cat_df.drop(index=['Export']).transpose()
+    ei_cat_df = ei_cat_df[sorted(ei_cat_df.columns)]
+    ei_cat_df.index = df_index
+    colors = pd.Series({'Biomass': '#996633', 'Fossil': '#858585', 'RE-fuels': '#910091', 'Wind+Solar': '#009d3f',
+                        'non-RE': '#000ECD'})
+    pdf_name = os.path.join(save_dir, f'EI-categories-{fn_suffix}.pdf')
+    plot_stacked_bar(ei_cat_df,
+                     xlabel='Yearly emissions limit [MtCO2-eq./y]', ylabel='Primary energy [TWh]',
+                     ylim=625, pdf_name=pdf_name, colors=colors)
+
+    # Renewable RES: biofuel + biomass + non-biomass
+    ei_res_re_df = retrieve_non_zero_val(df=ei_df.loc[res_renewable].drop(columns=['Subcategory']).transpose())
+    ei_res_re_df = ei_res_re_df[['AMMONIA_RE', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS', 'WOOD', 'RES_HYDRO',
+                                 'RES_SOLAR', 'RES_WIND', 'H2_RE', 'BIODIESEL']]
+    ei_res_re_df = ei_res_re_df[sorted(ei_res_re_df.columns)]
+    colors = get_colors(list(ei_res_re_df.columns), 'resources', user_data_path=user_data_dir)
+    ei_res_re_df.columns = get_names(list(ei_res_re_df.columns), 'resources', user_data_path=user_data_dir)
+    ei_res_re_df.index = df_index
+    pdf_name = os.path.join(save_dir, f'EI-RE-{fn_suffix}.pdf')
+    plot_stacked_bar(ei_res_re_df, xlabel='Yearly emissions limit [MtCO2-eq./y]', ylabel='Primary energy [TWh]',
+                     ylim=625, pdf_name=pdf_name, colors=colors)
+
+    # Non-renewable RES: Fossil fuel + Other non-renewable
+    ei_res_non_re_df = retrieve_non_zero_val(df=ei_df.loc[res_non_renewable].drop(columns=['Subcategory']).transpose())
+    ei_res_non_re_df = ei_res_non_re_df[['GAS', 'ELECTRICITY', 'AMMONIA', 'WASTE', 'LFO', 'COAL']]
+    ei_res_non_re_df = ei_res_non_re_df[sorted(ei_res_non_re_df.columns)]
+    colors = get_colors(list(ei_res_non_re_df.columns), 'resources', user_data_path=user_data_dir)
+    ei_res_non_re_df.columns = get_names(list(ei_res_non_re_df.columns), 'resources', user_data_path=user_data_dir)
+    ei_res_non_re_df.index = x_gwp_tot_index.astype(int)
+    pdf_name = os.path.join(save_dir, f'EI-non-RE-{fn_suffix}.pdf')
+    plot_stacked_bar(ei_res_non_re_df, xlabel='Yearly emissions limit [MtCO2-eq./y]', ylabel='Primary energy [TWh]',
+                     ylim=375, pdf_name=pdf_name, colors=colors)
+
+
+def plot_einv_op(einv_res_cat_df, einv_op_df, res_renewable, res_non_renewable, x_gwp_tot_index, save_dir, fn_suffix):
+
+    # Einv_op by RESOURCES subcategories: Other non-renewable, Fossil fuel,
+    # Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
+    einv_res_cat_df.columns = np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(einv_res_cat_df.transpose(), xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=160,
+                     pdf_name=save_dir + '/einv-res-' + fn_suffix + '.pdf')
+
+    # Einv_op classed by RESOURCES (RE and non-RE)
+    einv_op_filtered_df = retrieve_non_zero_val(df=einv_op_df.transpose())
+    einv_op_filtered_df.index = np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(einv_op_filtered_df, xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=160,
+                     pdf_name=save_dir + '/einv-op-details-' + fn_suffix + '.pdf')
+
+    # Einv_op by RE-RESOURCES
+    einv_op_re_filtered_df = retrieve_non_zero_val(df=einv_op_df.loc[res_renewable].transpose())
+    einv_op_re_filtered_df.index = np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(einv_op_re_filtered_df, xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=160,
+                     pdf_name=save_dir + '/einv-op-re-res-' + fn_suffix + '.pdf')
+
+    # Einv_op by NON-RE-RESOURCES
+    einv_op_non_re_filtered_df = retrieve_non_zero_val(df=einv_op_df.loc[res_non_renewable].transpose())
+    einv_op_non_re_filtered_df.index = np.round(x_gwp_tot_index, 1)
+    new_cols = list(einv_op_non_re_filtered_df.columns)
+    new_cols = replace_item_in_list(target_list=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
+    einv_op_non_re_filtered_df.columns = new_cols
+    plot_stacked_bar(einv_op_non_re_filtered_df, xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=30,
+                     pdf_name=save_dir + '/einv-op-non-re-res-' + fn_suffix + '.pdf')
+
+
+def plot_einv_const(einv_tech_cat_df, einv_const_dict, x_gwp_tot_index, save_dir, fn_suffix):
+
+    # Einv_const by TECHNOLOGIES categories: electricity, mobility, heat, ...
+    einv_tech_cat_df.columns = np.round(x_gwp_tot_index, 1)
+    plot_stacked_bar(einv_tech_cat_df.drop(index=['Infrastructure']).transpose(),
+                     xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=35,
+                     pdf_name=save_dir + '/einv-tech-' + fn_suffix + '.pdf')
+
+    # Einv_const classed by categories of technologies: 'Electricity', 'Heat', 'Mobility',
+    # 'Infrastructure', 'Synthetic fuels', 'Storage'
+    einv_const_dict['Electricity'].index = np.round(x_gwp_tot_index, 1)
+    ymax = einv_const_dict['Electricity'].sum(axis=1).max() * 1.05
+    elec_tech = list(einv_const_dict['Electricity'].max(axis=0)[einv_const_dict['Electricity'].max(axis=0) > 0.1].index)
+    plot_stacked_bar(einv_const_dict['Electricity'][elec_tech],
+                     xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=ymax,
+                     pdf_name=save_dir + '/einv_const-elec-' + fn_suffix + '.pdf')
+
+    einv_const_dict['Mobility'].index = np.round(x_gwp_tot_index, 1)
+    ymax = einv_const_dict['Mobility'].sum(axis=1).max() * 1.05
+    # select only the mobility technologies with Einv_const > 0.5 GWh/y
+    mobility_tech = list(einv_const_dict['Mobility'].max(axis=0)[einv_const_dict['Mobility'].max(axis=0) > 0.5].index)
+    plot_stacked_bar(einv_const_dict['Mobility'][mobility_tech],
+                     xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=ymax,
+                     pdf_name=save_dir + '/einv_const-mob-' + fn_suffix + '.pdf')
+
+
+def plot_gwp(gwp_op_df, gwp_const_df, user_data_dir, save_dir, fn_suffix):
+
+    gwp_const_filtered_df = retrieve_non_zero_val(df=gwp_const_df.transpose())
+    gwp_const_by_tech_cat = \
+        gwp_const_per_category(gwp_const_df=gwp_const_filtered_df, user_data_dir=user_data_dir)
+    tech_list = ['Electricity', 'Heat high temperature', 'Heat low temperature centralised',
+                 'Heat low temperature decentralised', 'Passenger public', 'Passenger private', 'Freight',
+                 'Synthetic fuels', 'Electricity storage', 'Thermal storage', 'Other storage']
+
+    # Aggregate GWP_const by sectors: heat, storage, mobility, and electricity
+    gwp_const_by_cat_df = pd.concat([gwp_const_by_tech_cat[tech].sum(axis=1) for tech in tech_list], axis=1)
+    gwp_const_by_cat_df.columns = tech_list
+    df_1 = gwp_const_by_cat_df[
+        ['Heat high temperature', 'Heat low temperature centralised', 'Heat low temperature decentralised']].sum(axis=1)
+    df_1.name = 'Heat'
+    df_2 = gwp_const_by_cat_df[['Electricity storage', 'Thermal storage', 'Other storage']].sum(axis=1)
+    df_2.name = 'Storage'
+    df_3 = gwp_const_by_cat_df[['Passenger public', 'Passenger private', 'Freight']].sum(axis=1)
+    df_3.name = 'Mobility'
+    df_4 = gwp_const_by_cat_df[['Electricity', 'Synthetic fuels']]
+    gwp_const_concat_df = pd.concat([df_1, df_2, df_3, df_4], axis=1)
+    plot_stacked_bar(gwp_const_concat_df, xlabel='p [%]', ylabel='[MtCO2-eq./y]', ylim=9,
+                     pdf_name=save_dir + '/gwp_const-breakdown-' + fn_suffix + '.pdf')
+
+    # GHG emissions breakdown by resources
+    gwp_op_filtered_df = retrieve_non_zero_val(df=gwp_op_df.transpose())
+    new_cols = list(gwp_op_filtered_df.columns)
+    new_cols = replace_item_in_list(target_list=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
+    gwp_op_filtered_df.columns = new_cols
+    plot_stacked_bar(gwp_op_filtered_df, xlabel='p [%]', ylabel='[MtCO2-eq./y]', ylim=100,
+                     pdf_name=save_dir + '/gwp_op-breakdown-' + fn_suffix + '.pdf')
+
+
+def plot_cost(cost_inv_df, cost_op_df, user_data_dir, res_renewable, res_non_renewable, save_dir, fn_suffix):
+
+    cost_inv_filtered_df = retrieve_non_zero_val(df=cost_inv_df.transpose())
+    # cost_maint_filtered_df = retrieve_non_zero_val(df=cost_maint_df.transpose())
+    cost_op_filtered_df = retrieve_non_zero_val(df=cost_op_df.transpose())
+
+    # Retrieve the list of technologies
+    aux_tech_df = pd.read_csv(user_data_dir + "/aux_technologies.csv", index_col=0)
+
+    # Retrieve the list subcategory of technologies
+    tech_subcategory_list = list(dict.fromkeys(list(aux_tech_df['Subcategory'])))
+    tech_by_subcategory = dict()
+    for cat in tech_subcategory_list:
+        tech_by_subcategory[cat] = list(aux_tech_df[aux_tech_df['Subcategory'] == cat].index)
+
+    concat_list = []
+    for cat in tech_by_subcategory.keys():
+        concat_list.append(cost_inv_filtered_df[[i for i in cost_inv_filtered_df.columns
+                                                 if i in tech_by_subcategory[cat]]].sum(axis=1))
+    cost_inv_by_cat_df = pd.concat(concat_list, axis=1)
+    cost_inv_by_cat_df.columns = tech_by_subcategory.keys()
+
+    plot_stacked_bar(cost_inv_filtered_df[[i for i in cost_inv_filtered_df.columns
+                                          if i in tech_by_subcategory['Electricity']]],
+                     xlabel='p [%]', ylabel='[bEUR/y]', ylim=30,
+                     pdf_name=save_dir + '/cost-inv-elec-breakdown-' + fn_suffix + '.pdf')
+    plot_stacked_bar(cost_inv_filtered_df[[i for i in cost_inv_filtered_df.columns
+                                          if i in tech_by_subcategory['Passenger private']]],
+                     xlabel='p [%]', ylabel='[bEUR/y]', ylim=30,
+                     pdf_name=save_dir + '/cost-inv-private-mob-breakdown-' + fn_suffix + '.pdf')
+    plot_stacked_bar(cost_inv_by_cat_df, xlabel='p [%]', ylabel='[bEUR/y]', ylim=30,
+                     pdf_name=save_dir + '/cost-inv-breakdown-' + fn_suffix + '.pdf')
+
+    cost_inv_by_cat_aggregated_df = \
+        pd.concat([cost_inv_by_cat_df[['Electricity', 'Infrastructure', 'Synthetic fuels']],
+                   cost_inv_by_cat_df[['Electricity storage', 'Thermal storage', 'Other storage']].sum(axis=1),
+                   cost_inv_by_cat_df[['Heat high temperature', 'Heat low temperature centralised',
+                                       'Heat low temperature decentralised']].sum(axis=1),
+                   cost_inv_by_cat_df[['Passenger public', 'Passenger private', 'Freight']].sum(axis=1)], axis=1)
+    cost_inv_by_cat_aggregated_df.columns = ['Electricity', 'Infrastructure', 'Synthetic fuels',
+                                             'storage', 'heat', 'mobility']
+    plot_stacked_bar(cost_inv_by_cat_aggregated_df, xlabel='p [%]', ylabel='[bEUR/y]', ylim=30,
+                     pdf_name=save_dir + '/cost-inv-breakdown-' + fn_suffix + '.pdf')
+    plot_stacked_bar(cost_op_filtered_df[[i for i in res_renewable if i in cost_op_filtered_df.columns]],
+                     xlabel='p [%]', ylabel='[bEUR/y]', ylim=60,
+                     pdf_name=save_dir + '/cost-op-re-breakdown-' + fn_suffix + '.pdf')
+    plot_stacked_bar(cost_op_filtered_df[[i for i in res_non_renewable if i in cost_op_filtered_df.columns]],
+                     xlabel='p [%]', ylabel='[bEUR/y]', ylim=20,
+                     pdf_name=save_dir + '/cost-op-non-re-breakdown-' + fn_suffix + '.pdf')
+
+
+def main(config_fn, domestic_re_share):
 
     cwd = os.getcwd()
     print("Current working directory: {0}".format(cwd))
 
     # Load configuration into a dict
-    config = load_config(config_fn=config_name_file+'.yaml')
+    config = load_config(config_fn=config_fn + '.yaml')
 
     # Loading data
     all_data = es.import_data(user_data_dir=config['user_data'], developer_data_dir=config['developer_data'])
@@ -54,319 +232,138 @@ if __name__ == '__main__':
     # -----------------------------------------------
 
     range_val = range(100, 0, -5)
-    if config_name_file == 'config_2035_2_GW_nuc':
-        dir_name = f"{config['case_studies_dir']}/{'cost_GWP_tot_2_GW_nuc_' + str(domestic_RE_share)}"
-    elif config_name_file == 'config_2035_5_6_GW_nuc':
-        dir_name = f"{config['case_studies_dir']}/{'cost_GWP_tot_5_6_GW_nuc_' + str(domestic_RE_share)}"
+    if config_fn == 'config_2035_2_GW_nuc':
+        dir_name = f"{config['case_studies_dir']}/{'cost_GWP_tot_2_GW_nuc_' + str(domestic_re_share)}"
+    elif config_fn == 'config_2035_5_6_GW_nuc':
+        dir_name = f"{config['case_studies_dir']}/{'cost_GWP_tot_5_6_GW_nuc_' + str(domestic_re_share)}"
     else:
-        dir_name = f"{config['case_studies_dir']}/{'cost_GWP_tot_' + str(domestic_RE_share)}"
+        dir_name = f"{config['case_studies_dir']}/{'cost_GWP_tot_' + str(domestic_re_share)}"
 
-    df_res, df_fec_details = eroi_computation(dir_name=dir_name, user_data=config['user_data'], range_val=range_val)
-    df_Einv_op, df_Einv_RES_cat, df_Einv_TECH_cat, df_EI_cat, df_EI = \
+    res_df, fec_details_df = eroi_computation(dir_name=dir_name, user_data_dir=config['user_data'], range_val=range_val)
+    einv_op_df, einv_res_cat_df, einv_tech_cat_df, ei_cat_df, ei_df = \
         res_details(range_val=range_val, all_data=all_data, dir_name=dir_name, user_data=config['user_data'])
-    df_GWP = gwp_computation(dir_name=dir_name, range_val=range_val)
-    df_cost = cost_computation(dir_name=dir_name, range_val=range_val)
-    Einv_const_dict = retrieve_einv_const_by_categories(range_val=range_val, all_data=all_data,
+    gwp_df = gwp_computation(dir_name=dir_name, range_val=range_val)
+    x_gwp_tot_index = gwp_df.sum(axis=1).values
+    cost_df = cost_computation(dir_name=dir_name, range_val=range_val)
+    einv_const_dict = retrieve_einv_const_by_categories(range_val=range_val, all_data=all_data,
                                                         dir_name=dir_name, user_data=config['user_data'])
-    df_assets = res_assets_capacity(range_val=range_val, dir_name=dir_name)
-    df_gwp_const, df_gwp_op = gwp_breakdown(dir_name=dir_name, range_val=range_val)
-    df_cost_inv, df_cost_maint, df_cost_op = cost_breakdown(dir_name=dir_name, range_val=range_val)
+    assets_df = res_assets_capacity(range_val=range_val, dir_name=dir_name)
+    gwp_const_df, gwp_op_df = gwp_breakdown(dir_name=dir_name, range_val=range_val)
+    cost_inv_df, cost_maint_df, cost_op_df = cost_breakdown(dir_name=dir_name, range_val=range_val)
 
     ######
     # Share of energies
-    for p in range(100, 0, -5):
-        tot_EI = df_EI[p].sum()
-        print('GWP_tot %.1f [MtCO2-eq./y]: EROI %.1f offshore %.1f [GW] onshore %.1f [GW] PV %.1f [GW] NUC %.1f [GW]'
-              % (df_GWP.sum(axis=1).loc[p], df_res['EROI'].loc[p], df_assets[p].loc['WIND_OFFSHORE'],
-                 df_assets[p].loc['WIND_ONSHORE'], df_assets[p].loc['PV'], df_assets[p]['NUCLEAR']))
-        print('GWh: Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f '
-              'Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f'
-              % (df_EI[p]['GAS'],  df_EI[p]['METHANOL_RE'],  df_EI[p]['AMMONIA_RE'],  df_EI[p]['H2_RE'],
-                 df_EI[p]['GAS_RE'],  df_EI[p]['RES_SOLAR'],  df_EI[p]['RES_WIND'],  df_EI[p]['WOOD'],
-                 df_EI[p]['WET_BIOMASS'],   df_EI[p]['WASTE']))
-        print('Percentage: Gas %.1f METHANOL_RE %.1f AMMONIA_RE %.1f H2_RE %.1f '
-              'Gas-re %.1f PV %.1f Wind %.1f wood %.1f wet biomass %.1f waste %.1f'
-              % (100 * df_EI[p]['GAS'] / tot_EI, 100 * df_EI[p]['METHANOL_RE'] / tot_EI,
-                 100 * df_EI[p]['AMMONIA_RE'] / tot_EI, 100 * df_EI[p]['H2_RE'] / tot_EI,
-                 100 * df_EI[p]['GAS_RE'] / tot_EI, 100 * df_EI[p]['RES_SOLAR'] / tot_EI,
-                 100 * df_EI[p]['RES_WIND'] / tot_EI, 100 * df_EI[p]['WOOD'] / tot_EI,
-                 100 * df_EI[p]['WET_BIOMASS'] / tot_EI,  100 * df_EI[p]['WASTE'] / tot_EI))
-
-    ####################################################################################################################
-    # Compare the case p = 100, 20, 10 and 5
-    # When GWP_tot <= p * gwp_limit
-    # Use fec_details DataFrame to identify the technologies that satisfy the different EDU and the FEC related
-    # df_year_balance_100 = pd.read_csv(dir_name + '/run_100/' + "/output/year_balance.csv", index_col=0)
-    # fec_details_100, fec_tot_100 = compute_fec(year_balance=df_year_balance_100, user_data_dir=config['user_data'])
-    #
-    # df_year_balance_10 = pd.read_csv(dir_name + '/run_10/' + "/output/year_balance.csv", index_col=0)
-    # fec_details_10, fec_tot_10 = compute_fec(year_balance=df_year_balance_10, user_data_dir=config['user_data'])
-    #
-    # df_year_balance_5 = pd.read_csv(dir_name + '/run_5/' + "/output/year_balance.csv", index_col=0)
-    # fec_details_5, fec_tot_5 = compute_fec(year_balance=df_year_balance_5, user_data_dir=config['user_data'])
-    #
-    # df_energy_stored_50 = pd.read_csv(dir_name + '/run_50/' + "/output/hourly_data/energy_stored.csv",
-    #                                   index_col=0).dropna(axis=1)
-    # df_layer_elec_50 = pd.read_csv(dir_name + '/run_50/' + "/output/hourly_data/layer_ELECTRICITY.csv",
-    #                                index_col=0).dropna(axis=1)
-    # df_layer_HEAT_LOW_T_DECEN_50 = pd.read_csv(dir_name+'/run_50/'+"/output/hourly_data/layer_HEAT_LOW_T_DECEN.csv",
-    #                                            index_col=0).dropna(axis=1)
-    # df_layer_HEAT_LOW_T_DHN_50 = pd.read_csv(dir_name + '/run_50/' + "/output/hourly_data/layer_HEAT_LOW_T_DHN.csv",
-    #                                          index_col=0).dropna(axis=1)
-
-    #
-    # df_layer_gas_5 = pd.read_csv(dir_name+'/run_5/'+"/output/hourly_data/layer_GAS.csv", index_col=0).dropna(axis=1)
-    # df_layer_gas_5['GAS_STORAGE_Pin']
-
-    # Compare technologies that produce electricity between p = 5 and 10 %
-    # For instance, when p = 5  -> CCGT mainly produced electricity for the case where GWP_tot is constrained
-    # print(df_year_balance_10[df_year_balance_10['ELECTRICITY'] > 0]['ELECTRICITY'])
-    # print(df_year_balance_5[df_year_balance_5['ELECTRICITY'] > 0]['ELECTRICITY'])
-
+    if 0:
+        print_share_of_energies(ei_df, gwp_df, res_df, assets_df)
     ####################################################################################################################
     # -----------------------------------------------
     # PLOT
     # -----------------------------------------------
     ####################################################################################################################
-    
-    if config_name_file == 'config_2035_2_GW_nuc':
-        dir_plot = 'cost_GWP_tot_2_GW_nuc_' + str(domestic_RE_share)
-    elif config_name_file == 'config_2035_5_6_GW_nuc':
-        dir_plot = 'cost_GWP_tot_5_6_GW_nuc_' + str(domestic_RE_share)
-    else:
-        dir_plot = 'cost_GWP_tot_' + str(domestic_RE_share)
+    fn_suffix = 'cost-' + str(domestic_re_share)
 
-    make_dir(cwd+'/export/')
-    make_dir(cwd+'/export/'+dir_plot+'/')
-    if config_name_file == 'config_2035_2_GW_nuc':
-        dir_plot = cwd + '/export/cost_GWP_tot_2_GW_nuc_' + str(domestic_RE_share)
-    elif config_name_file == 'config_2035_5_6_GW_nuc':
-        dir_plot = cwd + '/export/cost_GWP_tot_5_6_GW_nuc_' + str(domestic_RE_share)
+    if config_fn == 'config_2035_2_GW_nuc':
+        dir_plot = 'cost_GWP_tot_2_GW_nuc_' + str(domestic_re_share)
+    elif config_fn == 'config_2035_5_6_GW_nuc':
+        dir_plot = 'cost_GWP_tot_5_6_GW_nuc_' + str(domestic_re_share)
     else:
-        dir_plot = cwd + '/export/cost_GWP_tot_' + str(domestic_RE_share)
-    pdf = 'cost-' + str(domestic_RE_share)
+        dir_plot = 'cost_GWP_tot_' + str(domestic_re_share)
+
+    main_export_dir = os.path.join(cwd, 'export')
+    make_dir(main_export_dir)
+    save_dir = os.path.join(main_export_dir, dir_plot)
+    make_dir(save_dir)
 
     ####################################################################################################################
     # EROI, FEC, Einv_tot, and GWP_tot
     # \alpha^0 = \text{GWP}_{op}^0
-    x_gwp_tot_index = df_GWP.sum(axis=1).values
-    plot_one_serie(df_data=df_cost.sum(axis=1), label='Cost',
-                   pdf_name=dir_plot + '/cost_' + str(domestic_RE_share) + '.pdf',
-                   x_index=x_gwp_tot_index, ylim=[40, 65], ylabel='[bEUR/y]')
-    plot_one_serie(df_data=df_res['EROI'], label='EROI',
-                   pdf_name=dir_plot + '/eroi_custom_' + str(domestic_RE_share) + '.pdf',
-                   x_index=x_gwp_tot_index, ylim=[1, 10], ylabel='[-]', yticks_val=[3, 5, 7, 9])
-    plot_one_serie(df_data=df_res['EROI'], label='EROI',
-                   pdf_name=dir_plot + '/eroi_' + str(domestic_RE_share) + '.pdf',
-                   x_index=x_gwp_tot_index, ylim=[1, 10], ylabel='[-]')
-    plot_one_serie(df_data=df_res['FEC'], label='FEC',
-                   pdf_name=dir_plot + '/fec_' + str(domestic_RE_share) + '.pdf',
-                   x_index=x_gwp_tot_index, ylim=[300, 480], ylabel='[TWh/y]')
-    plot_one_serie(df_data=df_res['Einv'], label='Einv',
-                   pdf_name=dir_plot + '/einv_' + str(domestic_RE_share) + '.pdf',
-                   x_index=x_gwp_tot_index, ylim=[30, 180], ylabel='[TWh/y]')
-    plot_one_serie(df_data=df_EI.drop(columns=['Subcategory']).transpose().sum(axis=1), label='Primary energy',
-                   pdf_name=dir_plot + '/EI_tot_' + str(domestic_RE_share) + '.pdf',
-                   x_index=x_gwp_tot_index, ylim=[350, 550], ylabel='[TWh/y]')
+    if 0:
+        intervals = [[40, 65], [1, 10], [1, 10], [300, 480], [30, 180], [350, 550]]
+        plot_series(cost_df, res_df, ei_df, x_gwp_tot_index, save_dir, domestic_re_share, intervals)
 
     ####################################################################################################################
     # FEC
-    fec_plots(df_fec_data=df_fec_details, pdf=pdf, dir_plot=dir_plot)
+    if 0:
+        fec_plots(df_fec_data=fec_details_df, save_dir=save_dir, fn_suffix=fn_suffix)
 
     ####################################################################################################################
     # PRIMARY ENERGY
-    new_list = list(df_EI_cat.index)
-    for item_old, item_new in zip(['Biofuel', 'Non-biomass', 'Other non-renewable', 'Fossil fuel'],
-                                  ['Synthetic fuels', 'Wind+Solar', 'Waste+Methanol+Ammonia', 'Fossil fuels']):
-        new_cols = replace_item_in_list(l=new_list, item_old=item_old, item_new=item_new)
-    df_EI_cat.index = new_list
-    df_EI_cat.columns = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_cat.drop(index=['Export']).transpose(),
-                     xlabel='Yearly emissions limit [MtCO2-eq./y]',  ylabel='Primary energy [TWh]',
-                     ylim=600, pdf_name=dir_plot+'/EI-categories-'+pdf+'.pdf')
-
-    # Renewable RES: biofuel + biomass + non-biomass
-    RES_renewable = ['AMMONIA_RE', 'H2_RE', 'BIOETHANOL', 'BIODIESEL', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS', 'WOOD',
+    res_renewable = ['AMMONIA_RE', 'H2_RE', 'BIOETHANOL', 'BIODIESEL', 'METHANOL_RE', 'GAS_RE', 'WET_BIOMASS', 'WOOD',
                      'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO']
-    df_EI_RES_RE = retrieve_non_zero_val(df=df_EI.loc[RES_renewable].drop(columns=['Subcategory']).transpose())
-    new_cols = list(df_EI_RES_RE.columns)
-    for item_old, item_new in zip(['BIODIESEL', 'WET_BIOMASS', 'WOOD', 'METHANOL_RE', 'GAS_RE', 'AMMONIA_RE', 'H2_RE',
-                                   'RES_HYDRO', 'RES_SOLAR', 'RES_WIND', 'RES_GEO'],
-                                  ['Biodiesel', 'Wet biomass', 'Wood', 'Methanol-RE', 'Gas-RE', 'Ammonia-RE', 'H2-RE',
-                                   'Hydro', 'Solar', 'Wind', 'Geo']):
-        new_cols = replace_item_in_list(l=new_cols, item_old=item_old, item_new=item_new)
-    df_EI_RES_RE.columns = new_cols
-    # https://matplotlib.org/stable/tutorials/colors/colormaps.html
-    colors = plt.cm.tab20b(np.linspace(0, 1, 10))
-    df_EI_RES_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_RE[['Ammonia-RE', 'Methanol-RE', 'Gas-RE', 'Wet biomass', 'Wood', 'Hydro',
-                                           'Solar', 'Wind', 'H2-RE', 'Biodiesel']],
-                     xlabel='Yearly emissions limit [MtCO2-eq./y]', ylabel='Primary energy [TWh]',
-                     ylim=530, pdf_name=dir_plot + '/EI-RE-' + pdf + '.pdf', colors=colors)
-
-    # Non-renewable RES: Fossil fuel + Other non-renewable
-    RES_non_renewable = ['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE',
+    res_non_renewable = ['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE',
                          'METHANOL', 'URANIUM']
-    colors = plt.cm.tab20c(np.linspace(0, 1, 10))
-    df_EI_RES_non_RE = retrieve_non_zero_val(df=df_EI.loc[RES_non_renewable].drop(columns=['Subcategory']).transpose())
-    new_cols = list(df_EI_RES_non_RE.columns)
-    for item_old, item_new in zip(['LFO', 'DIESEL', 'COAL', 'GASOLINE', 'GAS', 'ELECTRICITY', 'AMMONIA', 'H2', 'WASTE',
-                                   'METHANOL', 'URANIUM'],
-                                  ['LFO', 'DIESEL', 'Coal', 'GASOLINE', 'NG', 'Elec. import', 'Ammonia', 'H2', 'Waste',
-                                   'Methanol', 'URANIUM']):
-        new_cols = replace_item_in_list(l=new_cols, item_old=item_old, item_new=item_new)
-    # new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
-    df_EI_RES_non_RE.columns = new_cols
-    df_EI_RES_non_RE.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_EI_RES_non_RE[['NG', 'Elec. import', 'Ammonia', 'Waste', 'LFO', 'Coal']],
-                     xlabel='Yearly emissions limit [MtCO2-eq./y]', ylabel='Primary energy [TWh]', ylim=350,
-                     pdf_name=dir_plot + '/EI-non-RE-' + pdf + '.pdf', colors=colors)
+    if 1:
+        plot_primary_energy(ei_df, ei_cat_df, res_renewable, res_non_renewable, x_gwp_tot_index,
+                            config['user_data'], save_dir, fn_suffix)
 
     ####################################################################################################################
     # Einv_tot = Einv_operation + Einv_construction
     # RESOURCES -> use Einv only for the operation (0 for construction)
     # TECHNOLOGIES -> use Einv only for the construction (0 for operation)
-
-    # Einv_op by RESOURCES subcategories: Other non-renewable, Fossil fuel,
-    # Biofuel, Non-biomass (WIND, SOLAR, HYDRO, ...)
-    df_Einv_RES_cat.columns = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_Einv_RES_cat.transpose(), xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=160,
-                     pdf_name=dir_plot+'/einv-res-'+pdf+'.pdf')
-
-    # Einv_op classed by RESOURCES (RE and non-RE)
-    df_einv_op_filtered = retrieve_non_zero_val(df=df_Einv_op.transpose())
-    df_einv_op_filtered.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_einv_op_filtered, xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=160,
-                     pdf_name=dir_plot+'/einv-op-details-'+pdf+'.pdf')
-
-    # Einv_op by RE-RESOURCES
-    df_einv_op_RE_filtered = retrieve_non_zero_val(df=df_Einv_op.loc[RES_renewable].transpose())
-    df_einv_op_RE_filtered.index = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_einv_op_RE_filtered, xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=160,
-                     pdf_name=dir_plot+'/einv-op-re-res-'+pdf+'.pdf')
-
-    # Einv_op by NON-RE-RESOURCES
-    df_einv_op_non_RE_filtered = retrieve_non_zero_val(df=df_Einv_op.loc[RES_non_renewable].transpose())
-    df_einv_op_non_RE_filtered.index = np.round(x_gwp_tot_index, 1)
-    new_cols = list(df_einv_op_non_RE_filtered.columns)
-    new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
-    df_einv_op_non_RE_filtered.columns = new_cols
-    plot_stacked_bar(df_data=df_einv_op_non_RE_filtered, xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=30,
-                     pdf_name=dir_plot+'/einv-op-non-re-res-'+pdf+'.pdf')
-
-    # 2. Einv_const by TECHNOLOGIES categories: electricity, mobility, heat, ...
-    df_Einv_TECH_cat.columns = np.round(x_gwp_tot_index, 1)
-    plot_stacked_bar(df_data=df_Einv_TECH_cat.drop(index=['Infrastructure']).transpose(),
-                     xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=35,
-                     pdf_name=dir_plot+'/einv-tech-'+pdf+'.pdf')
-
-    # Einv_const classed by categories of technologies: 'Electricity', 'Heat', 'Mobility',
-    # 'Infrastructure', 'Synthetic fuels', 'Storage'
-    Einv_const_dict['Electricity'].index = np.round(x_gwp_tot_index, 1)
-    ymax = Einv_const_dict['Electricity'].sum(axis=1).max() * 1.05
-    elec_tech = list(Einv_const_dict['Electricity'].max(axis=0)[Einv_const_dict['Electricity'].max(axis=0) > 0.1].index)
-    plot_stacked_bar(df_data=Einv_const_dict['Electricity'][elec_tech],
-                     xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=ymax,
-                     pdf_name=dir_plot+'/einv_const-elec-'+pdf+'.pdf')
-
-    Einv_const_dict['Mobility'].index = np.round(x_gwp_tot_index, 1)
-    ymax = Einv_const_dict['Mobility'].sum(axis=1).max() * 1.05
-    # select only the mobility technologies with Einv_const > 0.5 GWh/y
-    mobility_tech = list(Einv_const_dict['Mobility'].max(axis=0)[Einv_const_dict['Mobility'].max(axis=0) > 0.5].index)
-    plot_stacked_bar(df_data=Einv_const_dict['Mobility'][mobility_tech],
-                     xlabel='GWP total [MtCO2-eq./y]', ylabel='[TWh]', ylim=ymax,
-                     pdf_name=dir_plot+'/einv_const-mob-'+pdf+'.pdf')
+    if 0:
+        plot_einv_op(einv_res_cat_df, einv_op_df, res_renewable, res_non_renewable, x_gwp_tot_index,
+                     save_dir, fn_suffix)
+        plot_einv_const(einv_tech_cat_df, einv_const_dict, x_gwp_tot_index, save_dir, fn_suffix)
 
     ##############################################################################################################
     # GWP breakdown by resources and technologies
     # GHG emissions related to technologies
-    df_gwp_const_filtered = retrieve_non_zero_val(df=df_gwp_const.transpose())
-    gwp_const_by_tech_cat = gwp_const_per_category(df_gwp_const=df_gwp_const_filtered, user_data=config["user_data"])
-    tech_list = ['Electricity', 'Heat high temperature', 'Heat low temperature centralised',
-                 'Heat low temperature decentralised', 'Passenger public', 'Passenger private', 'Freight',
-                 'Synthetic fuels', 'Electricity storage', 'Thermal storage', 'Other storage']
-
-    # Aggregate GWP_const by sectors: heat, storage, mobility, and electricity
-    df_gwp_const_by_cat = pd.concat([gwp_const_by_tech_cat[tech].sum(axis=1) for tech in tech_list], axis=1)
-    df_gwp_const_by_cat.columns = tech_list
-    df_1 = df_gwp_const_by_cat[
-        ['Heat high temperature', 'Heat low temperature centralised', 'Heat low temperature decentralised']].sum(axis=1)
-    df_1.name = 'Heat'
-    df_2 = df_gwp_const_by_cat[['Electricity storage', 'Thermal storage', 'Other storage']].sum(axis=1)
-    df_2.name = 'Storage'
-    df_3 = df_gwp_const_by_cat[['Passenger public', 'Passenger private', 'Freight']].sum(axis=1)
-    df_3.name = 'Mobility'
-    df_4 = df_gwp_const_by_cat[['Electricity', 'Synthetic fuels']]
-    df_gwp_const_concat = pd.concat([df_1, df_2, df_3, df_4], axis=1)
-    plot_stacked_bar(df_data=df_gwp_const_concat, xlabel='p [%]', ylabel='[MtCO2-eq./y]', ylim=9,
-                     pdf_name=dir_plot + '/gwp_const-breakdown-' + pdf + '.pdf')
-
-    # GHG emissions breakdown by resources
-    df_gwp_op_filtered = retrieve_non_zero_val(df=df_gwp_op.transpose())
-    new_cols = list(df_gwp_op_filtered.columns)
-    new_cols = replace_item_in_list(l=new_cols, item_old='ELECTRICITY', item_new='ELECTRICITY_IMPORT')
-    df_gwp_op_filtered.columns = new_cols
-    plot_stacked_bar(df_data=df_gwp_op_filtered, xlabel='p [%]', ylabel='[MtCO2-eq./y]', ylim=100,
-                     pdf_name=dir_plot + '/gwp_op-breakdown-' + pdf + '.pdf')
+    if 0:
+        plot_gwp(gwp_op_df, gwp_const_df, user_data_dir, save_dir, fn_suffix)
 
     ##############################################################################################################
     # Cost breakdown by resources and technologies
-    df_cost_inv_filtered = retrieve_non_zero_val(df=df_cost_inv.transpose())
-    df_cost_maint_filtered = retrieve_non_zero_val(df=df_cost_maint.transpose())
-    df_cost_op_filtered = retrieve_non_zero_val(df=df_cost_op.transpose())
-
-    # Retrieve the list of technologies
-    df_aux_tech = pd.read_csv(config['user_data'] + "/aux_technologies.csv", index_col=0)
-
-    # Retrieve the list subcategory of technologies
-    tech_subcategory_list = list(dict.fromkeys(list(df_aux_tech['Subcategory'])))
-    tech_by_subcategory = dict()
-    for cat in tech_subcategory_list:
-        tech_by_subcategory[cat] = list(df_aux_tech[df_aux_tech['Subcategory'] == cat].index)
-
-    concat_list = []
-    for cat in tech_by_subcategory.keys():
-        concat_list.append(df_cost_inv_filtered[[i for i in df_cost_inv_filtered.columns
-                                                 if i in tech_by_subcategory[cat]]].sum(axis=1))
-    df_cost_inv_by_cat = pd.concat(concat_list, axis=1)
-    df_cost_inv_by_cat.columns = tech_by_subcategory.keys()
-
-    plot_stacked_bar(df_data=df_cost_inv_filtered[[i for i in df_cost_inv_filtered.columns
-                                                   if i in tech_by_subcategory['Electricity']]],
-                     xlabel='p [%]', ylabel='[bEUR/y]', ylim=30,
-                     pdf_name=dir_plot + '/cost-inv-elec-breakdown-' + pdf + '.pdf')
-    plot_stacked_bar(df_data=df_cost_inv_filtered[[i for i in df_cost_inv_filtered.columns
-                                                   if i in tech_by_subcategory['Passenger private']]],
-                     xlabel='p [%]', ylabel='[bEUR/y]', ylim=30,
-                     pdf_name=dir_plot + '/cost-inv-private-mob-breakdown-' + pdf + '.pdf')
-    plot_stacked_bar(df_data=df_cost_inv_by_cat, xlabel='p [%]', ylabel='[bEUR/y]', ylim=30,
-                     pdf_name=dir_plot + '/cost-inv-breakdown-' + pdf + '.pdf')
-
-    df_cost_inv_by_cat_aggregated = \
-        pd.concat([df_cost_inv_by_cat[['Electricity', 'Infrastructure', 'Synthetic fuels']],
-                   df_cost_inv_by_cat[['Electricity storage', 'Thermal storage', 'Other storage']].sum(axis=1),
-                   df_cost_inv_by_cat[['Heat high temperature', 'Heat low temperature centralised',
-                                       'Heat low temperature decentralised']].sum(axis=1),
-                   df_cost_inv_by_cat[['Passenger public', 'Passenger private', 'Freight']].sum(axis=1)], axis=1)
-    df_cost_inv_by_cat_aggregated.columns = ['Electricity', 'Infrastructure', 'Synthetic fuels',
-                                             'storage', 'heat', 'mobility']
-    plot_stacked_bar(df_data=df_cost_inv_by_cat_aggregated, xlabel='p [%]', ylabel='[bEUR/y]', ylim=30,
-                     pdf_name=dir_plot + '/cost-inv-breakdown-' + pdf + '.pdf')
-    plot_stacked_bar(df_data=df_cost_op_filtered[[i for i in RES_renewable if i in df_cost_op_filtered.columns]],
-                     xlabel='p [%]', ylabel='[bEUR/y]', ylim=60,
-                     pdf_name=dir_plot + '/cost-op-re-breakdown-' + pdf + '.pdf')
-    plot_stacked_bar(df_data=df_cost_op_filtered[[i for i in RES_non_renewable if i in df_cost_op_filtered.columns]],
-                     xlabel='p [%]', ylabel='[bEUR/y]', ylim=20,
-                     pdf_name=dir_plot + '/cost-op-non-re-breakdown-' + pdf + '.pdf')
+    if 0:
+        plot_cost(cost_inv_df, cost_op_df, user_data_dir, res_renewable, res_non_renewable, save_dir, fn_suffix)
 
     ####################################################################################################################
-    # PLot assets installed capacities
-    df_assets.columns = np.round(x_gwp_tot_index, 1)
-    plot_asset_capacities_by_tech(df_assets=df_assets, pdf=pdf, user_data=config['user_data'], dir_plot=dir_plot,
-                                  xlabel='[MtCO2-eq./y]')
-
+    # Plot assets installed capacities
+    assets_df.columns = np.round(x_gwp_tot_index, 1)
+    if 0:
+        plot_asset_capacities_by_tech(assets_df=assets_df, user_data_dir=config['user_data'],
+                                      save_dir=dir_plot, fn_suffix=fn_suffix, xlabel='[MtCO2-eq./y]')
     ##############
     #
-    df_EI_filtered = retrieve_non_zero_val(df=df_EI.drop(columns=['Subcategory']).transpose())
-    df_EI_percentage = df_EI_filtered.divide(df_EI_filtered.sum(axis=1), axis=0) * 100
-    df_EI_percentage.index = np.round(x_gwp_tot_index, 1)
+    # ei_filtered_df = retrieve_non_zero_val(df=ei_df.drop(columns=['Subcategory']).transpose())
+    # ei_percentage_df = ei_filtered_df.divide(ei_filtered_df.sum(axis=1), axis=0) * 100
+    # ei_percentage_df.index = np.round(x_gwp_tot_index, 1)
+
+    ####################################################################################################################
+    # Compare the case p = 100, 20, 10 and 5
+    # When GWP_tot <= p * gwp_limit
+    # Use fec_details DataFrame to identify the technologies that satisfy the different EDU and the FEC related
+    # year_balance_100_df = pd.read_csv(dir_name + '/run_100/' + "/output/year_balance.csv", index_col=0)
+    # fec_details_100, fec_tot_100 = compute_fec(year_balance=year_balance_100_df, user_data_dir=config['user_data'])
+    #
+    # year_balance_10_df = pd.read_csv(dir_name + '/run_10/' + "/output/year_balance.csv", index_col=0)
+    # fec_details_10, fec_tot_10 = compute_fec(year_balance=year_balance_10_df, user_data_dir=config['user_data'])
+    #
+    # year_balance_5_df = pd.read_csv(dir_name + '/run_5/' + "/output/year_balance.csv", index_col=0)
+    # fec_details_5, fec_tot_5 = compute_fec(year_balance=year_balance_5_df, user_data_dir=config['user_data'])
+    #
+    # energy_stored_50_df = pd.read_csv(dir_name + '/run_50/' + "/output/hourly_data/energy_stored.csv",
+    #                                   index_col=0).dropna(axis=1)
+    # layer_elec_50_df = pd.read_csv(dir_name + '/run_50/' + "/output/hourly_data/layer_ELECTRICITY.csv",
+    #                                index_col=0).dropna(axis=1)
+    # layer_HEAT_LOW_T_DECEN_50_df = pd.read_csv(dir_name+'/run_50/'+"/output/hourly_data/layer_HEAT_LOW_T_DECEN.csv",
+    #                                            index_col=0).dropna(axis=1)
+    # layer_HEAT_LOW_T_DHN_50_df = pd.read_csv(dir_name + '/run_50/' + "/output/hourly_data/layer_HEAT_LOW_T_DHN.csv",
+    #                                          index_col=0).dropna(axis=1)
+
+    #
+    # layer_gas_5_df = pd.read_csv(dir_name+'/run_5/'+"/output/hourly_data/layer_GAS.csv", index_col=0).dropna(axis=1)
+    # layer_gas_5_df['GAS_STORAGE_Pin']
+
+    # Compare technologies that produce electricity between p = 5 and 10 %
+    # For instance, when p = 5  -> CCGT mainly produced electricity for the case where GWP_tot is constrained
+    # print(year_balance_10_df[year_balance_10_df['ELECTRICITY'] > 0]['ELECTRICITY'])
+    # print(year_balance_5_df[year_balance_5_df['ELECTRICITY'] > 0]['ELECTRICITY'])
+
+
+if __name__ == '__main__':
+
+    # parameters
+    domestic_re_share_ = 0  # 0, 30 %
+    config_fn_ = 'config_2035'  # config_2035, config_2035_2_GW_nuc, config_2035_5_6_GW_nuc
+
+    main(config_fn_, domestic_re_share_)

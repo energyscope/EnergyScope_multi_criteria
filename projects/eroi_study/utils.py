@@ -4,6 +4,7 @@ from sys import platform
 import os
 
 import yaml
+import pandas as pd
 
 
 def load_config(config_fn: str):
@@ -31,3 +32,24 @@ def load_config(config_fn: str):
         cfg[param] = os.path.join(cfg['energyscope_dir'], cfg[param])
 
     return cfg
+
+
+def rename_columns(df: pd.DataFrame, old_col: list, new_col: list):
+    """
+    Rename columns of a pd.DataFrame.
+    """
+    new_cols = list(df.columns)
+    for item_old, item_new in zip(old_col, new_col):
+        new_cols = replace_item_in_list(target_list=new_cols, item_old=item_old, item_new=item_new)
+    df.columns = new_cols
+    return df
+
+
+def replace_item_in_list(target_list: list, item_old: str, item_new: str):
+    """
+    Replace a specific item into a list.
+    """
+    for i in range(len(target_list)):
+        if target_list[i] == item_old:
+            target_list[i] = item_new
+    return target_list

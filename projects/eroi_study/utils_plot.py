@@ -27,8 +27,8 @@ def plot_one_serie(df: pd.DataFrame, label: str, pdf_name: str, x_index: list, y
     plt.ylim(ylim[0], ylim[1])
     plt.legend(fontsize=15)
     plt.tight_layout()
-    # plt.savefig(pdf_name)
-    # plt.close()
+    plt.savefig(pdf_name)
+    plt.close()
 
 
 def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: str, label_2: str, pdf_name: str,
@@ -51,8 +51,8 @@ def plot_two_series(df_data_1: pd.DataFrame, df_data_2: pd.DataFrame, label_1: s
     plt.ylim(ylim[0], ylim[1])
     plt.legend(fontsize=fontsize)
     plt.tight_layout()
-    # plt.savefig(pdf_name)
-    # plt.close()
+    plt.savefig(pdf_name)
+    plt.close()
 
 
 def plot_stacked_bar(df: pd.DataFrame, xlabel: str, ylabel: str, ylim: float, pdf_name: str,
@@ -61,12 +61,15 @@ def plot_stacked_bar(df: pd.DataFrame, xlabel: str, ylabel: str, ylim: float, pd
     Stacked bar plot of a pd.DataFrame.
     """
     # plt.figure()
-    df.plot(kind='bar', stacked=True, color=colors)
+    ax = df.plot(kind='bar', stacked=True, color=colors)
     plt.xticks(fontsize=15)
+    plt.xticks(labels=[t if i % 3 == 0 else '' for i, t in enumerate(df.index)], ticks=range(0, len(df.index)))
     plt.yticks(fontsize=15)
     plt.ylabel(ylabel, fontsize=15)
     plt.xlabel(xlabel, fontsize=15)
     plt.ylim(0, ylim)
+    ax.spines.right.set_visible(False)
+    ax.spines.top.set_visible(False)
     plt.legend(fontsize=15, ncol=ncol)
     plt.tight_layout()
     plt.savefig(pdf_name)

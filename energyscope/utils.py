@@ -17,18 +17,18 @@ def make_dir(path: str):
         os.mkdir(path)
 
 
-def get_colors(elements: List[str], element_type: str, data_path: str) -> pd.Series:
+def get_colors(elements: List[str], element_type: str, user_data_path: str) -> pd.Series:
     """
     Return the list of colors (in hexadecimal) corresponding to the resources or techs passed
     :param elements: List of resources or technologies
     :param element_type: 'resource' or 'technologies'
-    :param data_path: Path to Data directory
+    :param user_data_path: Path to Data directory
     """
 
     accepted_types = ['resources', 'technologies']
     assert element_type in accepted_types, f'Error: element_type must be one of {accepted_types}.'
 
-    fn = os.path.join(data_path, f"User_data/aux_{element_type}.csv")
+    fn = os.path.join(user_data_path, f"aux_{element_type}.csv")
     colors = pd.read_csv(fn, index_col=0)["Color"]
 
     for element in elements:
@@ -37,22 +37,22 @@ def get_colors(elements: List[str], element_type: str, data_path: str) -> pd.Ser
     return colors.loc[elements]
 
 
-def get_names(elements: List[str], element_type: str, data_path: str) -> pd.Series:
+def get_names(elements: List[str], element_type: str, user_data_path: str) -> pd.Series:
     """
     Return the list of names corresponding to the resources or techs passed
     :param elements: List of resources or technologies
     :param element_type: 'resource' or 'technologies'
-    :param data_path: Path to Data directory
+    :param user_data_path: Path to Data directory
     """
 
     accepted_types = ['resources', 'technologies']
     assert element_type in accepted_types, f'Error: element_type must be one of {accepted_types}.'
 
-    fn = os.path.join(data_path, f"User_data/aux_{element_type}.csv")
+    fn = os.path.join(user_data_path, f"aux_{element_type}.csv")
     colors = pd.read_csv(fn, index_col=0)["Name"]
 
     for element in elements:
-        assert element in colors.index, f'Error: element {element} has no associated color.'
+        assert element in colors.index, f'Error: element {element} has no associated name.'
 
     return colors.loc[elements]
 

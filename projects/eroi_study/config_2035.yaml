@@ -1,4 +1,5 @@
 # Path from main directory to energyscope subdirectories and files
+energyscope_dir: '/home/duboisa1/Global_Grid/code/EnergyScope_multi_criteria'
 # Case studies directory and name of case study
 case_studies_dir: 'case_studies'
 case_study_name: 'run_100'

@@ -1,0 +1,32 @@
+locals:
+  - "RES_WIND"
+  - "RES_SOLAR"
+  - "RES_HYDRO"
+  - "RES_GEO"
+  - "WASTE"
+  - "WET_BIOMASS"
+  - "WOOD"
+imports:
+  - "AMMONIA"
+  - "AMMONIA_RE"
+  - "BIODIESEL"
+  - "BIOETHANOL"
+  - "COAL"
+  - "DIESEL"
+  - "ELECTRICITY"
+  - "GAS"
+  - "GAS_RE"
+  - "GASOLINE"
+  - "H2"
+  - "H2_RE"
+  - "LFO"
+  - "METHANOL"
+  - "METHANOL_RE"
+methanol-re:
+  - "METHANOL_RE"
+gas-re:
+  - "GAS_RE"
+gas:
+  - "GAS"
+elec-import:
+  - "ELECTRICITY"

@@ -1,5 +1,5 @@
 Category,Subcategory,Technologies name,parameter name,c_inv,c_maint,gwp_constr,einv_constr,lifetime,c_p,fmin_perc,fmax_perc,f_min,f_max
-,,Name (simplified),Name (in model and documents),"[Meuro/GW],[Meuro/GWh],[Meuro/(Mkmpass/h)],[Meuro/(Mtonkm/h)]","[Meuro/GW],[Meuro/GWh],[Meuro/(Mkmpass/h)],[Meuro/(Mtonkm/h)]","[ktonCO2_eq/GW],[ktonCO2_eq/GWh],[ktonCO2_eq/(Mkmpass/h)],[ktonCO2_eq/(Mtonkm/h)]",[GWh/y],[years],[],[],[],[GW],[GW]
+,,Name (simplified),Name (in model and documents),"[Meuro/GW],[Meuro/GWh],[Meuro/(Mkmpass/h)],[Meuro/(Mtonkm/h)]","[Meuro/GW],[Meuro/GWh],[Meuro/(Mkmpass/h)],[Meuro/(Mtonkm/h)]","[ktonCO2_eq/GW],[ktonCO2_eq/GWh],[ktonCO2_eq/(Mkmpass/h)],[ktonCO2_eq/(Mtonkm/h)]",[GWh/GW],[years],[],[],[],[GW],[GW]
 Storage,Other storage,Ammonia storage,AMMONIA_STORAGE,0.00635,0.000397,0.00141,0.00659,20,1.0,0,1.0,0,1000000000000000.0
 Synthetic fuels,Synthetic fuels,Amonia to H2,AMMONIA_TO_H2,681.0,62.9,964.0,4440.0,25,0.86,0,1.0,0,1000000000000000.0
 Synthetic fuels,Synthetic fuels,Carbon capture atmospheric,ATM_CCS,5160.0,128.0,631.0,5610.0,40,1.0,0,1.0,0,1000000000000000.0

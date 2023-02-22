@@ -1,28 +1,28 @@
 parameter name,Category,Subcategory,Name,Color
-ELECTRICITY,Non-renewable,Other non-renewable,Elec. import,#00b0f0
-GASOLINE,Non-renewable,Fossil fuel,Gasoline,#858585
-DIESEL,Non-renewable,Fossil fuel,Diesel,#d8d8d8
-BIOETHANOL,Renewable,Biofuel,Bio-ethanol,#858585
-BIODIESEL,Renewable,Biofuel,Biodiesel,#d8d8d8
-LFO,Non-renewable,Fossil fuel,LFO,#8B008B
-GAS,Non-renewable,Fossil fuel,NG,#ffc000
-GAS_RE,Renewable,Biofuel,Gas-RE,#ffc000
-WOOD,Renewable,Biomass,Wood,#996633
-WET_BIOMASS,Renewable,Biomass,Wet biomass,#336600
-COAL,Non-renewable,Fossil fuel,Coal,#A0522D
+ELECTRICITY,Non-renewable,Other non-renewable,Elec. import,#FECA1F
+GASOLINE,Non-renewable,Fossil fuel,Gasoline,#D9A38B
+DIESEL,Non-renewable,Fossil fuel,Diesel,#B46970
+BIOETHANOL,Renewable,Biofuel,Bio-ethanol,#C77856
+BIODIESEL,Renewable,Biofuel,Bio-diesel,#8F464E
+LFO,Non-renewable,Fossil fuel,LFO,#472327
+GAS,Non-renewable,Fossil fuel,Gas,#78A58D
+GAS_RE,Renewable,Biofuel,Gas (Re.),#558069
+WOOD,Renewable,Biomass,Wood,#843D0A
+WET_BIOMASS,Renewable,Biomass,Wet biomass,#547240
+COAL,Non-renewable,Fossil fuel,Coal,#1E2924
 URANIUM,Non-renewable,Other non-renewable,Uranium,#E59014
-WASTE,Non-renewable,Other non-renewable,Waste,#808000
-H2,Non-renewable,Other non-renewable,H2,#da00ff
-H2_RE,Renewable,Biofuel,H2-RE,#da00ff
-AMMONIA,Non-renewable,Other non-renewable,Ammonia,#000ECD
-METHANOL,Non-renewable,Other non-renewable,Methanol,#CC0066
-AMMONIA_RE,Renewable,Biofuel,Ammonia-RE,#000ECD
-METHANOL_RE,Renewable,Biofuel,Methanol-RE,#CC0066
+WASTE,Non-renewable,Other non-renewable,Waste,#324426
+H2,Non-renewable,Other non-renewable,H2,#CE0707
+H2_RE,Renewable,Biofuel,H2 (Re.),#AC0606
+AMMONIA,Non-renewable,Other non-renewable,Ammonia,#064788
+METHANOL,Non-renewable,Other non-renewable,Methanol,#C27AEA
+AMMONIA_RE,Renewable,Biofuel,Ammonia (Re.),#0859AA
+METHANOL_RE,Renewable,Biofuel,Methanol (Re.),#A63DE0
 ELEC_EXPORT,Export,Export,Elec. export,#FED348
 CO2_EMISSIONS,Export,Export,CO2 emissions,#9AA6A6
-RES_WIND,Renewable,Non-biomass,Wind,#009d3f
-RES_SOLAR,Renewable,Non-biomass,Solar,#ffee00
-RES_HYDRO,Renewable,Non-biomass,Hydro,#0070c0
+RES_WIND,Renewable,Non-biomass,Wind,#6299DA
+RES_SOLAR,Renewable,Non-biomass,Solar,#FED037
+RES_HYDRO,Renewable,Non-biomass,Hydro,#054281
 RES_GEO,Renewable,Non-biomass,Geothermal,#632D07
 CO2_ATM,Others,Others,CO2 atm.,#748585
 CO2_INDUSTRY,Others,Others,CO2 industry,#535F5F

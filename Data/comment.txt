@@ -1,0 +1,27 @@
+The values contained in this folder are the same as in the original Data folder except for the following changes:
+
+Adrien's values for 2035
+
+% gwp_op
+BIOETHANOL 0.245
+BIODIESEL 0.22
+GAS_RE 0.0781
+H2_RE 0.0511
+AMMONIA_RE 0.0631
+METHANOL_RE 0.0745
+
+% einv_op
+BIOETHANOL 0.101
+BIODIESEL 0.101
+GAS_RE 0.147
+H2_RE 0.134
+AMMONIA 0.174
+AMMONIA_RE 0.295
+METHANOL_RE 0.146
+
+gwp_op ELECTRICITY --> linear interpolation from 481.2 (2015, stefano moret) to 0 in 2015 ==> 2035 = 206
+
+Where does it come from ?
+c_op and gwp_op ==> coming mostly from gauhtier's thesis (inversion for biodiesel and bioethanol)
+c_op BIODIESEL, BIOETHANOL, H2 -> correspond to values in readthedocs but a lot of missing sources
+einv_op --> ok muyldermans + orban

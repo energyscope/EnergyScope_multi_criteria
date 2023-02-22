@@ -16,7 +16,7 @@ model_path: 'projects/pareto/models'
 step1_output: 'energyscope/step1_io/TD_of_days_12.out'
 
 # PATH to AMPL licence (to adapt by the user)
-AMPL_path: '/home/duboisa1/ampl_linux-intel64'
+AMPL_path: '/home/duboisa1/ampl.linux-intel64'
 
 # Printing
 # printing the data in ETSD_data.dat file for the optimisation problem
@@ -63,9 +63,9 @@ Technologies:
 
 # Run options
 options:
-  solver: "/home/duboisa1/ampl_linux-intel64/cplex"
+  solver: "/home/duboisa1/ampl.linux-intel64/cplex"
   show_stats: 1
   log_file: "log.txt"
-  cplex_options: "timelimit=3600 bardisplay=1 display=1"
+  cplex_options: "timelimit=3600 bardisplay=0 display=0"
   # cplex_options: "timelimit=3600 crossover=0 bardisplay=1 display=1 feasibility=1e-3 optimality=1e-3"
   # cplex_options: "timelimit=3600 baropt predual=-1 crossover=0 aggregate=-1 ordering=1 prestats=1 bardisplay=1 display=1"

@@ -435,15 +435,13 @@ if __name__ == '__main__':
     # extract_results_step2(f"{output_dir_}cost")
     # extract_results_step2(f"{output_dir_}einv")
     extract_results_step2(f"{output_dir_}gwp")
-    exit()
 
     epsilons = [0.05, 0.07]  # [0.0025, 0.005, 0.01, 0.025, 0.05, 0.075]
     for epsilon in epsilons:
         extract_results_step2(f"{output_dir_}cost_epsilon_{epsilon}")
 
-    exit()
     epsilon_tuples = [(0.01, 0.01), (0.02, 0.02)]
     epsilons = [0.0025, 0.005, 0.01, 0.025, 0.05, 0.075]
     for epsilon in epsilons:
         for epsilon_cost, epsilon_einv in epsilon_tuples:
-            extract_results_step2(f"{output_dir_}{run_name_}_def2_{epsilon_cost}_{epsilon_einv}_{epsilon}")
+            extract_results_step2(f"{output_dir_}{run_name_}_{epsilon_cost}_{epsilon_einv}_{epsilon}")

@@ -40,5 +40,6 @@ printing_td: True
 }
 
 # Printing more detailed outputs
+'print_barh' : False
 'print_hourly_data': True
-'print_sankey': True
+'print_sankey': False

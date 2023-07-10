@@ -48,20 +48,19 @@ if __name__ == '__main__':
 
     # Reading outputs
     outputs = es.read_outputs(config['case_study'], hourly_data=True, layers=['layer_ELECTRICITY','layer_HEAT_LOW_T_DECEN'])
-
-    # Plots (examples)
-    # primary resources used
-    fig2, ax2 = es.plot_barh(outputs['resources_breakdown'][['Used']], title='Primary energy [GWh/y]',show_plot=True)
-
-    # elec assets
     elec_assets = es.get_assets_l(layer='ELECTRICITY', eff_tech=config['all_data']['Layers_in_out'],
                                   assets=outputs['assets'])
-    fig3, ax3 = es.plot_barh(elec_assets[['f']], title='Electricity assets [GW_e]',x_label='Installed capacity [GW_e]')
+    # Plots (examples)
+    # primary resources used
+    if config['print_barh']:
+        fig2, ax2 = es.plot_barh(outputs['resources_breakdown'][['Used']], title='Primary energy [GWh/y]')
+        fig3, ax3 = es.plot_barh(elec_assets[['f']], title='Electricity assets [GW_e]',x_label='Installed capacity [GW_e]')
 
-    # layer_ELECTRICITY for the 12 tds
-    elec_layer_plot = es.plot_layer_elec_td(outputs['layer_ELECTRICITY'])
     # layer_HEAT_LOW_T_DECEN for the 12 tds
-    fig,ax = es.hourly_plot(plotdata=outputs['layer_HEAT_LOW_T_DECEN'], nbr_tds=12)
-    plt.show()
+    if config['print_hourly_data']:
+        fig, ax = es.hourly_plot(plotdata=outputs['layer_HEAT_LOW_T_DECEN'], nbr_tds=12, show_plot=True)
+        elec_layer_plot = es.plot_layer_elec_td(outputs['layer_ELECTRICITY'])
+
+
     
     

@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from energyscope import elec_order_graphs, plotting_names, rename_storage_power, colors_elec
 
 
-def hourly_plot(plotdata: pd.DataFrame, title='', xticks=None, figsize=(17,7), colors=None, nbr_tds=None, show=True):
+def hourly_plot(plotdata: pd.DataFrame, title='', xticks=None, figsize=(17,7), colors=None, nbr_tds=None, show_plot =True):
     """Cleans and plot the hourly data
     Drops the null columns and plots the hourly data in plotdata dataframe as stacked bars
 
@@ -57,11 +57,12 @@ def hourly_plot(plotdata: pd.DataFrame, title='', xticks=None, figsize=(17,7), c
             ax.axvline(x=i * 24, color='dimgray', linestyle='--')
     plt.subplots_adjust(right=0.75)
     fig.tight_layout()
-    fig.show()
+    if show_plot:
+        plt.show()
     return fig, ax
 
 
-def plot_layer_elec_td(layer_elec: pd.DataFrame, title='Layer electricity', tds = np.arange(1,13), reorder_elec=None, figsize=(13,7), xticks=None):
+def plot_layer_elec_td(layer_elec: pd.DataFrame, title='Layer electricity', tds = np.arange(1,13), reorder_elec=None, figsize=(13,7), xticks=None, show_plot =True):
     """Cleans and plots the layer electricity
     Select the rows linked with specific TD, reorder the columns for the plot,
     merge the EVs columns with the batteries output, drop the null columns and plots
@@ -145,12 +146,14 @@ def plot_layer_elec_td(layer_elec: pd.DataFrame, title='Layer electricity', tds 
     plotdata.rename(columns=lambda x: rename_storage_power(x) if x.endswith('Pin') or x.endswith('Pout') else x, inplace=True)
 
     fig, ax = hourly_plot(plotdata=plotdata, title=title, xticks=xticks, figsize=figsize, colors=colors_elec,
-                          nbr_tds=tds[-1], show=True)
+                          nbr_tds=tds[-1], show_plot=True)
+    if show_plot:
+        plt.show()
 
     return {'fig': fig, 'ax': ax, 'other_prods': other_prods, 'other_cons': other_cons}
 
 
-def plot_barh(plotdata: pd.DataFrame, treshold=0.15, title='', x_label='', y_label='', xlim=None, legend=None, figsize=(13,7), show_plot=True):
+def plot_barh(plotdata: pd.DataFrame, treshold=0.15, title='', x_label='', y_label='', xlim=None, legend=None, figsize=(13,7),show_plot =True):
     """Cleans and plot the plotdata into a barh ordered plot
     Drops the rows with maximum value below the treshold in plotdata, sort them according to the last column
     and plots them in a barh plot
@@ -212,6 +215,6 @@ def plot_barh(plotdata: pd.DataFrame, treshold=0.15, title='', x_label='', y_lab
 
     fig.tight_layout()
     if show_plot:
-        fig.show()
+        plt.show()
 
     return fig,ax

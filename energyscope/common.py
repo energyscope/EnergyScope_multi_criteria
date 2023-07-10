@@ -124,6 +124,7 @@ colors_elec = {'Ind. cogen. gas': '#DC143C', # Heat HT in sankey
                'Public mobility': '#EDA200', # Very light brown
                'Other cons.': '#329da8', # Blue-green
                'DHN HP elec.': '#F20000', # Red
+               'DHN cogen. gas': '#FFD700', # yellow
                'Dec. HP elec.': '#FF6D66', # Light red
                'Ind. direct elec.': '#B60000', # Dark red
                'Lithium batt. Pout': '#6fb1c7', #Light blue (close to elec)

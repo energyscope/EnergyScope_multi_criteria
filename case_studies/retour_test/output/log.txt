@@ -29,7 +29,7 @@ solve_result = solved
 
 solve_result_num = 0
 
-_solve_elapsed_time = 18.438
+_solve_elapsed_time = 18.531
 
 TotalCost 47091.17090123794
 GWP_op 99999.99909107437
@@ -47,4 +47,3 @@ Einv_tot 65807.74258931639
 --------------SAVING ASSETS -----------
 --------------SAVING STORAGE -----------
 --------------SAVING LAYERS -----------
---------------SAVING SANKEY --------

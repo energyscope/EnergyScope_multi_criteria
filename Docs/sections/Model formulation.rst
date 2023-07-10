@@ -53,8 +53,8 @@ scenario). The following :numref:`Figure %s <fig:ProcessStructure>`  illustrates
 
 
 
-This documentation is built from previous works (:cite:`Moret2017PhDThesis,Limpens2019,Limpens2021thesis`). 
-For more details about the research approach, the choice of clustering method or the reconstruction method; refer to :cite:`Limpens2021thesis`.
+This documentation is built from previous works (:cite:`Moret2017PhDThesis,Limpens2019,limpens2021generating`). 
+For more details about the research approach, the choice of clustering method or the reconstruction method; refer to :cite:`limpens2021generating`.
 
 
 .. _sec_td_selection:
@@ -192,7 +192,7 @@ defined as “*the energy which reaches the final consumer’s door*”
 input energy needed to satisfy the EUD in energy services. As an
 example, in the case of decentralised heat production with a NG boiler,
 the FEC is the amount of NG consumed by the boiler; the EUD is the
-amount of heat produced by the boiler, i.e. the heating service needed
+amount of heat produced by the boiler, i.e. the heating service needed
 by the final user.
 
 The input for the proposed modelling framework is the EUD in energy
@@ -229,7 +229,7 @@ energy system encompasses all the energy conversion technologies needed
 to transform resources and supply the EUD. In this example, Solar and NG
 resources cannot be directly used to supply heat. Thus, they use
 technologies, such as boilers or CHP for NG, to supply the EUT layer
-(e.g. the high temperature industrial heat layer). *Layers* are defined
+(e.g. the high temperature industrial heat layer). *Layers* are defined
 as all the elements in the system that need to be balanced in each time
 period; they include resources and EUTs. As an example, the electricity
 layer must be balanced at any time, meaning that the production and
@@ -291,7 +291,7 @@ for sets, Tables :numref:`%s <tab:paramsDistributions>` and
 :numref:`%s <tab:variablesdependent>` for variables. On
 this basis, the equations representing the constraints and the objective
 function are formulated in  :numref:`Figure %s <fig:EndUseDemand>` and
-Eqs. :eq:`eq:obj_func` - :eq:`eq:efficiency`
+Eqs. :eq:`eq:obj_func` - :eq:`eq:efficiency`
 and described in the following paragraphs.
 
 .. _ssec_sets_params_vars:
@@ -662,7 +662,7 @@ Energy model formulation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the following, the overall LP formulation is proposed through :numref:`Figure %s <fig:EndUseDemand>` and equations
- (`[eq:obj_func] <#eq:obj_func>`)-(`[eq:efficiency] <#eq:efficiency>`)
+ :eq:`eq:obj_func` - :eq:`eq:solarAreaLimited`
 the constraints are regrouped in paragraphs. It starts with the
 calculation of the EUD. Then, the cost, the GWP and the objective
 functions are introduced. Then, it follows with more specific
@@ -742,7 +742,7 @@ Cost, emissions and objective function
     ~~~~~~ \forall i \in \text{RES}
     :label: eq:c_op
 
-The objective, Eq. :eq:`eq:obj_func`, is the
+The objective, Eq. :eq:`eq:obj_func`, is the
 minimisation of the total annual cost of the energy system (:math:`\textbf{C}_{\textbf{tot}}`),
 defined as the sum of the annualized investment cost of the technologies
 (:math:`\tau\textbf{C}_{\textbf{inv}}`), the operating and maintenance cost of the
@@ -751,15 +751,15 @@ technologies (:math:`\textbf{C}_{\textbf{maint}}`) and the operating cost of the
 results from the multiplication of its specific investment cost
 (:math:`c_{inv}`) and its installed size (**F**), the latter defined with
 respect to the main end-uses output [3]_ type,
-Eq. :eq:`eq:c_inv`. :math:`\textbf{C}_{\textbf{inv}}` is annualised with the
+Eq. :eq:`eq:c_inv`. :math:`\textbf{C}_{\textbf{inv}}` is annualised with the
 factor :math:`\tau`, calculated based on the interest rate (:math:`t_{op}`)
-and the technology lifetime (*lifetime*), Eq. :eq:`eq:tau`.
+and the technology lifetime (*lifetime*), Eq. :eq:`eq:tau`.
 The total operation and maintenance cost is calculated in the same way,
-Eq. :eq:`eq:c_maint`. The total cost of the resources is
+Eq. :eq:`eq:c_maint`. The total cost of the resources is
 calculated as the sum of the end-use over different periods multiplied
 by the period duration (:math:`t_{op}`) and the specific cost of the resource
-(:math:`c_{op}`), Eq. :eq:`eq:c_op`. Note that, in
-Eq. :eq:`eq:c_op`), summing over the typical days using the
+(:math:`c_{op}`), Eq. :eq:`eq:c_op`. Note that, in
+Eq. :eq:`eq:c_op`), summing over the typical days using the
 set T_H_TD [4]_ is equivalent to summing over the 8760h of the year.
 
 .. math::
@@ -781,7 +781,7 @@ The global annual GHG emissions are calculated using a LCA approach,
 i.e. taking into account emissions of the technologies and resources
 ‘*from cradle to grave*’. For climate change, the natural choice as
 indicator is the GWP, expressed in ktCO\ :math:`_2`-eq./year. In
-Eq. :eq:`eq:GWP_tot`, the total yearly emissions of the
+Eq. :eq:`eq:GWP_tot`, the total yearly emissions of the
 system (:math:`\textbf{GWP}_{\textbf{tot}}`) are defined as the sum of the emissions related to
 the construction and end-of-life of the energy conversion technologies
 :math:`\textbf{GWP}_{\textbf{constr}}`, allocated to one year based on the technology
@@ -789,16 +789,16 @@ lifetime (:math:`lifetime`), and the emissions related to resources
 :math:`\textbf{GWP}_{\textbf{op}}`). Similarly to the costs, the total emissions related to
 the construction of technologies are the product of the specific
 emissions (:math:`gwp_{constr}` and the installed size (:math:`\textbf{F}`),
-Eq. :eq:`eq:GWP_constr`. The total emissions of the
+Eq. :eq:`eq:GWP_constr`. The total emissions of the
 resources are the emissions associated to fuels (from cradle to
 combustion) and imports of electricity (:math:`gwp_{op}`) multiplied by the
-period duration (:math:`t_{op}`), Eq. :eq:`eq:GWP_op`. GWP
+period duration (:math:`t_{op}`), Eq. :eq:`eq:GWP_op`. GWP
 accounting can be conducted in different manners deepending on the scope of emission. The
 European Commission and the IEA mainly uses resource-related emissions
 :math:`\textbf{GWP}_{\textbf{op}}` while neglecting indirect emissions related to the
 construction of technologies :math:`\textbf{GWP}_{\textbf{constr}}`. To facilitate the
 comparison with their results, a similar implementation is proposed in
-Eq. :eq:`eq:GWP_tot`.
+Eq. :eq:`eq:GWP_tot`.
 
 System design and operation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -809,7 +809,7 @@ System design and operation
 
 The installed capacity of a technology (**F**) is constrained between
 upper and lower bounds (*f\ max* and *f\ min*),
-Eq. :eq:`eq:fmin_fmax`. This formulation allows
+Eq. :eq:`eq:fmin_fmax`. This formulation allows
 accounting for old technologies still existing in the target year (lower
 bound), but also for the maximum deployment potential of a technology.
 As an example, for offshore wind turbines, :math:`f_{min}` represents
@@ -842,11 +842,11 @@ these two is needed, the other one being fixed to the default value of
 1. For example, intermittent renewables are constrained by an hourly
 load factor (:math:`c_{p,t}\in[0;1]`) while CCGTs are constrained by
 an annual load factor (:math:`c_{p}`, in that case 96% in 2035).
-Eqs. :eq:`eq:cp_t` and :eq:`eq:c_p` link the
+Eqs. :eq:`eq:cp_t` and :eq:`eq:c_p` link the
 installed size of a technology to its actual use in each period (:math:`\textbf{F}_{\textbf{t}}`)
 via the two capacity factors. The total use of resources is limited by
 the yearly availability (:math:`avail`),
-Eq. :eq:`eq:res_avail`.
+Eq. :eq:`eq:res_avail`.
 
 .. math::
     \sum_{i \in \text{RES}~\cup \text{TECH} \setminus \text{STO}} f(i,l) \textbf{F}_\textbf{t}(i,h,td) + \sum_{j \in \text{STO}} \bigg(\textbf{Sto}_\textbf{out}(j,l,h,td) - \textbf{Sto}_\textbf{in}(j,l,h,td)\bigg)  
@@ -858,7 +858,7 @@ Eq. :eq:`eq:res_avail`.
   
 The matrix :math:`f` defines for all technologies and resources outputs to
 (positive) and inputs (negative) layers.
-Eq. :eq:`eq:layer_balance` expresses the balance
+Eq. :eq:`eq:layer_balance` expresses the balance
 for each layer: all outputs from resources and technologies (including
 storage) are used to satisfy the EUD or as inputs to other resources and
 technologies.
@@ -890,15 +890,15 @@ The storage level (:math:`\textbf{Sto}_{\textbf{level}}`) at a time step (:math:
 to the storage level at :math:`t-1` (accounting for the losses in
 :math:`t-1`), plus the inputs to the storage, minus the output from the
 storage (accounting for input/output efficiencies),
-Eq. :eq:`eq:sto_level`:. The storage systems which can
+Eq. :eq:`eq:sto_level`:. The storage systems which can
 only be used for short-term (daily) applications are included in the
 daily storage set (STO DAILY). For these units,
-Eq. :eq:`eq:Sto_level_bound_DAILY`: imposes
+Eq. :eq:`eq:Sto_level_bound_DAILY`: imposes
 that the storage level be the same at the end of each typical day [5]_.
 Adding this constraint drastically reduces the computational time. For
 the other storage technologies, which can also be used for seasonal
 storage, the capacity is bounded by
-Eq. :eq:`eq:Sto_level_bound`. For these units,
+Eq. :eq:`eq:Sto_level_bound`. For these units,
 the storage behaviour is thus optimized over 8760h.
 
 .. math::
@@ -916,13 +916,13 @@ the storage behaviour is thus optimized over 8760h.
     \forall j \in STO \setminus {V2G} , \forall l \in L, \forall h \in H, \forall td \in TD
 
 
-Eqs. :eq:`eq:StoInCeil` - :eq:`eq:StoOutCeil`
+Eqs. :eq:`eq:StoInCeil` - :eq:`eq:StoOutCeil`
 force the power input and output to zero if the layer is
 incompatible [6]_. As an example, a PHS will only be linked to the
 electricity layer (input/output efficiencies :math:`>` 0). All other
 efficiencies will be equal to 0, to impede that the PHS exchanges with
 incompatible layers (e.g. mobility, heat, etc).
-Eq. :eq:`eq:LimitChargeAndDischarge`
+Eq. :eq:`eq:LimitChargeAndDischarge`
 limits the power input/output of a storage technology based on its
 installed capacity (**F**) and three specific characteristics. First,
 storage availability (:math:`\%_{sto_{avail}}`) is defined as the ratio between
@@ -936,7 +936,7 @@ storage [7]_. As an example, a daily thermal storage needs at least 4
 hours to discharge
 (:math:`t_{sto_{out}}=4`\ [h]), and
 another 4 hours to charge
-(:math:`t_{sto_{in}}=4`\ [h]). Eq. :eq:`eq:LimitChargeAndDischarge` applies for 
+(:math:`t_{sto_{in}}=4`\ [h]). Eq. :eq:`eq:LimitChargeAndDischarge` applies for 
 all storage except electric vehicles which are limited by another constraint Eq. :eq:`eq:LimitChargeAndDischarge_ev`, presented later.
 
 Networks
@@ -963,18 +963,18 @@ Networks
     \textbf{F} (DHN) = \sum_{j \in \text{TECH} \setminus {STO} | f(j,\text{HeatLowTDHN}) >0} f(j,\text{HeatLowTDHN}) \cdot \textbf{F} (j) 
     :label: eq:DHNCost
 
-Eq. :eq:`eq:loss` calculates network losses as a share
+Eq. :eq:`eq:loss` calculates network losses as a share
 (:math:`%_{net_{loss}}`) of the total energy transferred through the network. As
 an example, losses in the electricity grid are estimated to be 4.5\% of
 the energy transferred in 2015 [8]_.
-Eqs. :eq:`eq:mult_grid` - :eq:`eq:DHNCost`
+Eqs. :eq:`eq:mult_grid` - :eq:`eq:DHNCost`
 define the extra investment for networks. Integration of intermittent RE
 implies additional investment costs for the electricity grid
 (:math:`c_{grid,ewtra}`). As an example, the reinforcement of the electricity
 grid is estimated to be 358 millions €\ :sub:`2015` per Gigawatt of
 intermittent renewable capacity installed (see 
 `Data for the grid <#ssec:app1_grid:>`__ for details).
-Eq. :eq:`eq:DHNCost` links the size of DHN to the total
+Eq. :eq:`eq:DHNCost` links the size of DHN to the total
 size of the installed centralized energy conversion technologies.
 
 Additional Constraints
@@ -985,7 +985,7 @@ Additional Constraints
     :label: eq:CstNuke
 
 Nuclear power plants are assumed to have no power variation over the
-year, Eq. :eq:`eq:CstNuke`. If needed, this equation can
+year, Eq. :eq:`eq:CstNuke`. If needed, this equation can
 be replicated for all other technologies for which a constant operation
 over the year is desired.
 
@@ -1006,12 +1006,12 @@ over the year is desired.
     :label: eq:freight_share_constant
 
 
-Eqs. :eq:`eq:mob_share_fix` - :eq:`eq:freight_share_fix`
+Eqs. :eq:`eq:mob_share_fix` - :eq:`eq:freight_share_fix`
 impose that the share of the different technologies for mobility
 (:math:`\textbf{%}_{\textbf{PassMob}}`) and (:math:`\textbf{%}_{\textbf{Freight}}`) be the same at each time
 step [9]_. In other words, if 20% of the mobility is supplied by train,
 this share remains constant in the morning or the afternoon.
-Eq. :eq:`eq:freight_share_constant`
+Eq. :eq:`eq:freight_share_constant`
 verifies that the freight technologies supply the overall freight demand
 (this constraint is related to :numref:`Figure %s <fig:EndUseDemand>`).
 
@@ -1036,10 +1036,10 @@ installed together with another decentralized technology, which serves
 as backup to compensate for the intermittency of solar thermal. Thus, we
 define the total installed capacity of solar thermal
 **F**\ ('':math:`Dec_{solar}`'') as the sum of **F\ sol**\ (:math:`j`),
-Eq. :eq:`eq:de_strategy_dec_total_ST`,
+Eq. :eq:`eq:de_strategy_dec_total_ST`,
 where :math:`\textbf{F}_{\textbf{sol}}(j)` is the solar thermal
 capacity associated to the backup technology :math:`j`.
-Eq. :eq:`eq:op_strategy_dec_total_ST`
+Eq. :eq:`eq:op_strategy_dec_total_ST`
 links the installed size of each solar thermal capacity
 :math:`\textbf{F}_{\textbf{sol}}(j)` to its actual production
 ::math:`\textbf{F}_{\textbf{t}_\textbf{sol}}(j,h,td))` via the
@@ -1066,7 +1066,7 @@ solar capacity factor (:math:`c_{p,t}('Dec_{solar}')`).
    Illustrative example of a decentralised heating layer with thermal
    storage, solar thermal and two conventional production technologies,
    gas boilers and electrical HP. In this case,
-   Eq. :eq:`eq:heat_decen_share` applied to the
+   Eq. :eq:`eq:heat_decen_share` applied to the
    electrical HPs becomes the equality between the two following terms:
    left term is the heat produced by: the eHPs
    (:math:`\textbf{F}_{\textbf{t}}('eHPs',h,td)`), the solar panel
@@ -1082,14 +1082,14 @@ technology :math:`j`, to which it is related via the set *TS OF DEC TECH*,
 i.e. :math:`i`\ =\ *TS OF DEC TECH(j)*. Each thermal storage :math:`i` can store
 heat from its technology :math:`j` and the associated thermal solar
 :math:`\textbf{F}_{\textbf{sol}}` (:math:`j`). Similarly to the passenger mobility,
-Eq. :eq:`eq:heat_decen_share` makes the model
+Eq. :eq:`eq:heat_decen_share` makes the model
 more realistic by defining the operating strategy for decentralized
 heating. In fact, in the model we represent decentralized heat in an
 aggregated form; however, in a real case, residential heat cannot be
 aggregated. A house heated by a decentralised gas boiler and solar
 thermal panels should not be able to be heated by the electrical heat
 pump and thermal storage of the neighbours, and vice-versa. Hence,
-Eq. :eq:`eq:heat_decen_share` imposes that the
+Eq. :eq:`eq:heat_decen_share` imposes that the
 use of each technology (:math:`\textbf{F}_{\textbf{t}}(j,h,td)`),
 plus its associated thermal solar
 (:math:`\textbf{F}_{\textbf{t}_\textbf{sol}}(j,h,td)`) plus
@@ -1133,7 +1133,7 @@ in [km-pass/h] and its capacity per vehicles (:math:`veh_{capa}` in
 [km-pass/h/veh.]). Thus, the energy that can be stored in batteries
 **F**\ (:math:`i`) of *V2G*\ (:math:`j`) is the ratio of the installed capacity of
 vehicle by its specific capacity per vehicles times the size of battery
-per car (:math:`ev_{batt,size}(j)`), Eq. 
+per car (:math:`ev_{batt,size}(j)`), Eq. 
 :eq:`eq:SizeOfBEV`. As an example, if this technology
 of cars covers 10 Mpass-km/h, and the capacity per vehicle is 50.4
 pass-km/car/h (which represents an average speed of 40km/h and occupancy
@@ -1151,12 +1151,12 @@ Leaf (ZE0), thus, the equivalent battery has a capacity of 4.76 GWh.
 
 
 
-Eq. :eq:`eq:BtoBEV` forces batteries of electric vehicles
+Eq. :eq:`eq:BtoBEV` forces batteries of electric vehicles
 to supply, at least, the energy required by each associated electric
 vehicle technology. This lower bound is not an equality; in fact,
 according to the V2G concept, batteries can also be used to support the
 grid. :numref:`Figure %s <fig:V2GAndBatteries>` shows through an example
-with only BEVs how Eq. :eq:`eq:BtoBEV` simplifies the
+with only BEVs how Eq. :eq:`eq:BtoBEV` simplifies the
 implementation of V2G. In this illustration, a battery technology is
 associated to a BEV. The battery can either supply the BEV needs or
 sends electricity back to the grid.
@@ -1169,7 +1169,7 @@ sends electricity back to the grid.
 
     \forall i \in V2G , \forall j \in \text{EVs_BATT OF V2G}(j) , \forall l \in L, \forall h \in H, \forall td \in TD
 
-Eq. :eq:`eq:LimitChargeAndDischarge_ev` limits the availability of batteries to the number of vehicle connected to the grid.
+Eq. :eq:`eq:LimitChargeAndDischarge_ev` limits the availability of batteries to the number of vehicle connected to the grid.
 This equation is similar to the one for other type of storage (see Eq. :eq:`eq:LimitChargeAndDischarge`); 
 except that a part of the batteries are not accounted, i.e. the one running (see Eq. :eq:`eq:BtoBEV`). 
 Therefore, the available output is corrected by removing the electricity powering the running car (here, :math:`f(i,Elec) \leq 0`) 
@@ -1183,7 +1183,7 @@ and the available batteries is corrected by removing the numbers of electric car
 
 For each electric vehicle (:math:`ev`), a minimum state of charge is imposed for each hour of the day \big(:math:`soc_{ev}(i,h)`\big). 
 As an example, we can impose that the state of charge of EV is 60% in the morning, to ensure that cars can be used to go for work. 
-Eq. :eq:`eq:EV_min_state_of_charge` imposes, for each type of `V2G`, 
+Eq. :eq:`eq:EV_min_state_of_charge` imposes, for each type of `V2G`, 
 that the level of charge of the EV batteries is greater than the minimum state of charge times the storage capacity.
 
 
@@ -1209,13 +1209,13 @@ Peak demand
     \%_{Peak_{sh}} \max_{h\in H,td\in TD}  \big\{ \textbf{EndUses}(HeatLowTDHN,h,td) \big\}
   
 Finally,
-Eqs. :eq:`eq:dec_peak` - :eq:`eq:dhn_peak`
+Eqs. :eq:`eq:dec_peak` - :eq:`eq:dhn_peak`
 constrain the installed capacity of low temperature heat supply. Based
 on the selected TDs, the ratio between the yearly peak demand and the
 TDs peak demand is defined for space heating (:math:`\%_{Peak_{sh}}`).
-Eq. :eq:`eq:dec_peak` imposes that the installed
+Eq. :eq:`eq:dec_peak` imposes that the installed
 capacity for decentralised technologies covers the real peak over the
-year. Similarly, Eq. :eq:`eq:dhn_peak` forces the
+year. Similarly, Eq. :eq:`eq:dhn_peak` forces the
 centralised heating system to have a supply capacity (production plus
 storage) higher than the peak demand. These equations force the
 installed capacity to meet the peak heating demand, i.e. which
@@ -1228,7 +1228,7 @@ Adaptations for the case study
 
 Additional constraints are required to implement scenarios. Scenarios
 require six additional constraints
-(Eqs. :eq:`eq:LimitGWP` - :eq:`eq:solarAreaLimited`)
+(Eqs. :eq:`eq:LimitGWP` - :eq:`eq:solarAreaLimited`)
 to impose a limit on the GWP emissions, the minimum share of RE primary
 energy, the relative shares of technologies, such as gasoline cars in
 the private mobility, the cost of energy efficiency measures, the
@@ -1250,9 +1250,9 @@ solar technologies.
 
 To force the Belgian energy system to decrease its emissions, two lever
 can constraint the annual emissions:
-Eq. :eq:`eq:LimitGWP` imposes a maximum yearly
+Eq. :eq:`eq:LimitGWP` imposes a maximum yearly
 emissions threshold on the GWP (:math:`gwp_{limit}`); and
-Eq. :eq:`eq:LimitRE` fixes the minimum renewable primary
+Eq. :eq:`eq:LimitRE` fixes the minimum renewable primary
 energy share.
 
 .. math::
@@ -1269,10 +1269,10 @@ energy share.
 
 
 To represent the Belgian energy system in 2015,
-Eq. :eq:`eq:fmin_max_perc` imposes the relative
+Eq. :eq:`eq:fmin_max_perc` imposes the relative
 share of a technology in its sector.
-Eq. :eq:`eq:fmin_max_perc` is complementary to
-Eq. :eq:`eq:fmin_fmax`, as it expresses the minimum
+Eq. :eq:`eq:fmin_max_perc` is complementary to
+Eq. :eq:`eq:fmin_fmax`, as it expresses the minimum
 (:math:`f_{min,\%}`) and maximum (:math:`f_{max,\%}`) yearly output shares of each
 technology for each type of EUD. In fact, for a given technology,
 assigning a relative share (e.g. boilers providing at least a given
@@ -1286,7 +1286,7 @@ indicated.
     :label: eq:efficiency
 
 To account for efficiency measures from today to the target year,
-Eq. :eq:`eq:efficiency` imposes their cost. The EUD
+Eq. :eq:`eq:efficiency` imposes their cost. The EUD
 is based on a scenario detailed in 
 `Data for end use demand <#sec:app1_end_uses>`__ and has a lower energy demand
 than the “business as usual” scenario, which has the highest energy
@@ -1309,10 +1309,10 @@ already expressed in €\ :sub:`2015`.
 
 
 
-Eq. :eq:`eq:elecImpLimited` limits the power grid
+Eq. :eq:`eq:elecImpLimited` limits the power grid
 import capacity from neighbouring countries based on a net transfer
-capacity (:math:`elec_{import,max}`). Eq. :eq:`eq:import_resources_constant` imposes that some resources are imported at a constant power. 
-As an example, gas and hydrogen are supposed imported at a constant flow during the year. 
+capacity (:math:`elec_{import,max}`). Eq. :eq:`eq:import_resources_constant` imposes that some resources are imported at a constant power. 
+As an example, gas or hydrogen are supposed to be imported at a constant flow during the year. 
 In addition to offering a more realistic representation, this implementation makes it possible to visualise the level of storage within the region (i.e. gas, petrol ...).
 
 .. caution::
@@ -1330,10 +1330,10 @@ In addition to offering a more realistic representation, this implementation mak
     + \big( \textbf{F}(Dec_{Solar}) + \textbf{F}(DHN_{Solar}) \big)/power\_density_{solar~thermal}  \leq solar_{area}
 
 In this model version, the upper limit for solar based technologies is
-calculated based on the available land area (*solar\ area*) and power
+calculated based on the available land area (:math:`solar_{area}`) and power
 densities of both PV (:math:`power\_density_{pv}`) and solar thermal
 (:math:`power\_density_{solar~thermal}`),
-Eq. :eq:`eq:solarAreaLimited`. The equivalence
+Eq. :eq:`eq:solarAreaLimited`. The equivalence
 between an install capacity (in watt peaks Wp) and the land use (in
 :math:`km^2`) is calculated based on the power peak density
 (in [Wp/m\ :math:`^2`]). In other words, it represents the peak power of a
@@ -1467,20 +1467,20 @@ documentation to support the modeler in her/his first steps.
 
 .. [9]
    [foot:nonLinear]All equations expressed in a compact non-linear form
-   in this section Eqs. :eq:`eq:mob_share_fix`, :eq:`eq:freight_share_fix`, 
+   in this section Eqs. :eq:`eq:mob_share_fix`, :eq:`eq:freight_share_fix`, 
    :eq:`eq:heat_decen_share` and :eq:`eq:dhn_peak` can be linearised. For these
    cases, the **EndUses** is defined with parameters and a variable
    representing a constant share over the year (e.g.  :math:`\textbf{%}_\textbf{public}`). As
    an example, **EndUses** in
-   Eq. :eq:`eq:mob_share_fix` is equal to
+   Eq. :eq:`eq:mob_share_fix` is equal to
    :math:`\textbf{EndUsesInput}(PassMb) \cdot %pass (h, td) / t_op (h, td)`.
    The term :math:`\textbf{%}_{\textbf{public}}`, is missing in the equation, but is implicitly
    implemented in :math:`\textbf{%}_{\textbf{PassMob}}`.
 
 .. [10]
    This generation (ZE0) was marketed from 2010 to 2017 with a battery
-   capacity of 24 kWh. The new generation (ZE1) accounts for an improved
-   capacity and reaches 40 kWh per battery. Data from
+   capacity of 24 kWh. The new generation (ZE1) accounts for an improved
+   capacity and reaches 40 kWh per battery. Data from
    https://en.wikipedia.org/wiki/Nissan_Leaf, consulted on 08-02-2021
 
 .. [11]
@@ -1500,10 +1500,10 @@ documentation to support the modeler in her/his first steps.
    The calculation is based on the annual capacity factor, the
    conversion efficiency and the average yearly irradiation. As an
    example, for PV, the efficiency in 2035 is estimated at
-   23% :cite:`DanishEnergyAgency2019` with an average daily
+   23% :cite:`DanishEnergyAgency2019` with an average daily
    irradiation - similar to historical values - of
-   2820 Wh/m\ \ :math:`^2` in
-   Belgium :cite:`IRM_Atlas_Irradiation`. The capacity
+   2820 Wh/m\ \ :math:`^2` in
+   Belgium :cite:`IRM_Atlas_Irradiation`. The capacity
    factor of solar is around 11.4%, hence specific area for 1 kilowatt
    peak (:math:`kW_p`) is
    :math:`2820/24\cdot0.23/0.114\approx236.7`\ \ [:math:`MW_p`/km\ \ :math:`^2`]=\ \ :math:`0.2367`
@@ -1514,4 +1514,3 @@ documentation to support the modeler in her/his first steps.
    provides free access to a library of optimization solvers, statistics
    are available at: https://neos-server.org/neos/report.html, consulted
    the 27/01/2021.
-

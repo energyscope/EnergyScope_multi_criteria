@@ -34,7 +34,7 @@ The data can be grouped into three parts: resources (Section `Resources <#app:se
 complement and confirm or correct the prices already reported in previous works
 :cite:`Moret2017PhDThesis,Limpens2019,limpens2020impact`.
 For energy demand, the annual demand is calculated from the work of the
-European Commission’s projections up to 2050
+European Commission's projections up to 2050
 :cite:`EuropeanCommission2016`. As a complement, the time
 series are all calculated on the basis of the year 2015. For
 technologies, they are characterised by the following characteristics:
@@ -397,12 +397,12 @@ Since, a specific study for the Belgian case has been conducted by a consortium 
       | ources**    | {op}`       | {op}`       | {2direct}`  |             |
       |             |             |             | [26]_       |             |
       +-------------+-------------+-------------+-------------+-------------+
-      |             | [€\ :sub:`2\| [kgCO\      | [kgCO:sub:`\| [GWh]       |
-      |             | 015`/MWh\   | :sub:`2-eq.`| 2`/MWh\     |             |
+      |             | [€\ :sub:`2\| [kgCO\      | [kgCO:sub:\ | [GWh]       |
+      |             | 015`/MWh\   | :sub:`2-eq.`| `2`/MWh\    |             |
       |             | :sub:`fuel`]| /MWh\       | :sub:`fuel`]|             |
       |             |             | :sub:`fuel`]|             |             |
       +-------------+-------------+-------------+-------------+-------------+
-      | Electricity | 84.3 [27]_  | 275.3 [28]_ | 0           | 27.5        |
+      | Electricity | 84.3 [27]_  | 206.4 [28]_ | 0           | 27.5        |
       | Import      |             |             |             |             |
       +-------------+-------------+-------------+-------------+-------------+
       | Gasoline    | 82.4 [29]_  | 345 [28]_   | 250         | infinity    |
@@ -425,7 +425,7 @@ Since, a specific study for the Belgian case has been conducted by a consortium 
       | non-RE      | 23.1        | 150  [28]_  | 260 [33]_   | 17.8        |
       | waste       |             |             |             |             |
       +-------------+-------------+-------------+-------------+-------------+
-      | Coal        | 17.6        | 401         | 360         | infinity    |
+      | Coal        | 17.6        | 401         | 360         | 33.3 [37]_  |
       |             |             | :cite:`\    |             |             |
       |             |             | we\         |             |             |
       |             |             | idema_ecoin\|             |             |
@@ -437,10 +437,10 @@ Since, a specific study for the Belgian case has been conducted by a consortium 
       |             |             | idema_ecoin\|             |             |
       |             |             | vent_2013`  |             |             |
       +-------------+-------------+-------------+-------------+-------------+
-      | Bio-diesel  | 111.3 [35]_ | 0  [36]_    | 270         | infinity    |
+      | Bio-diesel  | 120.0       | 0  [36]_    | 270         | infinity    |
       |             |             |             |             |             |
       +-------------+-------------+-------------+-------------+-------------+
-      | B\          | 120.0       | 0  [36]_    | 250         | infinity    |
+      | B\          | 111.3 [35]_ | 0  [36]_    | 250         | infinity    |
       | io-gasoline |             |             |             |             |
       +-------------+-------------+-------------+-------------+-------------+
       | Renew. gas  | 118.3       | 0 [36]_     | 200         | infinity    |
@@ -541,6 +541,10 @@ Since, a specific study for the Belgian case has been conducted by a consortium 
 .. [36]
    Emissions related to electro-fuels
    and bio-fuels production are neglected.
+   
+.. [37]
+   Belgium is phasing out coal. Coal is still used in industrial processes.
+   In 2015, 33.3 TWh of coal were used. Thus, the amount available should be lower than this value.
 
 
 .. _sec:app1_end_uses:
@@ -640,7 +644,7 @@ building. HDD is derived from measurements of outside air temperature.
 The heating requirements for a given building at a specific location are
 considered to be directly proportional to the number of HDD at that
 location. [...] Heating degree days are defined relative to a base
-temperature*”. According to the European Environment Agency [37]_, the
+temperature*”. According to the European Environment Agency [37b]_, the
 base temperature is 15.5\ :math:`^o`\ C, we took 16\ :math:`^o`\ C. HDH
 are computed as the difference between ambient temperature and the
 reference temperature at each hour of the year. If the ambient
@@ -671,9 +675,9 @@ By normalising the HDH, we find :math:`%_{sh}`, which is represented in
       ========== ================= ============= ========================
       \          **Space heating** **Hot water** **Process heat**\  [39]_
       \          [TWh]             [TWh]         [TWh]
-      Households 65.9              16.8          0
-      Industry   17.0              5.2           65.3
-      Services   23.1              4.4           0
+      Households 70.2              18.0          0
+      Industry   13.1              3.4           50.4
+      Services   34.8              7.8           0
       ========== ================= ============= ========================
 
    .. [39]
@@ -1156,7 +1160,7 @@ respectively, i.e. they are not constraining the model.
       +--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+
       | Boiler       | 58.9         | 1.2          | 12.3         | 17           | 95           | 0            | 92.7         | 0.216        |
       | NG           | :cite:`\     | :cite:`\     | [122]_       | \            |              |              | \            |              |
-      |              | \            | \            |              | \            |              |              | :cite:\      |              |
+      |              | \            | \            |              | \            |              |              | :cite:`\     |              |
       |              | Mo\          | Mo\          |              | :cite:`\     |              |              | Mo\          |              |
       |              | ret201\      | ret201\      |              | eur\         |              |              | ret201\      |              |
       |              | 7PhDTh\      | 7PhDTh\      |              | opean_\      |              |              | 7PhDTh\      |              |
@@ -1165,7 +1169,7 @@ respectively, i.e. they are not constraining the model.
       |              |              |              |              | nergy_\      |              |              |              |              |
       |              |              |              |              | 2008`        |              |              |              |              |
       +--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+
-      | Boiler       | 115          | 2.3          | 28.9         | 17           | 90           | 0            | 86.4:r       | 0.451        |
+      | Boiler       | 115          | 2.3          | 28.9         | 17           | 90           | 0            | 86.4         | 0.451        |
       | Wood         | \            | \            | \            | \            |              |              | \            |              |
       |              | :cite:`\     | :cite:`\     | \            | \            |              |              | :cite:`\     |              |
       |              | Mo\          | Mo\          | :cite:`\     | :cite:`\     |              |              | Mo\          |              |
@@ -1176,7 +1180,7 @@ respectively, i.e. they are not constraining the model.
       |              |              |              |              | nergy_\      |              |              |              |              |
       |              |              |              |              | 2008`        |              |              |              |              |
       +--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+
-      | Boiler       | 54.9         | 1.2          | 12.3         | 17           | 95           | 0            | 87.3:r       | 0.309        |
+      | Boiler       | 54.9         | 1.2          | 12.3         | 17           | 95           | 0            | 87.3         | 0.309        |
       | Oil          | [123]_       | [124]_       | \            | \            |              |              | \            |              |
       |              |              |              | \            | \            |              |              | :cite:`\     |              |
       |              |              |              | :cite:`\     | :cite:`\     |              |              | Mo\          |              |
@@ -1504,7 +1508,7 @@ respectively, i.e. they are not constraining the model.
       |            |            |            |            | nal_2\     |            |            |            |
       |            |            |            |            | 008`       |            |            |            |
       +------------+------------+------------+------------+------------+------------+------------+------------+
-      | Boiler     | 159        | 5.08       | 4.8        | 17         | 100        | 0          | 90:ra      |
+      | Boiler     | 159        | 5.08       | 4.8        | 17         | 100        | 0          | 90         |
       | NG         | \          | \          | \          | \          |            |            | \          |
       |            | \          | \          | \          | \          |            |            | \          |
       |            | \          | \          | \          | \          |            |            | :cite:`\   |
@@ -1530,8 +1534,8 @@ respectively, i.e. they are not constraining the model.
       |            | 4-1`       | 4-1`       |            | rgy_2\     |            |            | 4-1`       |
       |            |            |            |            | 008`       |            |            |            |
       +------------+------------+------------+------------+------------+------------+------------+------------+
-      | Boiler     | 142        | 8.5 [221]_ | 21         | 17         | 100        | 0          | 85:ra      |
-      | Oil        | \          |            | .1:ra      | \          |            |            | \          |
+      | Boiler     | 142        | 8.5 [221]_ | 21.1\      | 17         | 100        | 0          | 85         |
+      | Oil        | \          |            | \          | \          |            |            | \          |
       |            | \          |            | \          | \          |            |            | \          |
       |            | \          |            | \          | \          |            |            | :cite:`\   |
       |            | :cite:`\   |            | :cite:`\   | :cite:`\   |            |            | Moret\     |
@@ -1543,8 +1547,8 @@ respectively, i.e. they are not constraining the model.
       |            | 011`       |            |            | rgy_2\     |            |            |            |
       |            |            |            |            | 008`       |            |            |            |
       +------------+------------+------------+------------+------------+------------+------------+------------+
-      | Solar      | 719 [222]_ | 8.1 [223]_ | 221.2      | 20         | 1          | 0          | -          |
-      | Th.        |            |            | \          | \          | 1.3 [224]_ |            |            |
+      | Solar      | 719 [222]_ | 8.1 [223]_ | 221.2      | 20         | 11.3\      | 0          | NA         |
+      | Th.        |            |            | \          | \          | [224]_     |            |            |
       |            |            |            | \          | \          |            |            |            |
       |            |            |            | \          | \          |            |            |            |
       |            |            |            | :cite:`\   | :cite:`\   |            |            |            |
@@ -1704,7 +1708,7 @@ summarised in :numref:`Table %s <tbl:mob_specific_costs_calculation>`.
       |           |           | [241]_    |           |           |           | [242]_    | constr}`  |
       +-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
       |           |           | [k€\      | [k€\      | [         | [1000     | [         | [         |
-      |           |           | :math:`_  | :math:`_  | pass/     | km/y]     | km/h]     | years]    |
+      |           |           | :math:`_\ | :math:`_\ | pass/     | km/y]     | km/h]     | years]    |
       |           |           | 2015`     | 2015`     | veh.]     |           |           |           |
       |           |           | /veh.]    | /veh./y]  |           |           |           |           |
       +-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
@@ -2113,26 +2117,26 @@ Based on this approach, two technologies have been added: methanol boats and met
       |             |            |             |             |             |
       |             |            |             |             |             |
       +-------------+------------+-------------+-------------+-------------+
-      | Train       | 104        | 2.1         | 34.2        | 38500.0     |
+      | Train       | 104        | 2.1         | 34.2        | 38500       |
       | freight     |            |             |             |             |
       +-------------+------------+-------------+-------------+-------------+
-      | Boat Diesel | 76         | 3.8         | 11.4        | 36000.0     |
+      | Boat Diesel | 76         | 3.8         | 11.4        | 36000       |
       +-------------+------------+-------------+-------------+-------------+
-      | Boat NG     | 76         | 3.8         | 11.4        | 36000.0     |
+      | Boat NG     | 76         | 3.8         | 11.4        | 36000       |
       +-------------+------------+-------------+-------------+-------------+
-      | Boat        | 76         | 3.8         | 11.4        | 36000.0     |
+      | Boat        | 76         | 3.8         | 11.4        | 36000       |
       | Methnanol   |            |             |             |             |
       +-------------+------------+-------------+-------------+-------------+
-      | Truck       | 371        | 18.6        | 9.3         | 450.0       |
+      | Truck       | 371        | 18.6        | 9.3         | 450         |
       | Diesel      |            |             |             |             |
       +-------------+------------+-------------+-------------+-------------+
-      | Truck FC    | 402        | 12.1        | 9.3         | 450.0       |
+      | Truck FC    | 402        | 12.1        | 9.3         | 450         |
       +-------------+------------+-------------+-------------+-------------+
-      | Truck Elec. | 771        | 23.1        | 9.3         | 450.0       |
+      | Truck Elec. | 771        | 23.1        | 9.3         | 450         |
       +-------------+------------+-------------+-------------+-------------+
-      | Truck NG    | 371        | 18.6        | 9.3         | 450.0       |
+      | Truck NG    | 371        | 18.6        | 9.3         | 450         |
       +-------------+------------+-------------+-------------+-------------+
-      | Truck       | 371        | 18.6        | 9.3         | 450.0       |
+      | Truck       | 371        | 18.6        | 9.3         | 450         |
       | Methanol    |            |             |             |             |
       +-------------+------------+-------------+-------------+-------------+
 
@@ -2691,8 +2695,8 @@ technical performances of each technology.
       |           | {inv}`    | {maint}`  | p_{con    | fetime`   |
       |           |           |           | str}`     |           |
       +-----------+-----------+-----------+-----------+-----------+
-      |           | [:math:`  | [:math:`  | [kgCO     | [y]       |
-      |           | €_{2015}` | €_{2015}` | \ :sub:`2`|           |
+      |           | [:math:`\ | [:math:`\ | [kgCO\    | [y]       |
+      |           | €_{2015}` | €_{2015}` | :sub:`2`  |           |
       |           | /kWh]     | /kWh/y]   | -eq./kWh] |           |
       +-----------+-----------+-----------+-----------+-----------+
       | Li-on     | 302       | 0.62      | 61.3      | 15 [296]_ |
@@ -3125,7 +3129,7 @@ Switzerland).
    onshore and offshore, were assumed respectively.
 
 
-.. [37]
+.. [37b]
    From
    https://www.eea.europa.eu/data-and-maps/indicators/heating-degree-days-2,
    consulted the 06-12-2019

@@ -1,0 +1,9 @@
+23/07/10 10:33:11 [INFO    ] (import_data): Importing data files from C:\Users\ghuysn\GIT_Projects\EnergyScope_multi_criteria\Data\2020
+23/07/10 10:33:11 [INFO    ] (kmedoid_clustering): Starting kmedoid clustering of typical days based on C:\Users\ghuysn\GIT_Projects\EnergyScope_multi_criteria\energyscope\preprocessing\td_selection\data.dat
+23/07/10 10:33:11 [INFO    ] (kmedoid_clustering): Running kmedoid clustering
+23/07/10 10:33:15 [INFO    ] (kmedoid_clustering): End of kmedoid clustering
+23/07/10 10:33:15 [INFO    ] (print_data): Printing ESTD_data.dat
+23/07/10 10:33:15 [INFO    ] (print_data): Printing ESTD_12TD.dat
+23/07/10 10:33:15 [INFO    ] (run_es): Running EnergyScope
+23/07/10 10:33:46 [INFO    ] (run_es): End of run
+23/07/10 10:33:47 [INFO    ] (read_outputs): Reading outputs from: c:\users\ghuysn\git_projects\energyscope_multi_criteria\case_studies\retour_test\output

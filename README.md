@@ -3,9 +3,9 @@
 
  
 # Content and documentation #
-This folder contains the fourth release (v2_2, hourly LP) of the EnergyScope model adapted to the Belgian case.  
-This version of the model is an extension of the one in [4].  
-A documentation is available [here](https://energyscope-td.readthedocs.io).
+This folder contains the fifth release (v2_3, hourly LP) of the EnergyScope model adapted to the Belgian case.  
+This version has its pre-processing done in python (excel previously) and is based on the version proposed in [4].  
+A documentation is available [here](https://energyscope.readthedocs.io).
 
 Do refer to the documentation for:
 - Model overview
@@ -24,8 +24,24 @@ You may cite it as follows:
 - [3], for reference to the energyscope MILP modeling framework 	
 - [4], for reference to the current code 	
 
-You are welcome to report any bugs related to the code or its documentation through a git Issue or by emailing:    
+You are welcome to report any bugs related to the code by reporting an issue:
+
  moret.stefano@gmail.com or gauthierLimpens@gmail.com  
+ 
+# Content and documentation#
+Modified version for course LMECA2675 at UCLouvain
+This folder contains the third release (v2_1, hourly LP) of the EnergyScope model adapted to the Belgian case.  
+More recent releases are available @ the EnergyScope project repository: https://github.com/energyscope/EnergyScope   
+This version of the model is an extension of the one in [4].  
+The data and formulation are available here:
+	https://energyscope.readthedocs.io/en/latest/
+
+Do refer to the documentation for:
+- Model formulation
+- Data used and sources
+- License
+- Get started
+- Previous versions
 
 
 # References:  #  

@@ -5,8 +5,8 @@ Overview
 
 :Version: |version| (|release|)
 :Date: |today|
-:Version main developer: Gauthier Limpens (UCLouvain)
-:Short summary: One cell *whole*-energy system with an hourly resolution and data for the Belgian energy system in 2035.
+:Version contributors: Paolo Thiran, Matija Pavicevic, Xavier Rixhon, Gauthier Limpens (UCLouvain), Jonathan Dumas & Antoine Dubois (ULiege) 
+:Short summary: One cell *whole*-energy system with an hourly resolution and data for the Belgian energy system in 2035. Pre-Post processing in Python.
 
 The EnergyScope model optimises the design and operation of all the energy sectors, with the same level of details. The energy sectors are defined as electricity, heat, mobility and non-energy demand. 
 
@@ -16,11 +16,13 @@ It was originally created by EPFL (Switzerland) since 2011.
 
 It is written in an algebraic language which can be compiled with an open source solver (GLPK) but also commercial one (AMPL).
 
+It has been applied to the following countries:
+
 Features
 ========
 
 In the energy system community, several criteria are used to compare models. 
-EnergyScope TD is a bottom-up energy system model and has been compared to 53 other models in [limpens2021generating].
+EnergyScope TD is a bottom-up energy system model and has been compared to 53 other models in :cite:`limpens2021generating`.
 
 Each model is tailored for a different applications. In the following, the strengths and weaknesses of the model is presented.
 
@@ -88,7 +90,6 @@ Short computational time
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 The model has a short computational time around **60 seconds** making it an ideal candidate for uncertainty quantification.
-The strengths of the model are:
 
 
 Weaknesses of the model
@@ -142,15 +143,19 @@ Current developments
 ====================
 
 - Multi-region : 
-  **Main contributors**: Paolo Thiran
+  **Main contributors**: Paolo Thiran (`see Multi-region repository <https://github.com/energyscope/EnergyScope_multi_cells>`_)
 
-- Myopic pathway transition : 
-  **Main contributors**: Xavier Rixhon
+- Pathway transition (perfect foresight and myopic) : 
+  **Main contributors**: Xavier Rixhon and Gauthier Limpens (`see Pathway repository <https://github.com/energyscope/EnergyScope_pathway>`_)
 
 - Multi-criteria optimisation: 
+  **Main contributors**: Jonathan Dumas, Antoine Dubois and Nicolas Ghuys (`see Multi-criteria repository <https://github.com/energyscope/EnergyScope_multi_criteria>`_)
 
-- Soft-coupling with a dispatch model: 
-  **Main contributors**: Paolo Thiran, Matija Pavicevic and Gauthier Limpens
+- Soft-coupling with a dispatch model (`Dispa-SET <https://www.dispaset.eu/>`_)): 
+  **Main contributors**: Paolo Thiran, Matija Pavicevic and Gauthier Limpens (`see Dispatch-coupling repository <https://github.com/energyscope/EnergyScope_multi_criteria>`_)
+  
+- Soft-coupling with an economic model (GEMMES): 
+  **Main contributors**: Pierre Jacques (`see Economic-coupling repository <https://github.com/energyscope/EnergyScope_coupling_GEMMES>`_)
 
 
 

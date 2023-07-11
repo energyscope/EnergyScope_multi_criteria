@@ -163,7 +163,7 @@ let weight_einv := 0;
 
 # Criterias normalization setup (min and max obtain with single criterion optimisation): crit_normalised = (crit - crit_min) / (crit_max - crit_min)
 let cost_min := 38487.172541;
-let gwp_min := 17665.884492; #to modify if low GWP scenario
+let gwp_min := 17665.884492;# to modify if low GWP scenario
 let einv_min := 37265.398490;
 let cost_max := 79396.391412;
 let gwp_max := 84654.620000;
@@ -307,8 +307,8 @@ subject to op_cost_calc {i in RESOURCES}:
 # [Eq. 2.6]
 subject to totalGWP_calc:
 
-	#TotalGWP = sum {j in TECHNOLOGIES} (GWP_constr [j] / lifetime [j]) + sum {i in RESOURCES} GWP_op [i];
-	TotalGWP = sum {i in RESOURCES} GWP_op [i];
+	TotalGWP = sum {j in TECHNOLOGIES} (GWP_constr [j] / lifetime [j]) + sum {i in RESOURCES} GWP_op [i];
+	#TotalGWP = sum {i in RESOURCES} GWP_op [i];
 	#JUST RESOURCES :          TotalGWP = sum {i in RESOURCES} GWP_op [i];
 	#INCLUDING GREY EMISSIONS: TotalGWP = sum {j in TECHNOLOGIES} (GWP_constr [j] / lifetime [j]) + sum {i in RESOURCES} GWP_op [i];
 	

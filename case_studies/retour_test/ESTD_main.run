@@ -16,7 +16,7 @@ data "c:\users\ghuysn\git_projects\energyscope_multi_criteria\case_studies\retou
 
 # Run options
 option show_stats "3";
-option log_file "C:\Users\ghuysn\GIT_Projects\EnergyScope_multi_criteria\case_studies\retour_test\output\log.txt";
+option log_file "C:\Users\ghuysn\GIT_Projects\EnergyScope\case_studies\retour_test\output\log.txt";
 option presolve "10";
 option presolve_eps "1e-7";
 option presolve_fixeps "1e-7";
@@ -57,6 +57,7 @@ else {
         else {
 			include "c:\users\ghuysn\git_projects\energyscope_multi_criteria\energyscope\energy_model\run\print_year_summary.run";
 			include "c:\users\ghuysn\git_projects\energyscope_multi_criteria\energyscope\energy_model\run\print_hourly_data.run";
+			include "c:\users\ghuysn\git_projects\energyscope_multi_criteria\energyscope\energy_model\run\print_sankey.run";
 			exit 0;
 		}
 	}

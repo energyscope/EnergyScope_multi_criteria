@@ -1,13 +1,16 @@
 # Case study definition
 # name of the case study. The problem formulation and ouptuts will be printed into the following relative path from main directory : case_studies/config['case_study']
-'case_study': 'retour_test'
+'case_study': 'GWP_cut_30MtCO2'
 # number of typical days to consider
 'nbr_td': 12
 # Dictionnary with the dataframes containing all the data in the form : {'Demand': eud, 'Resources': resources, 'Technologies': technologies, 'End_uses_categories': end_uses_categories, 'Layers_in_out': layers_in_out, 'Storage_characteristics': storage_characteristics, 'Storage_eff_in': storage_eff_in, 'Storage_eff_out': storage_eff_out, 'Time_series': time_series, 'Misc': misc}
 'all_data': {}
 
 #Criteria limits
-'GWP_limit': 100000 #[ktCO2-eq./year] modify gwp_min if low GWP scenario
+#CAUTION : The limits used for criteria normalization (defined in es_model.mod line 164) have to be modify to explore "extreme" scenarios
+#REMARK : The weights of criteria can be change in es_model.mod line 159
+
+'GWP_limit': 30000 #[ktCO2-eq./year]
 'Einv_limit': 100000 #[Gwh/year]
 'Cost_limit': 100000 #[beuro/year]
 
@@ -40,6 +43,6 @@ printing_td: True
 }
 
 # Printing more detailed outputs
-'print_barh' : False
+'print_barh' : True
 'print_hourly_data': True
-'print_sankey': False
+'print_sankey': True

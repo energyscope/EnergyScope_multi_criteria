@@ -109,6 +109,14 @@ else {
 		    printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Einv_constr[i] / lifetime[i] else 0, if i in RESOURCES then Einv_op[i] else 0 >> (PathName & "/einv_breakdown.txt");
 	        }
 
+	        #ICI_1
+            ## Print HH_moi breakdown to txt file
+	        print "---------- SAVING HH_moi ----------";
+	        printf "%s\t%s\t%s\n", "Name", "HH_moi_constr", "HH_moi_op" > (PathName & "/hh_moi_breakdown.txt");
+	        for {i in TECHNOLOGIES union RESOURCES} {
+		    printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then HH_moi_constr[i] / lifetime[i] else 0, if i in RESOURCES then HH_moi_op[i] else 0 >> (PathName & "/hh_moi_breakdown.txt");
+	        }
+
 
             ## Print ENVIRONMENTAL PRICES breakdown to txt file
 	        print "---------- SAVING EP ----------";

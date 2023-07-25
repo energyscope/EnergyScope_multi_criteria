@@ -126,6 +126,12 @@ param power_density_solar_thermal >=0 default 0;# Maximum power irradiance for s
 param einv_op {RESOURCES} >= 0; # Energy invested to get a resources [GWh/y] #
 param einv_constr {TECHNOLOGIES} >= 0; # Energy invested in the construction of the technologies [GWh/GW].
 param einv_limit >=0; # [GWh/year] maximum system energy invested allowed
+
+#ICI_1
+param hh_moi_op {RESOURCES} >= 0; # Energy invested to get a resources [GWh/y] #
+param hh_moi_constr {TECHNOLOGIES} >= 0; # Energy invested in the construction of the technologies [GWh/GW].
+param hh_moi_limit >=0; # [GWh/year] maximum system energy invested allowed
+
 param ep_constr {TECHNOLOGIES} >= 0; # Environmental prices [b€]
 param ep_op {RESOURCES} >= 0; # Environmental prices [b€]
 param agro_land_constr {TECHNOLOGIES} >= 0; # Agricultural land use [km2*y]
@@ -148,30 +154,53 @@ param cost_max >= 0;
 param gwp_max >= 0;
 param weight_cost >= 0;
 param weight_gwp >= 0;
+
 param weight_einv >= 0;
 param einv_min >= 0;
 param einv_max >= 0;
 
+#ICI_1.1
+param weight_hh_moi >= 0;
+param hh_moi_min >= 0;
+param hh_moi_max >= 0;
+
 param goal_cost_norm >= 0;
 param goal_gwp_norm >= 0;
+
 param goal_einv_norm >= 0;
+
+#ICI_1.2
+param goal_hh_moi_norm >= 0;
 
 # Criterias weights for the multicriteria optimisation
 let weight_cost := 1;
 let weight_gwp := 0;
+
 let weight_einv := 0;
+
+#ICI 1.3
+let weight_hh_moi := 0;
 
 # Criterias normalization setup (min and max obtain with single criterion optimisation): crit_normalised = (crit - crit_min) / (crit_max - crit_min)
 let cost_min := 38487.172541;
-let gwp_min := 17665.884492;# to modify if low GWP scenario
-let einv_min := 37265.398490;
-let cost_max := 79396.391412;
+let gwp_min := 17000; #17665.884492 to modify if low GWP scenario
+let cost_max := 80000; #79396.391412;
 let gwp_max := 84654.620000;
+
+let einv_min := 37265.398490;
 let einv_max := 136191.017541;
+
+#ICI 1.4
+let hh_moi_min := 0;
+let hh_moi_max := 170191.017541;
 
 let goal_cost_norm := 0;
 let goal_gwp_norm := 0;
+
 let goal_einv_norm := 0;
+
+#ICI 1.5
+let goal_hh_moi_norm := 0;
 
 ##Additional parameter (hard coded as '8760' in the thesis)
 param total_time := sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} (t_op [h, td]); # [h]. added just to simplify equations
@@ -202,6 +231,11 @@ var TotalEinv >= 0; # Einv_tot [GWh/year]: Total Cumulative energy demand (Einv)
 var Einv_constr {TECHNOLOGIES} >= 0; #Total Einv of the technologies
 var Einv_op {RESOURCES} >= 0; # Total yearly Einv of the resources
 
+#ICI_2
+var TotalHH_moi >= 0; # hh_moi_tot [GWh/year]: Total Cumulative energy demand (hh_moi) in the system
+var HH_moi_constr {TECHNOLOGIES} >= 0; #Total hh_moi of the technologies
+var HH_moi_op {RESOURCES} >= 0; # Total yearly hh_moi of the resources
+
 ##Dependent variables [Table 2.4] :
 var End_uses {LAYERS, HOURS, TYPICAL_DAYS} >= 0; #EndUses [GW]: total demand for each type of end-uses (hourly power). Defined for all layers (0 if not demand). [Mpkm] or [Mtkm] for passenger or freight mobility.
 var TotalCost >= 0; # C_tot [ktCO2-eq./year]: Total GWP emissions in the system.
@@ -215,6 +249,10 @@ var Network_losses {END_USES_TYPES, HOURS, TYPICAL_DAYS} >= 0; # Net_loss [GW]: 
 var Storage_level {STORAGE_TECH, PERIODS} >= 0; # Sto_level [GWh]: Energy stored at each period
 
 var TotalEinv_norm >= 0;
+
+#ICI_3
+var TotalHH_moi_norm >= 0;
+
 var TotalEP >= 0; # EP_tot [M€2015/year]: Total environmental price (EP) of the system
 var EP_constr {TECHNOLOGIES} >= 0; #Total EP of the technologies
 var EP_op {RESOURCES} >= 0; # Total yearly EP of the resources
@@ -242,7 +280,11 @@ var TotalCost_norm >= 0;
 var TotalGWP_norm >= 0;
 var Positive_deviation_cost >= 0;
 var Positive_deviation_gwp >= 0;
+
 var Positive_deviation_einv >= 0;
+
+#ICI 3.1
+var Positive_deviation_hh_moi >= 0;
 
 #############################################
 ###      CONSTRAINTS Eqs [2.1-2.39]       ###
@@ -337,6 +379,26 @@ subject to einv_constr_calc {j in TECHNOLOGIES}:
 # [Eq. ?]
 subject to einv_op_calc {i in RESOURCES}:
 	Einv_op [i] = einv_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
+
+#ICI_4
+## Human Health
+#-----------
+
+# [Eq. ?]
+subject to totalHH_moi_calc:
+	TotalHH_moi = sum {j in TECHNOLOGIES} (HH_moi_constr [j] / lifetime [j]) + sum {i in RESOURCES} HH_moi_op [i];
+	#JUST RESOURCES :          TotalHH_moi = sum {i in RESOURCES} HH_moi_op [i];
+	#JUST GREY EMISSIONS:	   TotalHH_moi = sum {j in TECHNOLOGIES} (HH_moi_constr [j] / lifetime [j]);
+	#INCLUDING GREY EMISSIONS: TotalHH_moi = sum {j in TECHNOLOGIES} (HH_moi_constr [j] / lifetime [j]) + sum {i in RESOURCES} HH_moi_op [i];
+
+# [Eq. ?]
+subject to hh_moi_constr_calc {j in TECHNOLOGIES}:
+	hh_moi_constr [j] = hh_moi_constr [j] * F [j];
+
+# [Eq. ?]
+subject to hh_moi_op_calc {i in RESOURCES}:
+	hh_moi_op [i] = hh_moi_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
+
 
 ## EP
 #-----------
@@ -628,6 +690,12 @@ subject to Minimum_GWP_reduction :
 subject to Maximum_Einv :
 	TotalEinv <= einv_limit;
 
+#ICI_?
+#[Eq. ?]  constraint to reduce the HH_moi subject to Maximum_HH_moi :
+subject to Maximum_HH_moi :
+	TotalHH_moi <= hh_moi_limit;
+
+
 # [Eq. 2.35] Minimum share of RE in primary energy supply
 subject to Minimum_RE_share :
 	sum {j in RE_RESOURCES, t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} F_t [j, h, td] * t_op [h, td] 
@@ -664,17 +732,29 @@ subject to Cost_normalization :
 	TotalCost_norm = (TotalCost - cost_min) / (cost_max - cost_min);
 subject to GWP_normalization :
 	TotalGWP_norm = (TotalGWP - gwp_min) / (gwp_max - gwp_min);
+
 subject to Einv_normalization :
 	TotalEinv_norm = (TotalEinv - einv_min) / (einv_max - einv_min);
+
+#ICI_??
+subject to HH_moi_normalization :
+	TotalHH_moi_norm = (TotalHH_moi - hh_moi_min) / (hh_moi_max - hh_moi_min);
 
 subject to Cost_deviation_computation :
 	Positive_deviation_cost = TotalCost_norm - goal_cost_norm;
 subject to GWP_deviation_computation :
 	Positive_deviation_gwp = TotalGWP_norm - goal_gwp_norm;
+
 subject to Einv_deviation_computation :
 	Positive_deviation_einv = TotalEinv_norm - goal_einv_norm;
-subject to Multi_crit_computation :
-	Multi_crit_obj = weight_cost * Positive_deviation_cost + weight_gwp * Positive_deviation_gwp + weight_einv * Positive_deviation_einv;
 
-# Can choose between TotalGWP, TotalCost, TotalEinv and Multi_crit_obj
-minimize obj: Multi_crit_obj;
+#ICI_???
+subject to HH_moi_deviation_computation :
+	Positive_deviation_hh_moi = TotalHH_moi_norm - goal_hh_moi_norm;
+
+
+subject to Multi_crit_computation :
+	Multi_crit_obj = weight_cost * Positive_deviation_cost + weight_gwp * Positive_deviation_gwp + weight_einv * Positive_deviation_einv + weight_hh_moi * Positive_deviation_hh_moi; #ICI_????
+
+# Can choose between TotalGWP, TotalCost, TotalEinv, Multi_crit_obj and TotalHH_moi
+minimize obj: TotalCost;

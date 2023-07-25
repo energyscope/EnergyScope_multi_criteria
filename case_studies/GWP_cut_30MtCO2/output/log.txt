@@ -29,7 +29,7 @@ solve_result = 'solved?'
 
 solve_result_num = 100
 
-_solve_elapsed_time = 36.391
+_solve_elapsed_time = 35.11
 
 TotalCost 56507.6522836056
 GWP_op 21137.840037412556

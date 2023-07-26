@@ -130,6 +130,7 @@ colors_elec = {'Ind. cogen. gas': '#DC143C', # Heat HT in sankey
                'Lithium batt. Pout': '#6fb1c7', #Light blue (close to elec)
                'Lithium batt. Pin': '#6fb1c7', # Light blue (close to elec)
                'Electricity': '#00BFFF', # Light blue
-               'Elec export': '#00BFFF'  # Light blue
+               'Elec export': '#00BFFF',  # Light blue
+               'Dec. advcogen. h2': '#00BFFF'  # Light blue
 }
 #TODO add other tech into colors_elec

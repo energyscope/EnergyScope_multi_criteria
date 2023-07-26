@@ -127,10 +127,10 @@ param einv_op {RESOURCES} >= 0; # Energy invested to get a resources [GWh/y] #
 param einv_constr {TECHNOLOGIES} >= 0; # Energy invested in the construction of the technologies [GWh/GW].
 param einv_limit >=0; # [GWh/year] maximum system energy invested allowed
 
-#ICI_1
-param hh_moi_op {RESOURCES} >= 0; # Energy invested to get a resources [GWh/y] #
-param hh_moi_constr {TECHNOLOGIES} >= 0; # Energy invested in the construction of the technologies [GWh/GW].
-param hh_moi_limit >=0; # [GWh/year] maximum system energy invested allowed
+#ICI_1_OK
+param hh_moi_op {RESOURCES} >= 0; # criteria to get a resources [X/y] #
+param hh_moi_constr {TECHNOLOGIES} >= 0; # criteria in the construction of the technologies [X/GW].
+param hh_moi_limit >=0; # [GWh/year] maximum system criteria allowed
 
 param ep_constr {TECHNOLOGIES} >= 0; # Environmental prices [b€]
 param ep_op {RESOURCES} >= 0; # Environmental prices [b€]
@@ -159,7 +159,7 @@ param weight_einv >= 0;
 param einv_min >= 0;
 param einv_max >= 0;
 
-#ICI_1.1
+#ICI_1.1_OK
 param weight_hh_moi >= 0;
 param hh_moi_min >= 0;
 param hh_moi_max >= 0;
@@ -169,7 +169,7 @@ param goal_gwp_norm >= 0;
 
 param goal_einv_norm >= 0;
 
-#ICI_1.2
+#ICI_1.2_OK
 param goal_hh_moi_norm >= 0;
 
 # Criterias weights for the multicriteria optimisation
@@ -178,7 +178,7 @@ let weight_gwp := 0;
 
 let weight_einv := 0;
 
-#ICI 1.3
+#ICI_1.3_OK
 let weight_hh_moi := 0;
 
 # Criterias normalization setup (min and max obtain with single criterion optimisation): crit_normalised = (crit - crit_min) / (crit_max - crit_min)
@@ -190,16 +190,16 @@ let gwp_max := 84654.620000;
 let einv_min := 37265.398490;
 let einv_max := 136191.017541;
 
-#ICI 1.4
-let hh_moi_min := 0;
-let hh_moi_max := 170191.017541;
+#ICI_1.4_OK
+let hh_moi_min := 10000;
+let hh_moi_max := 250000;
 
 let goal_cost_norm := 0;
 let goal_gwp_norm := 0;
 
 let goal_einv_norm := 0;
 
-#ICI 1.5
+#ICI_1.5_OK
 let goal_hh_moi_norm := 0;
 
 ##Additional parameter (hard coded as '8760' in the thesis)
@@ -231,8 +231,8 @@ var TotalEinv >= 0; # Einv_tot [GWh/year]: Total Cumulative energy demand (Einv)
 var Einv_constr {TECHNOLOGIES} >= 0; #Total Einv of the technologies
 var Einv_op {RESOURCES} >= 0; # Total yearly Einv of the resources
 
-#ICI_2
-var TotalHH_moi >= 0; # hh_moi_tot [GWh/year]: Total Cumulative energy demand (hh_moi) in the system
+#ICI_2_OK
+var TotalHH_moi >= 0; # hh_moi_tot [X/year]: Total Cumulative hh_moi in the system
 var HH_moi_constr {TECHNOLOGIES} >= 0; #Total hh_moi of the technologies
 var HH_moi_op {RESOURCES} >= 0; # Total yearly hh_moi of the resources
 
@@ -250,7 +250,8 @@ var Storage_level {STORAGE_TECH, PERIODS} >= 0; # Sto_level [GWh]: Energy stored
 
 var TotalEinv_norm >= 0;
 
-#ICI_3
+#ICI_3_OK
+
 var TotalHH_moi_norm >= 0;
 
 var TotalEP >= 0; # EP_tot [M€2015/year]: Total environmental price (EP) of the system
@@ -283,7 +284,7 @@ var Positive_deviation_gwp >= 0;
 
 var Positive_deviation_einv >= 0;
 
-#ICI 3.1
+#ICI_3.1_OK
 var Positive_deviation_hh_moi >= 0;
 
 #############################################
@@ -380,7 +381,7 @@ subject to einv_constr_calc {j in TECHNOLOGIES}:
 subject to einv_op_calc {i in RESOURCES}:
 	Einv_op [i] = einv_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
 
-#ICI_4
+#ICI_4_?
 ## Human Health
 #-----------
 
@@ -393,11 +394,11 @@ subject to totalHH_moi_calc:
 
 # [Eq. ?]
 subject to hh_moi_constr_calc {j in TECHNOLOGIES}:
-	hh_moi_constr [j] = hh_moi_constr [j] * F [j];
+	HH_moi_constr [j] = hh_moi_constr [j] * F [j];
 
 # [Eq. ?]
 subject to hh_moi_op_calc {i in RESOURCES}:
-	hh_moi_op [i] = hh_moi_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
+	HH_moi_op [i] = hh_moi_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
 
 
 ## EP
@@ -690,7 +691,7 @@ subject to Minimum_GWP_reduction :
 subject to Maximum_Einv :
 	TotalEinv <= einv_limit;
 
-#ICI_?
+#ICI_5_OK
 #[Eq. ?]  constraint to reduce the HH_moi subject to Maximum_HH_moi :
 subject to Maximum_HH_moi :
 	TotalHH_moi <= hh_moi_limit;
@@ -736,7 +737,7 @@ subject to GWP_normalization :
 subject to Einv_normalization :
 	TotalEinv_norm = (TotalEinv - einv_min) / (einv_max - einv_min);
 
-#ICI_??
+#ICI_6_OK
 subject to HH_moi_normalization :
 	TotalHH_moi_norm = (TotalHH_moi - hh_moi_min) / (hh_moi_max - hh_moi_min);
 
@@ -748,13 +749,13 @@ subject to GWP_deviation_computation :
 subject to Einv_deviation_computation :
 	Positive_deviation_einv = TotalEinv_norm - goal_einv_norm;
 
-#ICI_???
+#ICI_7_OK
 subject to HH_moi_deviation_computation :
 	Positive_deviation_hh_moi = TotalHH_moi_norm - goal_hh_moi_norm;
 
 
 subject to Multi_crit_computation :
-	Multi_crit_obj = weight_cost * Positive_deviation_cost + weight_gwp * Positive_deviation_gwp + weight_einv * Positive_deviation_einv + weight_hh_moi * Positive_deviation_hh_moi; #ICI_????
+	Multi_crit_obj = weight_cost * Positive_deviation_cost + weight_gwp * Positive_deviation_gwp + weight_einv * Positive_deviation_einv + weight_hh_moi * Positive_deviation_hh_moi; #ICI_8_OK
 
 # Can choose between TotalGWP, TotalCost, TotalEinv, Multi_crit_obj and TotalHH_moi
 minimize obj: TotalCost;

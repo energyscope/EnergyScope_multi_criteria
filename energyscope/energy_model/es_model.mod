@@ -123,15 +123,15 @@ param solar_area >= 0; # Maximum land available for PV deployment [km2]
 param power_density_pv >=0 default 0;# Maximum power irradiance for PV.
 param power_density_solar_thermal >=0 default 0;# Maximum power irradiance for solar thermal.
 
-param einv_op {RESOURCES} >= 0; # Energy invested to get a resources [GWh/y] #
-param einv_constr {TECHNOLOGIES} >= 0; # Energy invested in the construction of the technologies [GWh/GW].
-param einv_limit >=0; # [GWh/year] maximum system energy invested allowed
+# New objectives #
+param crit_1_op {RESOURCES} >= 0; # Energy invested to get a resources [GWh/y] #
+param crit_1_constr {TECHNOLOGIES} >= 0; # Energy invested in the construction of the technologies [GWh/GW].
+param crit_1_limit >=0; # [GWh/year] maximum system energy invested allowed
+param crit_2_op {RESOURCES} >= 0; # criteria to get a resources [X/y] #
+param crit_2_constr {TECHNOLOGIES} >= 0; # criteria in the construction of the technologies [X/GW].
+param crit_2_limit >=0; # [GWh/year] maximum system criteria allowed
 
-#ICI_1_OK
-param hh_moi_op {RESOURCES} >= 0; # criteria to get a resources [X/y] #
-param hh_moi_constr {TECHNOLOGIES} >= 0; # criteria in the construction of the technologies [X/GW].
-param hh_moi_limit >=0; # [GWh/year] maximum system criteria allowed
-
+# New parameters #
 param ep_constr {TECHNOLOGIES} >= 0; # Environmental prices [b€]
 param ep_op {RESOURCES} >= 0; # Environmental prices [b€]
 param agro_land_constr {TECHNOLOGIES} >= 0; # Agricultural land use [km2*y]
@@ -147,6 +147,8 @@ param hh_op {RESOURCES} >= 0; # Damage to human health [DALY] (daly = disability
 param ecosys_op {RESOURCES} >= 0; # Damage to ecosystems [species*y]
 param rsc_op {RESOURCES} >= 0; # Damage to resources availability [b€]
 param rcm_op {RESOURCES} >= 0; # Raw critical material [kt/y]
+param einv_constr {TECHNOLOGIES} >= 0; # Energy invested in the construction of the technologies [GWh/GW].
+param einv_op {RESOURCES} >= 0; # Energy invested to get a resources [GWh/y] #
 
 param cost_min >= 0;
 param gwp_min >= 0;
@@ -155,31 +157,28 @@ param gwp_max >= 0;
 param weight_cost >= 0;
 param weight_gwp >= 0;
 
-param weight_einv >= 0;
-param einv_min >= 0;
-param einv_max >= 0;
-
-#ICI_1.1_OK
-param weight_hh_moi >= 0;
-param hh_moi_min >= 0;
-param hh_moi_max >= 0;
+# New objectives #
+param weight_crit_1 >= 0;
+param crit_1_min >= 0;
+param crit_1_max >= 0;
+param weight_crit_2 >= 0;
+param crit_2_min >= 0;
+param crit_2_max >= 0;
 
 param goal_cost_norm >= 0;
 param goal_gwp_norm >= 0;
 
-param goal_einv_norm >= 0;
-
-#ICI_1.2_OK
-param goal_hh_moi_norm >= 0;
+# New objectives #
+param goal_crit_1_norm >= 0;
+param goal_crit_2_norm >= 0;
 
 # Criterias weights for the multicriteria optimisation
-let weight_cost := 1;
+let weight_cost := 0;
 let weight_gwp := 0;
 
-let weight_einv := 0;
-
-#ICI_1.3_OK
-let weight_hh_moi := 0;
+# New objectives #
+let weight_crit_1 := 0;
+let weight_crit_2 := 1;
 
 # Criterias normalization setup (min and max obtain with single criterion optimisation): crit_normalised = (crit - crit_min) / (crit_max - crit_min)
 let cost_min := 38487.172541;
@@ -187,20 +186,18 @@ let gwp_min := 17000; #17665.884492 to modify if low GWP scenario
 let cost_max := 80000; #79396.391412;
 let gwp_max := 84654.620000;
 
-let einv_min := 37265.398490;
-let einv_max := 136191.017541;
-
-#ICI_1.4_OK
-let hh_moi_min := 10000;
-let hh_moi_max := 250000;
+# New objectives #
+let crit_1_min := 37265.398490;
+let crit_1_max := 136191.017541;
+let crit_2_min := 10000;
+let crit_2_max := 250000;
 
 let goal_cost_norm := 0;
 let goal_gwp_norm := 0;
 
-let goal_einv_norm := 0;
-
-#ICI_1.5_OK
-let goal_hh_moi_norm := 0;
+# New objectives #
+let goal_crit_1_norm := 0;
+let goal_crit_2_norm := 0;
 
 ##Additional parameter (hard coded as '8760' in the thesis)
 param total_time := sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} (t_op [h, td]); # [h]. added just to simplify equations
@@ -227,14 +224,13 @@ var Shares_lowT_dec {TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DECEN"] diff {"DE
 var F_solar         {TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DECEN"] diff {"DEC_SOLAR"}} >=0; # F_sol [GW]: Solar thermal installed capacity per heat decentralised technologies
 var F_t_solar       {TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DECEN"] diff {"DEC_SOLAR"}, h in HOURS, td in TYPICAL_DAYS} >= 0; # F_t_sol [GW]: Solar thermal operating per heat decentralised technologies
 
-var TotalEinv >= 0; # Einv_tot [GWh/year]: Total Cumulative energy demand (Einv) in the system
-var Einv_constr {TECHNOLOGIES} >= 0; #Total Einv of the technologies
-var Einv_op {RESOURCES} >= 0; # Total yearly Einv of the resources
-
-#ICI_2_OK
-var TotalHH_moi >= 0; # hh_moi_tot [X/year]: Total Cumulative hh_moi in the system
-var HH_moi_constr {TECHNOLOGIES} >= 0; #Total hh_moi of the technologies
-var HH_moi_op {RESOURCES} >= 0; # Total yearly hh_moi of the resources
+# New objectives #
+var TotalCrit_1 >= 0; # Crit_1_tot [GWh/year]: Total Cumulative energy demand (Crit_1) in the system
+var Crit_1_constr {TECHNOLOGIES} >= 0; #Total Crit_1 of the technologies
+var Crit_1_op {RESOURCES} >= 0; # Total yearly Crit_1 of the resources
+var TotalCrit_2 >= 0; # crit_2_tot [X/year]: Total Cumulative crit_2 in the system
+var Crit_2_constr {TECHNOLOGIES} >= 0; #Total crit_2 of the technologies
+var Crit_2_op {RESOURCES} >= 0; # Total yearly crit_2 of the resources
 
 ##Dependent variables [Table 2.4] :
 var End_uses {LAYERS, HOURS, TYPICAL_DAYS} >= 0; #EndUses [GW]: total demand for each type of end-uses (hourly power). Defined for all layers (0 if not demand). [Mpkm] or [Mtkm] for passenger or freight mobility.
@@ -248,12 +244,11 @@ var GWP_op {RESOURCES} >= 0; #  GWP_op [ktCO2-eq.]: Total yearly emissions of th
 var Network_losses {END_USES_TYPES, HOURS, TYPICAL_DAYS} >= 0; # Net_loss [GW]: Losses in the networks (normally electricity grid and DHN)
 var Storage_level {STORAGE_TECH, PERIODS} >= 0; # Sto_level [GWh]: Energy stored at each period
 
-var TotalEinv_norm >= 0;
+# New objectives #
+var TotalCrit_1_norm >= 0;
+var TotalCrit_2_norm >= 0;
 
-#ICI_3_OK
-
-var TotalHH_moi_norm >= 0;
-
+# New parameters #
 var TotalEP >= 0; # EP_tot [M€2015/year]: Total environmental price (EP) of the system
 var EP_constr {TECHNOLOGIES} >= 0; #Total EP of the technologies
 var EP_op {RESOURCES} >= 0; # Total yearly EP of the resources
@@ -275,6 +270,10 @@ var RSC_op {RESOURCES} >= 0; # Total yearly RSC of the resources
 var TotalRCM >= 0; # RCM_tot [kt/year]: Total cumulative raw critical material (RCM) used in the system
 var RCM_constr {TECHNOLOGIES} >= 0; #Total RCM of the technologies
 var RCM_op {RESOURCES} >= 0; # Total yearly RCM of the RCMs
+var TotalEinv >= 0; # Einv_tot [GWh/year]: Total Cumulative energy demand (Einv) in the system
+var Einv_constr {TECHNOLOGIES} >= 0; #Total Einv of the technologies
+var Einv_op {RESOURCES} >= 0; # Total yearly Einv of the resources
+
 
 var Multi_crit_obj >= 0;
 var TotalCost_norm >= 0;
@@ -282,10 +281,9 @@ var TotalGWP_norm >= 0;
 var Positive_deviation_cost >= 0;
 var Positive_deviation_gwp >= 0;
 
-var Positive_deviation_einv >= 0;
-
-#ICI_3.1_OK
-var Positive_deviation_hh_moi >= 0;
+# New objectives #
+var Positive_deviation_crit_1 >= 0;
+var Positive_deviation_crit_2 >= 0;
 
 #############################################
 ###      CONSTRAINTS Eqs [2.1-2.39]       ###
@@ -363,42 +361,42 @@ subject to gwp_constr_calc {j in TECHNOLOGIES}:
 subject to gwp_op_calc {i in RESOURCES}:
 	GWP_op [i] = gwp_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );	
 
-## Energy invested
+# New objectives #
+## Criteria 1
 #-----------
 
 # [Eq. ?]
-subject to totalEinv_calc:
-	TotalEinv = sum {j in TECHNOLOGIES} (Einv_constr [j] / lifetime [j]) + sum {i in RESOURCES} Einv_op [i];
-	#JUST RESOURCES :          TotalEinv = sum {i in RESOURCES} Einv_op [i];
-	#JUST GREY EMISSIONS:	   TotalEinv = sum {j in TECHNOLOGIES} (Einv_constr [j] / lifetime [j]);
-	#INCLUDING GREY EMISSIONS: TotalEinv = sum {j in TECHNOLOGIES} (Einv_constr [j] / lifetime [j]) + sum {i in RESOURCES} Einv_op [i];
+subject to totalCrit_1_calc:
+	TotalCrit_1 = sum {j in TECHNOLOGIES} (Crit_1_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_1_op [i];
+	#JUST RESOURCES :          TotalCrit_1 = sum {i in RESOURCES} Crit_1_op [i];
+	#JUST GREY EMISSIONS:	   TotalCrit_1 = sum {j in TECHNOLOGIES} (Crit_1_constr [j] / lifetime [j]);
+	#INCLUDING GREY EMISSIONS: TotalCrit_1 = sum {j in TECHNOLOGIES} (Crit_1_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_1_op [i];
 
 # [Eq. ?]
-subject to einv_constr_calc {j in TECHNOLOGIES}:
-	Einv_constr [j] = einv_constr [j] * F [j];
+subject to crit_1_constr_calc {j in TECHNOLOGIES}:
+	Crit_1_constr [j] = crit_1_constr [j] * F [j];
 
 # [Eq. ?]
-subject to einv_op_calc {i in RESOURCES}:
-	Einv_op [i] = einv_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
+subject to crit_1_op_calc {i in RESOURCES}:
+	Crit_1_op [i] = crit_1_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
 
-#ICI_4_?
-## Human Health
+## Criteria 2
 #-----------
 
 # [Eq. ?]
-subject to totalHH_moi_calc:
-	TotalHH_moi = sum {j in TECHNOLOGIES} (HH_moi_constr [j] / lifetime [j]) + sum {i in RESOURCES} HH_moi_op [i];
-	#JUST RESOURCES :          TotalHH_moi = sum {i in RESOURCES} HH_moi_op [i];
-	#JUST GREY EMISSIONS:	   TotalHH_moi = sum {j in TECHNOLOGIES} (HH_moi_constr [j] / lifetime [j]);
-	#INCLUDING GREY EMISSIONS: TotalHH_moi = sum {j in TECHNOLOGIES} (HH_moi_constr [j] / lifetime [j]) + sum {i in RESOURCES} HH_moi_op [i];
+subject to totalCrit_2_calc:
+	TotalCrit_2 = sum {j in TECHNOLOGIES} (Crit_2_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_2_op [i];
+	#JUST RESOURCES :          TotalCrit_2 = sum {i in RESOURCES} Crit_2_op [i];
+	#JUST GREY EMISSIONS:	   TotalCrit_2 = sum {j in TECHNOLOGIES} (Crit_2_constr [j] / lifetime [j]);
+	#INCLUDING GREY EMISSIONS: TotalCrit_2 = sum {j in TECHNOLOGIES} (Crit_2_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_2_op [i];
 
 # [Eq. ?]
-subject to hh_moi_constr_calc {j in TECHNOLOGIES}:
-	HH_moi_constr [j] = hh_moi_constr [j] * F [j];
+subject to crit_2_constr_calc {j in TECHNOLOGIES}:
+	Crit_2_constr [j] = crit_2_constr [j] * F [j];
 
 # [Eq. ?]
-subject to hh_moi_op_calc {i in RESOURCES}:
-	HH_moi_op [i] = hh_moi_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
+subject to crit_2_op_calc {i in RESOURCES}:
+	Crit_2_op [i] = crit_2_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
 
 
 ## EP
@@ -469,6 +467,23 @@ subject to hh_constr_calc {j in TECHNOLOGIES}:
 # [Eq. ?]
 subject to hh_op_calc {i in RESOURCES}:
 	HH_op [i] = hh_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
+
+## Einv
+#-----------
+
+# [Eq. ?]
+subject to totalEinv_calc:
+	TotalEinv = sum {j in TECHNOLOGIES} (Einv_constr [j] / lifetime [j]) + sum {i in RESOURCES} Einv_op [i];
+	#JUST RESOURCES :          TotalEinv = sum {i in RESOURCES} Einv_op [i];
+	#INCLUDING GREY EMISSIONS: TotalEinv = sum {j in TECHNOLOGIES} (Einv_constr [j] / lifetime [j]) + sum {i in RESOURCES} Einv_op [i];
+
+# [Eq. ?]
+subject to einv_constr_calc {j in TECHNOLOGIES}:
+	Einv_constr [j] = einv_constr [j] * F [j];
+
+# [Eq. ?]
+subject to einv_op_calc {i in RESOURCES}:
+	Einv_op [i] = einv_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
 
 ## ECOSYS
 #-----------
@@ -687,14 +702,14 @@ subject to peak_lowT_dhn:
 subject to Minimum_GWP_reduction :
 	TotalGWP <= gwp_limit;
 
-#[Eq. ?]  constraint to reduce the Einv subject to Maximum_Einv :
-subject to Maximum_Einv :
-	TotalEinv <= einv_limit;
+#[Eq. ?]  constraint to reduce the Crit_1 subject to Maximum_Crit_1 :
+subject to Maximum_Crit_1 :
+	TotalCrit_1 <= crit_1_limit;
 
 #ICI_5_OK
-#[Eq. ?]  constraint to reduce the HH_moi subject to Maximum_HH_moi :
-subject to Maximum_HH_moi :
-	TotalHH_moi <= hh_moi_limit;
+#[Eq. ?]  constraint to reduce the Crit_2 subject to Maximum_Crit_2 :
+subject to Maximum_Crit_2 :
+	TotalCrit_2 <= crit_2_limit;
 
 
 # [Eq. 2.35] Minimum share of RE in primary energy supply
@@ -734,28 +749,26 @@ subject to Cost_normalization :
 subject to GWP_normalization :
 	TotalGWP_norm = (TotalGWP - gwp_min) / (gwp_max - gwp_min);
 
-subject to Einv_normalization :
-	TotalEinv_norm = (TotalEinv - einv_min) / (einv_max - einv_min);
-
-#ICI_6_OK
-subject to HH_moi_normalization :
-	TotalHH_moi_norm = (TotalHH_moi - hh_moi_min) / (hh_moi_max - hh_moi_min);
+# New objectives #
+subject to Crit_1_normalization :
+	TotalCrit_1_norm = (TotalCrit_1 - crit_1_min) / (crit_1_max - crit_1_min);
+subject to Crit_2_normalization :
+	TotalCrit_2_norm = (TotalCrit_2 - crit_2_min) / (crit_2_max - crit_2_min);
 
 subject to Cost_deviation_computation :
 	Positive_deviation_cost = TotalCost_norm - goal_cost_norm;
 subject to GWP_deviation_computation :
 	Positive_deviation_gwp = TotalGWP_norm - goal_gwp_norm;
 
-subject to Einv_deviation_computation :
-	Positive_deviation_einv = TotalEinv_norm - goal_einv_norm;
-
-#ICI_7_OK
-subject to HH_moi_deviation_computation :
-	Positive_deviation_hh_moi = TotalHH_moi_norm - goal_hh_moi_norm;
+# New objectives #
+subject to Crit_1_deviation_computation :
+	Positive_deviation_crit_1 = TotalCrit_1_norm - goal_crit_1_norm;
+subject to Crit_2_deviation_computation :
+	Positive_deviation_crit_2 = TotalCrit_2_norm - goal_crit_2_norm;
 
 
 subject to Multi_crit_computation :
-	Multi_crit_obj = weight_cost * Positive_deviation_cost + weight_gwp * Positive_deviation_gwp + weight_einv * Positive_deviation_einv + weight_hh_moi * Positive_deviation_hh_moi; #ICI_8_OK
+	Multi_crit_obj = weight_cost * Positive_deviation_cost + weight_gwp * Positive_deviation_gwp + weight_crit_1 * Positive_deviation_crit_1 + weight_crit_2 * Positive_deviation_crit_2; # New objectives #
 
-# Can choose between TotalGWP, TotalCost, TotalEinv, Multi_crit_obj and TotalHH_moi
-minimize obj: TotalCost;
+# Can choose between TotalGWP, TotalCost, TotalCrit_1, Multi_crit_obj and TotalCrit_2
+minimize obj: Multi_crit_obj;

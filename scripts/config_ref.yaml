@@ -11,12 +11,11 @@
 #REMARK : The weights of criteria can be change in es_model.mod line 159
 
 'GWP_limit': 50000 #[ktCO2-eq./year]
-'Einv_limit': 150000 #[Gwh/year]
-
-#ICI_1
-'HH_moi_limit': 150000 #[Gwh/year]
-
 'Cost_limit': 120000 #[beuro/year]
+
+# New objectives #
+'Crit_1_limit': 150000 #[Gwh/year]
+'Crit_2_limit': 150000 #[Gwh/year]
 
 # Relative path from main directory to energyscope subdirectories and files
 'data_dir': 'Data/2020'  # Folders containing the csv data files

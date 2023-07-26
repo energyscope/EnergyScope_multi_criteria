@@ -2,10 +2,10 @@
 
 print "TotalCost", TotalCost;
 print "GWP_op", sum {i in RESOURCES} GWP_op [i];
-print "Einv_tot", TotalEinv;
 
-#ICI_1
-print "HH_moi_tot", TotalHH_moi;
+# New objectives #
+print "Crit_1_tot", TotalCrit_1;
+print "Crit_2_tot", TotalCrit_2;
 
 
 
@@ -32,21 +32,22 @@ for {i in TECHNOLOGIES union RESOURCES}{
     printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then GWP_constr [i] / lifetime [i] else 0, if i in RESOURCES then GWP_op [i] else 0 >> (PathName & "/gwp_breakdown.txt");
 }
 
-## Print Einv breakdown to txt file
-print "--------------SAVING Einv ----------";
-printf "%s\t%s\t%s\n", "Name", "Einv_constr", "Einv_op" > (PathName & "/einv_breakdown.txt");
+# New objectives #
+## Print Crit_1 breakdown to txt file
+print "--------------SAVING Crit_1 ----------";
+printf "%s\t%s\t%s\n", "Name", "Crit_1_constr", "Crit_1_op" > (PathName & "/crit_1_breakdown.txt");
 for {i in TECHNOLOGIES union RESOURCES} {
-printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Einv_constr[i] / lifetime[i] else 0, if i in RESOURCES then Einv_op[i] else 0 >> (PathName & "/einv_breakdown.txt");
+printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Crit_1_constr[i] / lifetime[i] else 0, if i in RESOURCES then Crit_1_op[i] else 0 >> (PathName & "/crit_1_breakdown.txt");
 }
 
-#ICI_1
-## Print HH_moi breakdown to txt file
-print "--------------SAVING HH_moi ----------";
-printf "%s\t%s\t%s\n", "Name", "HH_moi_constr", "HH_moi_op" > (PathName & "/hh_moi_breakdown.txt");
+## Print Crit_2 breakdown to txt file
+print "--------------SAVING Crit_2 ----------";
+printf "%s\t%s\t%s\n", "Name", "Crit_2_constr", "Crit_2_op" > (PathName & "/crit_2_breakdown.txt");
 for {i in TECHNOLOGIES union RESOURCES} {
-printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then HH_moi_constr[i] / lifetime[i] else 0, if i in RESOURCES then HH_moi_op[i] else 0 >> (PathName & "/HH_moi_breakdown.txt");
+printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Crit_2_constr[i] / lifetime[i] else 0, if i in RESOURCES then Crit_2_op[i] else 0 >> (PathName & "/crit_2_breakdown.txt");
 }
 
+# New parameters #
 ## Print ENVIRONMENTAL PRICES breakdown to txt file
 print "--------------SAVING EP ----------";
 printf "%s\t%s\t%s\n", "Name", "EP_constr", "EP_op" > (PathName & "/ep_breakdown.txt");
@@ -66,6 +67,13 @@ print "--------------SAVING HH ----------";
 printf "%s\t%s\t%s\n", "Name", "HH_constr", "HH_op" > (PathName & "/hh_breakdown.txt");
 for {i in TECHNOLOGIES union RESOURCES} {
     printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then HH_constr[i] / lifetime[i] else 0, if i in RESOURCES then HH_op[i] else 0 >> (PathName & "/hh_breakdown.txt");
+}
+
+## Print Crit_1 breakdown to txt file
+print "--------------SAVING Einv ----------";
+printf "%s\t%s\t%s\n", "Name", "Einv_constr", "Einv_op" > (PathName & "/einv_breakdown.txt");
+for {i in TECHNOLOGIES union RESOURCES} {
+printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Einv_constr[i] / lifetime[i] else 0, if i in RESOURCES then Einv_op[i] else 0 >> (PathName & "/einv_breakdown.txt");
 }
 
 ## Print DAMAGE TO RESOURCE AVAILABILITY breakdown to txt file

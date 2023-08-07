@@ -80,6 +80,7 @@ param end_uses_input {i in END_USES_INPUT} := sum {s in SECTORS} (end_uses_deman
 param i_rate > 0; # discount rate [-]: real discount rate
 param re_share_primary >= 0; # re_share [-]: minimum share of primary energy coming from RE
 param gwp_limit >= 0;    # [ktCO2-eq./year] maximum gwp emissions allowed.
+param cost_limit >= 0;    # [beuro/year] maximum gwp emissions allowed. #NEW_cost
 param share_mobility_public_min >= 0, <= 1; # %_public,min [-]: min limit for penetration of public mobility over total mobility 
 param share_mobility_public_max >= 0, <= 1; # %_public,max [-]: max limit for penetration of public mobility over total mobility 
 param share_freight_train_min >= 0, <= 1; # %_rail,min [-]: min limit for penetration of train in freight transportation
@@ -130,6 +131,9 @@ param crit_1_limit >=0; # [GWh/year] maximum system energy invested allowed
 param crit_2_op {RESOURCES} >= 0; # criteria to get a resources [X/y] #
 param crit_2_constr {TECHNOLOGIES} >= 0; # criteria in the construction of the technologies [X/GW].
 param crit_2_limit >=0; # [GWh/year] maximum system criteria allowed
+param crit_3_op {RESOURCES} >= 0; # criteria to get a resources [X/y] #
+param crit_3_constr {TECHNOLOGIES} >= 0; # criteria in the construction of the technologies [X/GW].
+param crit_3_limit >=0; # [GWh/year] maximum system criteria allowed
 
 # New parameters #
 param ep_constr {TECHNOLOGIES} >= 0; # Environmental prices [b€]
@@ -164,6 +168,9 @@ param crit_1_max >= 0;
 param weight_crit_2 >= 0;
 param crit_2_min >= 0;
 param crit_2_max >= 0;
+param weight_crit_3 >= 0;
+param crit_3_min >= 0;
+param crit_3_max >= 0;
 
 param goal_cost_norm >= 0;
 param goal_gwp_norm >= 0;
@@ -171,26 +178,30 @@ param goal_gwp_norm >= 0;
 # New objectives #
 param goal_crit_1_norm >= 0;
 param goal_crit_2_norm >= 0;
+param goal_crit_3_norm >= 0;
 
 # Criterias weights for the multicriteria optimisation
-let weight_cost := 0;
+let weight_cost := 1;
 let weight_gwp := 0;
 
 # New objectives #
 let weight_crit_1 := 0;
-let weight_crit_2 := 1;
+let weight_crit_2 := 0;
+let weight_crit_3 := 0;
 
 # Criterias normalization setup (min and max obtain with single criterion optimisation): crit_normalised = (crit - crit_min) / (crit_max - crit_min)
-let cost_min := 38487.172541;
-let gwp_min := 17000; #17665.884492 to modify if low GWP scenario
-let cost_max := 80000; #79396.391412;
-let gwp_max := 84654.620000;
+let cost_min := 35500;
+let cost_max := 78500;
+let gwp_min := 1000;#45000;#1000;
+let gwp_max := 120000; #100000;
 
 # New objectives #
-let crit_1_min := 37265.398490;
-let crit_1_max := 136191.017541;
-let crit_2_min := 10000;
-let crit_2_max := 250000;
+let crit_1_min := 5500; #50000;#5700;
+let crit_1_max := 411000;#185000
+let crit_2_min := 20;#150
+let crit_2_max := 1500;#550
+let crit_3_min := 14;#10;#1500
+let crit_3_max := 21000; #15000;
 
 let goal_cost_norm := 0;
 let goal_gwp_norm := 0;
@@ -198,6 +209,7 @@ let goal_gwp_norm := 0;
 # New objectives #
 let goal_crit_1_norm := 0;
 let goal_crit_2_norm := 0;
+let goal_crit_3_norm := 0;
 
 ##Additional parameter (hard coded as '8760' in the thesis)
 param total_time := sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} (t_op [h, td]); # [h]. added just to simplify equations
@@ -228,9 +240,12 @@ var F_t_solar       {TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DECEN"] diff {"DE
 var TotalCrit_1 >= 0; # Crit_1_tot [GWh/year]: Total Cumulative energy demand (Crit_1) in the system
 var Crit_1_constr {TECHNOLOGIES} >= 0; #Total Crit_1 of the technologies
 var Crit_1_op {RESOURCES} >= 0; # Total yearly Crit_1 of the resources
-var TotalCrit_2 >= 0; # crit_2_tot [X/year]: Total Cumulative crit_2 in the system
-var Crit_2_constr {TECHNOLOGIES} >= 0; #Total crit_2 of the technologies
-var Crit_2_op {RESOURCES} >= 0; # Total yearly crit_2 of the resources
+var TotalCrit_2 >= 0; # Crit_2_tot [X/year]: Total Cumulative Crit_2 in the system
+var Crit_2_constr {TECHNOLOGIES} >= 0; #Total Crit_2 of the technologies
+var Crit_2_op {RESOURCES} >= 0; # Total yearly Crit_2 of the resources
+var TotalCrit_3 >= 0; # Crit_3_tot [X/year]: Total Cumulative Crit_3 in the system
+var Crit_3_constr {TECHNOLOGIES} >= 0; #Total Crit_3 of the technologies
+var Crit_3_op {RESOURCES} >= 0; # Total yearly Crit_3 of the resources
 
 ##Dependent variables [Table 2.4] :
 var End_uses {LAYERS, HOURS, TYPICAL_DAYS} >= 0; #EndUses [GW]: total demand for each type of end-uses (hourly power). Defined for all layers (0 if not demand). [Mpkm] or [Mtkm] for passenger or freight mobility.
@@ -238,6 +253,7 @@ var TotalCost >= 0; # C_tot [ktCO2-eq./year]: Total GWP emissions in the system.
 var C_inv {TECHNOLOGIES} >= 0; #C_inv [Meuros]: Total investment cost of each technology
 var C_maint {TECHNOLOGIES} >= 0; #C_maint [Meuros/year]: Total O&M cost of each technology (excluding resource cost)
 var C_op {RESOURCES} >= 0; #C_op [Meuros/year]: Total O&M cost of each resource
+
 var TotalGWP >= 0; # GWP_tot [ktCO2-eq./year]: Total global warming potential (GWP) emissions in the system
 var GWP_constr {TECHNOLOGIES} >= 0; # GWP_constr [ktCO2-eq.]: Total emissions of the technologies
 var GWP_op {RESOURCES} >= 0; #  GWP_op [ktCO2-eq.]: Total yearly emissions of the resources [ktCO2-eq./y]
@@ -247,6 +263,7 @@ var Storage_level {STORAGE_TECH, PERIODS} >= 0; # Sto_level [GWh]: Energy stored
 # New objectives #
 var TotalCrit_1_norm >= 0;
 var TotalCrit_2_norm >= 0;
+var TotalCrit_3_norm >= 0;
 
 # New parameters #
 var TotalEP >= 0; # EP_tot [M€2015/year]: Total environmental price (EP) of the system
@@ -284,6 +301,7 @@ var Positive_deviation_gwp >= 0;
 # New objectives #
 var Positive_deviation_crit_1 >= 0;
 var Positive_deviation_crit_2 >= 0;
+var Positive_deviation_crit_3 >= 0;
 
 #############################################
 ###      CONSTRAINTS Eqs [2.1-2.39]       ###
@@ -397,6 +415,24 @@ subject to crit_2_constr_calc {j in TECHNOLOGIES}:
 # [Eq. ?]
 subject to crit_2_op_calc {i in RESOURCES}:
 	Crit_2_op [i] = crit_2_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
+
+## Criteria 3
+#-----------
+
+# [Eq. ?]
+subject to totalCrit_3_calc:
+	TotalCrit_3 = sum {j in TECHNOLOGIES} (Crit_3_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_3_op [i];
+	#JUST RESOURCES :          TotalCrit_3 = sum {i in RESOURCES} Crit_3_op [i];
+	#JUST GREY EMISSIONS:	   TotalCrit_3 = sum {j in TECHNOLOGIES} (Crit_3_constr [j] / lifetime [j]);
+	#INCLUDING GREY EMISSIONS: TotalCrit_3 = sum {j in TECHNOLOGIES} (Crit_3_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_3_op [i];
+
+# [Eq. ?]
+subject to crit_3_constr_calc {j in TECHNOLOGIES}:
+	Crit_3_constr [j] = crit_3_constr [j] * F [j];
+
+# [Eq. ?]
+subject to crit_3_op_calc {i in RESOURCES}:
+	Crit_3_op [i] = crit_3_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
 
 
 ## EP
@@ -697,19 +733,27 @@ subject to peak_lowT_dhn:
 
 ## Adaptation for the case study: Constraints needed for the application to Switzerland (not needed in standard LP formulation)
 #-----------------------------------------------------------------------------------------------------------------------
+#[Eq. ?]  constraint to reduce the Cost subject to Maximum_Cost :#NEW_cost
+subject to Maximum_Cost :
+	TotalCost <= cost_limit;
 
 # [Eq. 2.34]  constraint to reduce the GWP subject to Minimum_gwp_reduction :
 subject to Minimum_GWP_reduction :
 	TotalGWP <= gwp_limit;
 
+# New objectives #
+
 #[Eq. ?]  constraint to reduce the Crit_1 subject to Maximum_Crit_1 :
 subject to Maximum_Crit_1 :
 	TotalCrit_1 <= crit_1_limit;
 
-#ICI_5_OK
 #[Eq. ?]  constraint to reduce the Crit_2 subject to Maximum_Crit_2 :
 subject to Maximum_Crit_2 :
 	TotalCrit_2 <= crit_2_limit;
+
+#[Eq. ?]  constraint to reduce the Crit_3 subject to Maximum_Crit_3 :
+subject to Maximum_Crit_3 :
+	TotalCrit_3 <= crit_3_limit;
 
 
 # [Eq. 2.35] Minimum share of RE in primary energy supply
@@ -745,15 +789,17 @@ subject to solar_area_limited :
 # As the goals are set to be equal to crit_min, the normalised goals are equal to zero
 
 subject to Cost_normalization :
-	TotalCost_norm = (TotalCost - cost_min) / (cost_max - cost_min);
+	TotalCost_norm = ((TotalCost - cost_min) / (cost_max - cost_min))*100000 ;
 subject to GWP_normalization :
-	TotalGWP_norm = (TotalGWP - gwp_min) / (gwp_max - gwp_min);
+	TotalGWP_norm = ((TotalGWP - gwp_min) / (gwp_max - gwp_min))*100000;
 
 # New objectives #
 subject to Crit_1_normalization :
-	TotalCrit_1_norm = (TotalCrit_1 - crit_1_min) / (crit_1_max - crit_1_min);
+	TotalCrit_1_norm = ((TotalCrit_1 - crit_1_min) / (crit_1_max - crit_1_min))*100000;
 subject to Crit_2_normalization :
-	TotalCrit_2_norm = (TotalCrit_2 - crit_2_min) / (crit_2_max - crit_2_min);
+	TotalCrit_2_norm = ((TotalCrit_2 - crit_2_min) / (crit_2_max - crit_2_min))*100000;
+subject to Crit_3_normalization :
+	TotalCrit_3_norm = ((TotalCrit_3 - crit_3_min) / (crit_3_max - crit_3_min))*100000;
 
 subject to Cost_deviation_computation :
 	Positive_deviation_cost = TotalCost_norm - goal_cost_norm;
@@ -765,10 +811,12 @@ subject to Crit_1_deviation_computation :
 	Positive_deviation_crit_1 = TotalCrit_1_norm - goal_crit_1_norm;
 subject to Crit_2_deviation_computation :
 	Positive_deviation_crit_2 = TotalCrit_2_norm - goal_crit_2_norm;
+subject to Crit_3_deviation_computation :
+	Positive_deviation_crit_3 = TotalCrit_3_norm - goal_crit_3_norm;
 
 
 subject to Multi_crit_computation :
-	Multi_crit_obj = weight_cost * Positive_deviation_cost + weight_gwp * Positive_deviation_gwp + weight_crit_1 * Positive_deviation_crit_1 + weight_crit_2 * Positive_deviation_crit_2; # New objectives #
+	Multi_crit_obj = Positive_deviation_cost * weight_cost + weight_gwp * Positive_deviation_gwp + weight_crit_1 * Positive_deviation_crit_1 + weight_crit_2 * Positive_deviation_crit_2 + weight_crit_3 * Positive_deviation_crit_3; # New objectives
 
-# Can choose between TotalGWP, TotalCost, TotalCrit_1, Multi_crit_obj and TotalCrit_2
-minimize obj: Multi_crit_obj;
+# Can choose between TotalGWP, TotalCost, TotalCrit_1, TotalCrit_2, TotalCrit_3 and Multi_crit_obj
+minimize obj: TotalCost

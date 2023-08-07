@@ -1,6 +1,6 @@
 # Case study definition
 # name of the case study. The problem formulation and ouptuts will be printed into the following relative path from main directory : case_studies/config['case_study']
-'case_study': 'General_test_1'
+'case_study': 'Near_Opti_bound'
 # number of typical days to consider
 'nbr_td': 12
 # Dictionnary with the dataframes containing all the data in the form : {'Demand': eud, 'Resources': resources, 'Technologies': technologies, 'End_uses_categories': end_uses_categories, 'Layers_in_out': layers_in_out, 'Storage_characteristics': storage_characteristics, 'Storage_eff_in': storage_eff_in, 'Storage_eff_out': storage_eff_out, 'Time_series': time_series, 'Misc': misc}
@@ -10,12 +10,13 @@
 #CAUTION : The limits used for criteria normalization (defined in es_model.mod line 164) have to be modify to explore "extreme" scenarios
 #REMARK : The weights of criteria can be change in es_model.mod line 159
 
-'GWP_limit': 50000 #[ktCO2-eq./year]
-'Cost_limit': 120000 #[beuro/year]
+'GWP_limit': 120000 #[ktCO2-eq./year]
+'Cost_limit': 90000 #[beuro/year]
 
 # New objectives #
-'Crit_1_limit': 150000 #[Gwh/year]
-'Crit_2_limit': 150000 #[Gwh/year]
+'Crit_1_limit': 411000 #[Gwh/year]
+'Crit_2_limit': 1500 #[Gwh/year]
+'Crit_3_limit': 21000 #[Gwh/year]
 
 # Relative path from main directory to energyscope subdirectories and files
 'data_dir': 'Data/2020'  # Folders containing the csv data files
@@ -33,7 +34,7 @@ printing_td: True
 # path to AMPL licence directory (to adapt by the user), set to None if AMPL is in your PATH variables
 # /!\ Don't use "\" but rather "\\" or "/"
 'AMPL_path': 
-# options for ampl
+# options for ampl -> (initialy barconvtol=1e-6)
 'ampl_options' : {'show_stats': 3,
                   'log_file': 'output/log.txt',
                   'presolve': 10,
@@ -42,10 +43,10 @@ printing_td: True
                   'show_boundtol': 0,
                   '_log_input_only': False,
                   'solver': 'gurobi',
-                  'gurobi_options' : 'predual=-1 method=2 crossover=0 prepasses=3 barconvtol=1e-6 presolve=-1'
+                  'gurobi_options' : 'predual=-1 method=2 crossover=0 prepasses=3 barconvtol=1e-10 presolve=-1'
 }
 
 # Printing more detailed outputs
 'print_barh' : True
 'print_hourly_data': False
-'print_sankey': True
+'print_sankey': False

@@ -55,6 +55,16 @@ if __name__ == '__main__':
     if config['print_barh']:
         fig2, ax2 = es.plot_barh(outputs['resources_breakdown'][['Used']], title='Primary energy [GWh/y]')
         fig3, ax3 = es.plot_barh(elec_assets[['f']], title='Electricity assets [GW_e]',x_label='Installed capacity [GW_e]')
+        # Set the paths where you want to save the figures
+        path_to_fig_1 = r"C:\Users\ghuysn\Documents\PhD\Seminar\Nouveau dossier\Figure_1.png"
+        path_to_fig_2 = r"C:\Users\ghuysn\Documents\PhD\Seminar\Nouveau dossier\Figure_2.png"
+        # Save the figures to the specified paths
+        fig2.savefig(path_to_fig_1, dpi=300, bbox_inches='tight')
+        fig3.savefig(path_to_fig_2, dpi=300, bbox_inches='tight')
+
+        # Optionally, you may want to close the figures to free up memory
+        plt.close(fig2)
+        plt.close(fig3)
 
     # layer_HEAT_LOW_T_DECEN for the 12 tds
     if config['print_hourly_data']:

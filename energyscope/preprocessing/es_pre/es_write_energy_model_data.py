@@ -58,19 +58,21 @@ def print_data(config):
         # Prints the data into .dat file (out_path) with the right syntax for AMPL
         out_path = cs / config['case_study'] / 'ESTD_data.dat'
         # config['es_path'] + '/ESTD_data.dat'
+        cost_limit = config['Cost_limit'] #NEW_cost
         gwp_limit = config['GWP_limit']
 
         # New objectives #
         crit_1_limit = config['Crit_1_limit']
         crit_2_limit = config['Crit_2_limit']
+        crit_3_limit = config['Crit_3_limit']
 
         cost_limit = config['Cost_limit']
-        #cost_max = config['Cost_max']
+        #cost_max = config['Cost_limit']
 
         # Pre-processing df #
 
         # pre-processing resources # New objectives # # New parameters #
-        resources_simple = resources.loc[:, ['avail', 'gwp_op', 'c_op', 'crit_1_op', 'crit_2_op' , 'ep_op','agro_land_op','urban_land_op','hh_op','ecosys_op','rsc_op','rcm_op','einv_op'
+        resources_simple = resources.loc[:, ['avail', 'gwp_op', 'c_op', 'crit_1_op', 'crit_2_op', 'crit_3_op'  , 'ep_op','agro_land_op','urban_land_op','hh_op','ecosys_op','rsc_op','rcm_op','einv_op'
                                                                                                                                                                      '']]
         resources_simple.index.name = 'param :'
         resources_simple = resources_simple.astype('float')
@@ -293,10 +295,11 @@ def print_data(config):
         print_param('i_rate', i_rate, 'part [2.7.4]', out_path)
         print_param('re_share_primary', re_share_primary, 'Minimum RE share in primary consumption', out_path)
         print_param('gwp_limit', gwp_limit, 'gwp_limit [ktCO2-eq./year]: maximum GWP emissions', out_path) #ligne 99 excel
-
+        print_param('cost_limit', cost_limit, 'cost_limit [beuro/year]: maximum Cost', out_path)#NEW_cost
         # New objectives #
         print_param('crit_1_limit', crit_1_limit, 'crit_1_limit [GWh/year]: maximum GWh invested', out_path)
         print_param('crit_2_limit', crit_2_limit, 'crit_2_limit [GWh/year]: maximum GWh invested', out_path)
+        print_param('crit_3_limit', crit_3_limit, 'crit_3_limit [GWh/year]: maximum GWh invested', out_path)
 
         print_param('solar_area', solar_area, '', out_path)
         print_param('power_density_pv', power_density_pv, 'PV : 1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2',

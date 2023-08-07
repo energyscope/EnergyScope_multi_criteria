@@ -1,11 +1,12 @@
 ## Saving year summary to output file
 
 print "TotalCost", TotalCost;
-print "GWP_op", sum {i in RESOURCES} GWP_op [i];
+print "GWP_tot", sum {j in TECHNOLOGIES} (GWP_constr [j] / lifetime [j]) + sum {i in RESOURCES} GWP_op [i];
 
 # New objectives #
 print "Crit_1_tot", TotalCrit_1;
 print "Crit_2_tot", TotalCrit_2;
+print "Crit_3_tot", TotalCrit_3;
 
 
 
@@ -45,6 +46,13 @@ print "--------------SAVING Crit_2 ----------";
 printf "%s\t%s\t%s\n", "Name", "Crit_2_constr", "Crit_2_op" > (PathName & "/crit_2_breakdown.txt");
 for {i in TECHNOLOGIES union RESOURCES} {
 printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Crit_2_constr[i] / lifetime[i] else 0, if i in RESOURCES then Crit_2_op[i] else 0 >> (PathName & "/crit_2_breakdown.txt");
+}
+
+## Print Crit_3 breakdown to txt file
+print "--------------SAVING Crit_3 ----------";
+printf "%s\t%s\t%s\n", "Name", "Crit_3_constr", "Crit_3_op" > (PathName & "/crit_3_breakdown.txt");
+for {i in TECHNOLOGIES union RESOURCES} {
+printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Crit_3_constr[i] / lifetime[i] else 0, if i in RESOURCES then Crit_3_op[i] else 0 >> (PathName & "/crit_3_breakdown.txt");
 }
 
 # New parameters #

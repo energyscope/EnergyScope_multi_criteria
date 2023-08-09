@@ -190,7 +190,7 @@ let weight_crit_2 := 0.2;
 let weight_crit_3 := 0.2;
 
 # Criterias normalization setup (min and max obtain with single criterion optimisation): crit_normalised = (crit - crit_min) / (crit_max - crit_min)
-let cost_min := 45400;#OK
+let cost_min := 30400;#OK
 let cost_max := 90000;#OK car sinon nimp
 let gwp_min := 5000;#OK
 let gwp_max := 160000;#OK
@@ -819,4 +819,4 @@ subject to Multi_crit_computation :
 	Multi_crit_obj = Positive_deviation_cost * weight_cost + weight_gwp * Positive_deviation_gwp + weight_crit_1 * Positive_deviation_crit_1 + weight_crit_2 * Positive_deviation_crit_2 + weight_crit_3 * Positive_deviation_crit_3; # New objectives
 
 # Can choose between TotalGWP, TotalCost, TotalCrit_1, TotalCrit_2, TotalCrit_3 and Multi_crit_obj
-minimize obj: Multi_crit_obj
+minimize obj: TotalCost

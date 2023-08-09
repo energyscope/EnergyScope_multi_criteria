@@ -43,7 +43,7 @@ printing_td: True
                   'show_boundtol': 0,
                   '_log_input_only': False,
                   'solver': 'gurobi',
-                  'gurobi_options' : 'predual=-1 method=2 crossover=0 prepasses=3 barconvtol=1e-6 presolve=-1'
+                  'gurobi_options' : 'predual=-1 method=2 crossover=0 prepasses=3 barconvtol=1e-10 presolve=-1'
 }
 
 # Printing more detailed outputs

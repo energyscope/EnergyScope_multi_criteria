@@ -1,6 +1,6 @@
 # Case study definition
 # name of the case study. The problem formulation and ouptuts will be printed into the following relative path from main directory : case_studies/config['case_study']
-'case_study': 'Near_Opti_bound'
+'case_study': 'Near_Opti_0.2_0.2_0.2_0.2_0.2'
 # number of typical days to consider
 'nbr_td': 12
 # Dictionnary with the dataframes containing all the data in the form : {'Demand': eud, 'Resources': resources, 'Technologies': technologies, 'End_uses_categories': end_uses_categories, 'Layers_in_out': layers_in_out, 'Storage_characteristics': storage_characteristics, 'Storage_eff_in': storage_eff_in, 'Storage_eff_out': storage_eff_out, 'Time_series': time_series, 'Misc': misc}
@@ -10,7 +10,7 @@
 #CAUTION : The limits used for criteria normalization (defined in es_model.mod line 164) have to be modify to explore "extreme" scenarios
 #REMARK : The weights of criteria can be change in es_model.mod line 159
 
-'GWP_limit': 120000 #[ktCO2-eq./year]
+'GWP_limit': 160000 #[ktCO2-eq./year]
 'Cost_limit': 90000 #[beuro/year]
 
 # New objectives #
@@ -47,6 +47,6 @@ printing_td: True
 }
 
 # Printing more detailed outputs
-'print_barh' : True
+'print_barh' : False
 'print_hourly_data': False
-'print_sankey': False
+'print_sankey': True

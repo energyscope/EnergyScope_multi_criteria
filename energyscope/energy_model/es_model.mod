@@ -181,27 +181,27 @@ param goal_crit_2_norm >= 0;
 param goal_crit_3_norm >= 0;
 
 # Criterias weights for the multicriteria optimisation
-let weight_cost := 1;
-let weight_gwp := 0;
+let weight_cost := 0.4;
+let weight_gwp := 0.2;
 
 # New objectives #
 let weight_crit_1 := 0;
-let weight_crit_2 := 0;
-let weight_crit_3 := 0;
+let weight_crit_2 := 0.2;
+let weight_crit_3 := 0.2;
 
 # Criterias normalization setup (min and max obtain with single criterion optimisation): crit_normalised = (crit - crit_min) / (crit_max - crit_min)
-let cost_min := 35500;
-let cost_max := 78500;
-let gwp_min := 1000;#45000;#1000;
-let gwp_max := 120000; #100000;
+let cost_min := 45400;#OK
+let cost_max := 90000;#OK car sinon nimp
+let gwp_min := 5000;#OK
+let gwp_max := 160000;#OK
 
 # New objectives #
-let crit_1_min := 5500; #50000;#5700;
-let crit_1_max := 411000;#185000
-let crit_2_min := 20;#150
-let crit_2_max := 1500;#550
-let crit_3_min := 14;#10;#1500
-let crit_3_max := 21000; #15000;
+let crit_1_min := 15000;#5500
+let crit_1_max := 411000;
+let crit_2_min := 150;#20
+let crit_2_max := 1500;
+let crit_3_min := 350;#14
+let crit_3_max := 21000;
 
 let goal_cost_norm := 0;
 let goal_gwp_norm := 0;
@@ -819,4 +819,4 @@ subject to Multi_crit_computation :
 	Multi_crit_obj = Positive_deviation_cost * weight_cost + weight_gwp * Positive_deviation_gwp + weight_crit_1 * Positive_deviation_crit_1 + weight_crit_2 * Positive_deviation_crit_2 + weight_crit_3 * Positive_deviation_crit_3; # New objectives
 
 # Can choose between TotalGWP, TotalCost, TotalCrit_1, TotalCrit_2, TotalCrit_3 and Multi_crit_obj
-minimize obj: TotalCost
+minimize obj: Multi_crit_obj

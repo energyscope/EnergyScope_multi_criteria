@@ -1,6 +1,6 @@
 # Case study definition
 # name of the case study. The problem formulation and ouptuts will be printed into the following relative path from main directory : case_studies/config['case_study']
-'case_study': 'Near_Opti_0.2_0.2_0.2_0.2_0.2'
+'case_study': '100%_run_2020_GWPtot_MC'
 # number of typical days to consider
 'nbr_td': 12
 # Dictionnary with the dataframes containing all the data in the form : {'Demand': eud, 'Resources': resources, 'Technologies': technologies, 'End_uses_categories': end_uses_categories, 'Layers_in_out': layers_in_out, 'Storage_characteristics': storage_characteristics, 'Storage_eff_in': storage_eff_in, 'Storage_eff_out': storage_eff_out, 'Time_series': time_series, 'Misc': misc}
@@ -14,8 +14,8 @@
 'Cost_limit': 200000 #[beuro/year]
 
 # New objectives #
-'Crit_1_limit': 600000 #[Gwh/year]
-'Crit_2_limit': 20000 #[Gwh/year]
+'Crit_1_limit': 10000000 #[Gwh/year]
+'Crit_2_limit': 200000 #[Gwh/year]
 'Crit_3_limit': 100000 #[Gwh/year]
 
 # Relative path from main directory to energyscope subdirectories and files
@@ -43,10 +43,10 @@ printing_td: True
                   'show_boundtol': 0,
                   '_log_input_only': False,
                   'solver': 'gurobi',
-                  'gurobi_options' : 'predual=-1 method=2 crossover=0 prepasses=3 barconvtol=1e-10 presolve=-1'
+                  'gurobi_options' : 'predual=-1 method=2 crossover=0 prepasses=3 barconvtol=1e-6 presolve=-1'
 }
 
 # Printing more detailed outputs
 'print_barh' : False
-'print_hourly_data': False
+'print_hourly_data': True
 'print_sankey': True

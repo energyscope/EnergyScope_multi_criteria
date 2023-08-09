@@ -367,7 +367,6 @@ subject to op_cost_calc {i in RESOURCES}:
 subject to totalGWP_calc:
 
 	TotalGWP = sum {j in TECHNOLOGIES} (GWP_constr [j] / lifetime [j]) + sum {i in RESOURCES} GWP_op [i];
-	#TotalGWP = sum {i in RESOURCES} GWP_op [i];
 	#JUST RESOURCES :          TotalGWP = sum {i in RESOURCES} GWP_op [i];
 	#INCLUDING GREY EMISSIONS: TotalGWP = sum {j in TECHNOLOGIES} (GWP_constr [j] / lifetime [j]) + sum {i in RESOURCES} GWP_op [i];
 	
@@ -819,4 +818,4 @@ subject to Multi_crit_computation :
 	Multi_crit_obj = Positive_deviation_cost * weight_cost + weight_gwp * Positive_deviation_gwp + weight_crit_1 * Positive_deviation_crit_1 + weight_crit_2 * Positive_deviation_crit_2 + weight_crit_3 * Positive_deviation_crit_3; # New objectives
 
 # Can choose between TotalGWP, TotalCost, TotalCrit_1, TotalCrit_2, TotalCrit_3 and Multi_crit_obj
-minimize obj: TotalCost
+minimize obj: TotalCost;

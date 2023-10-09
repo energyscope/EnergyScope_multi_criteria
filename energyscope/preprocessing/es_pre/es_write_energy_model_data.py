@@ -138,6 +138,7 @@ def print_data(config):
         RE_RESOURCES = list(
             resources.loc[(resources['Category'] == 'Renewable'), :].index)
         EXPORT = list(resources.loc[resources['Category'] == 'Export', :].index)
+        LCA = list(resources.loc[resources['Category'] == 'LCA', :].index)
 
         END_USES_TYPES_OF_CATEGORY = []
         for i in END_USES_CATEGORIES:
@@ -233,6 +234,7 @@ def print_data(config):
         print_set(BIOFUELS, 'BIOFUELS', out_path)
         print_set(RE_RESOURCES, 'RE_RESOURCES', out_path)
         print_set(EXPORT, 'EXPORT', out_path)
+        print_set(LCA, 'LCA', out_path)
         newline(out_path)
         n = 0
         for j in END_USES_TYPES_OF_CATEGORY:
@@ -344,6 +346,7 @@ def print_data(config):
         newline(out_path)
         print_df('param:', share_ned, out_path)
         newline(out_path)
+
         with open(out_path, mode='a', newline='') as file:
             writer = csv.writer(file, delimiter='\t', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(['# Link between layers  (data from Tables 19,21,22,23,25,29,30)'])
@@ -354,9 +357,6 @@ def print_data(config):
             writer.writerow(
                 ['# Technologies data from Tables (10,19,21,22,23,25,27,28,29,30) and part [2.2.1.1] for hydro'])#
         print_df('param :', technologies_simple, out_path)
-        #print('test_in_2')
-        #print(technologies_simple)
-        #print('test_out_2')
         newline(out_path)
         with open(out_path, mode='a', newline='') as file:
             writer = csv.writer(file, delimiter='\t', quotechar=' ', quoting=csv.QUOTE_MINIMAL)

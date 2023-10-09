@@ -108,13 +108,12 @@ def import_data(config: dict):
     resources.dropna(axis=0, how='any', inplace=True)
     technologies.drop(columns=['Comment'], inplace=True)
     technologies.dropna(axis=0, how='any', inplace=True)
-    # cleaning indices and columns
 
     all_df = {'Demand': eud, 'Resources': resources, 'Technologies': technologies,
               'End_uses_categories': end_uses_categories, 'Layers_in_out': layers_in_out,
               'Storage_characteristics': storage_characteristics, 'Storage_eff_in': storage_eff_in,
-              'Storage_eff_out': storage_eff_out, 'Time_series': time_series,
-              }
+              'Storage_eff_out': storage_eff_out, 'Time_series': time_series}
+
 
     for key in all_df:
         if type(all_df[key].index[0]) == str:

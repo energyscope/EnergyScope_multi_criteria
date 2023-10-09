@@ -38,6 +38,7 @@ set RESOURCES; # Resources: fuels (renewables and fossils) and electricity impor
 set RES_IMPORT_CONSTANT within RESOURCES; # resources imported at constant power (e.g. NG, diesel, ...)
 set BIOFUELS within RESOURCES; # imported biofuels.
 set EXPORT within RESOURCES; # exported resources
+set LCA within RESOURCES; # computed lca new 06/10
 set END_USES_TYPES := setof {i in END_USES_CATEGORIES, j in END_USES_TYPES_OF_CATEGORY [i]} j; # secondary set
 set TECHNOLOGIES_OF_END_USES_TYPE {END_USES_TYPES}; # set all energy conversion technologies (excluding storage technologies and infrastructure)
 set STORAGE_TECH; #  set of storage technologies 
@@ -45,8 +46,8 @@ set STORAGE_OF_END_USES_TYPES {END_USES_TYPES} within STORAGE_TECH; # set all st
 set INFRASTRUCTURE; # Infrastructure: DHN, grid, and intermediate energy conversion technologies (i.e. not directly supplying end-use demand)
 
 ## SECONDARY SETS: a secondary set is defined by operations on MAIN SETS
-set LAYERS := (RESOURCES diff BIOFUELS diff EXPORT) union END_USES_TYPES; # Layers are used to balance resources/products in the system
-set TECHNOLOGIES := (setof {i in END_USES_TYPES, j in TECHNOLOGIES_OF_END_USES_TYPE [i]} j) union STORAGE_TECH union INFRASTRUCTURE; 
+set LAYERS := (RESOURCES diff BIOFUELS diff EXPORT) union END_USES_TYPES; # Layers are used to balance resources/products in the system MAYBE ADD diff LCA
+set TECHNOLOGIES := (setof {i in END_USES_TYPES, j in TECHNOLOGIES_OF_END_USES_TYPE [i]} j) union STORAGE_TECH union INFRASTRUCTURE;
 set TECHNOLOGIES_OF_END_USES_CATEGORY {i in END_USES_CATEGORIES} within TECHNOLOGIES := setof {j in END_USES_TYPES_OF_CATEGORY[i], k in TECHNOLOGIES_OF_END_USES_TYPE [j]} k;
 set RE_RESOURCES within RESOURCES; # List of RE resources (including wind hydro solar), used to compute the RE share
 set V2G within TECHNOLOGIES;   # EVs which can be used for vehicle-to-grid (V2G).
@@ -107,6 +108,7 @@ param c_maint {TECHNOLOGIES} >= 0; # O&M cost [Meuros/GW/year]: O&M cost does no
 param lifetime {TECHNOLOGIES} >= 0; # n: lifetime [years]
 param tau {i in TECHNOLOGIES} := i_rate * (1 + i_rate)^lifetime [i] / (((1 + i_rate)^lifetime [i]) - 1); # Annualisation factor ([-]) for each different technology [Eq. 2.2]
 param gwp_constr {TECHNOLOGIES} >= 0; # GWP emissions associated to the construction of technologies [ktCO2-eq./GW]. Refers to [GW] of main output
+param lca_op {TECHNOLOGIES} >= 0; # GWP emissions associated to the construction of technologies [ktCO2-eq./GW]. Refers to [GW] of main output
 param gwp_op {RESOURCES} >= 0; # GWP emissions associated to the use of resources [ktCO2-eq./GWh]. Includes extraction/production/transportation and combustion
 param c_p {TECHNOLOGIES} >= 0, <= 1 default 1; # yearly capacity factor of each technology [-], defined on annual basis. Different than 1 if sum {t in PERIODS} F_t (t) <= c_p * F
 param storage_eff_in {STORAGE_TECH , LAYERS} >= 0, <= 1; # eta_sto_in [-]: efficiency of input to storage from layers.  If 0 storage_tech/layer are incompatible
@@ -181,27 +183,27 @@ param goal_crit_2_norm >= 0;
 param goal_crit_3_norm >= 0;
 
 # Criterias weights for the multicriteria optimisation
-let weight_cost := 0.4;
-let weight_gwp := 0.2;
+let weight_cost := 0.65;
+let weight_gwp := 0.25;
 
 # New objectives #
-let weight_crit_1 := 0;
-let weight_crit_2 := 0.2;
-let weight_crit_3 := 0.2;
+let weight_crit_1 := 0.01;
+let weight_crit_2 := 0;
+let weight_crit_3 := 0.09;
 
 # Criterias normalization setup (min and max obtain with single criterion optimisation): crit_normalised = (crit - crit_min) / (crit_max - crit_min)
-let cost_min := 30400;#OK
-let cost_max := 90000;#OK car sinon nimp
-let gwp_min := 5000;#OK
-let gwp_max := 160000;#OK
+let cost_min := 1000;#40000;
+let cost_max := 70000;
+let gwp_min := 5000;
+let gwp_max := 100000;
 
 # New objectives #
-let crit_1_min := 15000;#5500
-let crit_1_max := 411000;
+let crit_1_min := 20000;
+let crit_1_max := 10000000;
 let crit_2_min := 150;#20
-let crit_2_max := 1500;
-let crit_3_min := 350;#14
-let crit_3_max := 21000;
+let crit_2_max := 55000;
+let crit_3_min := 950;#14
+let crit_3_max := 12000;
 
 let goal_cost_norm := 0;
 let goal_gwp_norm := 0;
@@ -373,6 +375,7 @@ subject to totalGWP_calc:
 # [Eq. 2.7]
 subject to gwp_constr_calc {j in TECHNOLOGIES}:
 	GWP_constr [j] = gwp_constr [j] * F [j];
+
 
 # [Eq. 2.8]
 subject to gwp_op_calc {i in RESOURCES}:

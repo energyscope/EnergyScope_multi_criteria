@@ -40,7 +40,6 @@ if __name__ == '__main__':
 
         # Running EnergyScope
         es.run_es(config)
-
     # Example to print the sankey from this script
     if config['print_sankey']:
         sankey_path = config['cs_path']/ config['case_study'] / 'output' / 'sankey'

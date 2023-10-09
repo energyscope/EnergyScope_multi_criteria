@@ -29,3 +29,4 @@ Renewable;Non-biomass;RES_GEO;1.00E+15;0;0;0;0;0;0;0;0;0;0;0;0;0;0;
 Others;Others;CO2_ATM;1.00E+15;0;0;0;0;0;0;0;0;0;0;0;0;0;0;
 Others;Others;CO2_INDUSTRY;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;
 Others;Others;CO2_CAPTURED;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;
+Others;Others;LCA_ACIDIFICATION;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;

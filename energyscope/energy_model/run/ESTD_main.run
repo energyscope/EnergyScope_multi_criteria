@@ -76,15 +76,12 @@ else {
 
 			## Saving sets and parameters to output file
 
-	
 			## Print cost breakdown to txt file.
 			print "--------------SAVING COSTS -----------";
 			printf "%s\t%s\t%s\t%s\n", "Name", "C_inv", "C_maint", "C_op" > (PathName & "/cost_breakdown.txt"); 
 			for {i in TECHNOLOGIES union RESOURCES}{
 				printf "%s\t%.6f\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then (tau[i] * C_inv[i]) else 0, if i in TECHNOLOGIES then C_maint [i] else 0, if i in RESOURCES then C_op [i] else 0 >> (PathName & "/cost_breakdown.txt");
 			}
-
-
 						
 			## Print resources breakdown to txt file.
 			print "--------------SAVING RESOURCES -----------";
@@ -92,7 +89,6 @@ else {
 			for {i in RESOURCES}{
 				printf "%s\t%.6f\t%.6f\n", i, sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [i, h, td] * t_op [h, td]) , avail [i] >> (PathName & "/resources_breakdown.txt");
 			}
-
 
 			## Print GWP breakdown
 			print "--------------SAVING GWP -----------";
@@ -130,71 +126,6 @@ else {
 	        for {i in TECHNOLOGIES union RESOURCES} {
 		    printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Crit_3_constr[i] / lifetime[i] else 0, if i in RESOURCES then Crit_3_op[i] else 0 >> (PathName & "/crit_3_breakdown.txt");
 	        }
-
-            # New parameters #
-
-            ## Print ENVIRONMENTAL PRICES breakdown to txt file
-	        print "---------- SAVING EP ----------";
-	        printf "%s\t%s\t%s\n", "Name", "EP_constr", "EP_op" > (PathName & "/ep_breakdown.txt");
-	        for {i in TECHNOLOGIES union RESOURCES} {
-	        	printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then EP_constr[i] / lifetime[i] else 0, if i in RESOURCES then EP_op[i] else 0 >> (PathName & "/ep_breakdown.txt");
-	        }
-
-            ## Print AGRO_LAND breakdown to txt file
-            print "---------- SAVING AGRO_LAND ----------";
-            printf "%s\t%s\t%s\n", "Name", "AGRO_LAND_constr", "AGRO_LAND_op" > (PathName & "/agro_land_breakdown.txt");
-            for {i in TECHNOLOGIES union RESOURCES} {
-                printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then AGRO_LAND_constr[i] / lifetime[i] else 0, if i in RESOURCES then AGRO_LAND_op[i] else 0 >> (PathName & "/agro_land_breakdown.txt");
-            }
-
-
-            ## Print AGRO_LAND tech breakdown to txt file
-            print "---------- SAVING AGRO_LAND_TECH ----------";
-            printf "Tech\t" > (PathName & "/agro_land_tech.txt");
-            for {i in RESOURCES diff BIOFUELS diff EXPORT} {
-                printf "%s\t",i >> (PathName & "/agro_land_tech.txt");
-            }
-            for {j in TECHNOLOGIES diff STORAGE_TECH} {
-                printf "\n %s \t", j >> (PathName & "/agro_land_tech.txt");
-                for {i in RESOURCES diff BIOFUELS diff EXPORT} {
-                    printf " %f\t",if layers_in_out[j, i] == 0 then 0 else
-                        sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} ((agro_land_op[i] * F_t[i, h, td] * t_op[h, td]) * (layers_in_out[j, i] * F_t[j, h, td])	# The specific resources emissions times the share of the technology
-                        / (min(-0.000001, sum{j2 in TECHNOLOGIES diff STORAGE_TECH} (layers_in_out[j2, i] * F_t[j2, h, td]) + sum{j2 in STORAGE_TECH} (Storage_out[j2, i, h, td] - Storage_in[j2, i, h, td] )))) 	# The total share of technologies
-                        >> (PathName & "/agro_land_tech.txt");
-                }
-            }
-
-
-            ## Print DAMAGE TO HUMAN HEALTH breakdown to txt file
-            print "---------- SAVING HH ----------";
-            printf "%s\t%s\t%s\n", "Name", "HH_constr", "HH_op" > (PathName & "/hh_breakdown.txt");
-            for {i in TECHNOLOGIES union RESOURCES} {
-                printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then HH_constr[i] / lifetime[i] else 0, if i in RESOURCES then HH_op[i] else 0 >> (PathName & "/hh_breakdown.txt");
-            }
-
-            ## Print Einv breakdown to txt file
-	        print "---------- SAVING Einv ----------";
-	        printf "%s\t%s\t%s\n", "Name", "Einv_constr", "Einv_op" > (PathName & "/einv_breakdown.txt");
-	        for {i in TECHNOLOGIES union RESOURCES} {
-		    printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Einv_constr[i] / lifetime[i] else 0, if i in RESOURCES then Einv_op[i] else 0 >> (PathName & "/einv_breakdown.txt");
-	        }
-
-
-            ## Print DAMAGE TO RESOURCE AVAILABILITY breakdown to txt file
-            print "---------- SAVING RSC ----------";
-            printf "%s\t%s\t%s\n", "Name", "RSC_constr", "RSC_op" > (PathName & "/rsc_breakdown.txt");
-            for {i in TECHNOLOGIES union RESOURCES} {
-                printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then RSC_constr[i] / lifetime[i] else 0, if i in RESOURCES then RSC_op[i] else 0 >> (PathName & "/rsc_breakdown.txt");
-            }
-
-
-            ## Print DAMAGE TO ECOSYSTEMS breakdown to txt file
-            print "---------- SAVING ECOSYS ----------";
-            printf "%s\t%s\t%s\n", "Name", "ECOSYS_constr", "ECOSYS_op" > (PathName & "/ecosys_breakdown.txt");
-            for {i in TECHNOLOGIES union RESOURCES} {
-                printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then ECOSYS_constr[i] / lifetime[i] else 0, if i in RESOURCES then ECOSYS_op[i] else 0 >> (PathName & "/ecosys_breakdown.txt");
-            }
-
 
 			## Print losses to txt file
 			print "--------------SAVING Losses -----------";

@@ -129,8 +129,6 @@ param lca_tech {TECHNOLOGIES} >= 0;
 param lca_res {RESOURCES} >= 0;
 param lca_op {TECHNOLOGIES} >= 0;
 param lca_limit >=0; # [GWh/year] maximum system energy invested allowed
-
-
 param crit_1_op {RESOURCES} >= 0; # Energy invested to get a resources [GWh/y] #
 param crit_1_constr {TECHNOLOGIES} >= 0; # Energy invested in the construction of the technologies [GWh/GW].
 param crit_1_limit >=0; # [GWh/year] maximum system energy invested allowed
@@ -171,11 +169,9 @@ param weight_gwp >= 0;
 param weight_lca>= 0;
 param lca_min >= 0;
 param lca_max >= 0;
-
 param weight_crit_1 >= 0;
 param crit_1_min >= 0;
 param crit_1_max >= 0;
-
 param weight_crit_2 >= 0;
 param crit_2_min >= 0;
 param crit_2_max >= 0;
@@ -188,24 +184,22 @@ param goal_gwp_norm >= 0;
 
 # New objectives #
 param goal_lca_norm >= 0;
-
 param goal_crit_1_norm >= 0;
 param goal_crit_2_norm >= 0;
 param goal_crit_3_norm >= 0;
 
 # Criterias weights for the multicriteria optimisation
-let weight_cost := 0.65;
-let weight_gwp := 0.25;
+let weight_cost := 0.1;
+let weight_gwp := 0.3;
 
-# New objectives #
+# New objectives weights #
 let weight_lca := 0.00;
-
-let weight_crit_1 := 0.01;
-let weight_crit_2 := 0;
-let weight_crit_3 := 0.09;
+let weight_crit_1 := 0.1;
+let weight_crit_2 := 0.1;
+let weight_crit_3 := 0.4;
 
 # Criterias normalization setup (min and max obtain with single criterion optimisation): crit_normalised = (crit - crit_min) / (crit_max - crit_min)
-let cost_min := 1000;#40000;
+let cost_min := 1000;
 let cost_max := 70000;
 let gwp_min := 5000;
 let gwp_max := 100000;
@@ -213,7 +207,6 @@ let gwp_max := 100000;
 # New objectives #
 let lca_min := 0;
 let lca_max := 10000000;
-
 let crit_1_min := 20000;
 let crit_1_max := 10000000;
 let crit_2_min := 150;#20
@@ -260,7 +253,6 @@ var TotalLCA >= 0; # TotalLCA [impact/year]
 var LCA_tech {TECHNOLOGIES} >= 0; # LCA of the construction of the technologies
 var LCA_res {RESOURCES} >= 0; # LCA of the extraction/production/transport of the resources
 var LCA_op {TECHNOLOGIES} >= 0; # LCA of the operation of the technologies
-
 var TotalCrit_1 >= 0; # Crit_1_tot [GWh/year]: Total Cumulative energy demand (Crit_1) in the system
 var Crit_1_constr {TECHNOLOGIES} >= 0; #Total Crit_1 of the technologies
 var Crit_1_op {RESOURCES} >= 0; # Total yearly Crit_1 of the resources
@@ -325,7 +317,6 @@ var Positive_deviation_gwp >= 0;
 
 # New objectives #
 var Positive_deviation_lca >= 0;
-
 var Positive_deviation_crit_1 >= 0;
 var Positive_deviation_crit_2 >= 0;
 var Positive_deviation_crit_3 >= 0;
@@ -429,194 +420,56 @@ subject to lca_op_calc {j in TECHNOLOGIES}:
 ## Criteria 1
 #-----------
 
-# [Eq. ?]
+# [Eq. 1001.1]
 subject to totalCrit_1_calc:
 	TotalCrit_1 = sum {j in TECHNOLOGIES} (Crit_1_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_1_op [i];
 	#JUST RESOURCES :          TotalCrit_1 = sum {i in RESOURCES} Crit_1_op [i];
 	#JUST GREY EMISSIONS:	   TotalCrit_1 = sum {j in TECHNOLOGIES} (Crit_1_constr [j] / lifetime [j]);
 	#INCLUDING GREY EMISSIONS: TotalCrit_1 = sum {j in TECHNOLOGIES} (Crit_1_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_1_op [i];
 
-# [Eq. ?]
+# [Eq. 1001.2]
 subject to crit_1_constr_calc {j in TECHNOLOGIES}:
 	Crit_1_constr [j] = crit_1_constr [j] * F [j];
 
-# [Eq. ?]
+# [Eq. 1001.3]
 subject to crit_1_op_calc {i in RESOURCES}:
 	Crit_1_op [i] = crit_1_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
 
 ## Criteria 2
 #-----------
 
-# [Eq. ?]
+# [Eq. 1002.1]
 subject to totalCrit_2_calc:
 	TotalCrit_2 = sum {j in TECHNOLOGIES} (Crit_2_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_2_op [i];
 	#JUST RESOURCES :          TotalCrit_2 = sum {i in RESOURCES} Crit_2_op [i];
 	#JUST GREY EMISSIONS:	   TotalCrit_2 = sum {j in TECHNOLOGIES} (Crit_2_constr [j] / lifetime [j]);
 	#INCLUDING GREY EMISSIONS: TotalCrit_2 = sum {j in TECHNOLOGIES} (Crit_2_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_2_op [i];
 
-# [Eq. ?]
+# [Eq. 1002.2]
 subject to crit_2_constr_calc {j in TECHNOLOGIES}:
 	Crit_2_constr [j] = crit_2_constr [j] * F [j];
 
-# [Eq. ?]
+# [Eq. 1002.3]
 subject to crit_2_op_calc {i in RESOURCES}:
 	Crit_2_op [i] = crit_2_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
 
 ## Criteria 3
 #-----------
 
-# [Eq. ?]
+# [Eq. 1003.1]
 subject to totalCrit_3_calc:
 	TotalCrit_3 = sum {j in TECHNOLOGIES} (Crit_3_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_3_op [i];
 	#JUST RESOURCES :          TotalCrit_3 = sum {i in RESOURCES} Crit_3_op [i];
 	#JUST GREY EMISSIONS:	   TotalCrit_3 = sum {j in TECHNOLOGIES} (Crit_3_constr [j] / lifetime [j]);
 	#INCLUDING GREY EMISSIONS: TotalCrit_3 = sum {j in TECHNOLOGIES} (Crit_3_constr [j] / lifetime [j]) + sum {i in RESOURCES} Crit_3_op [i];
 
-# [Eq. ?]
+# [Eq. 1003.2]
 subject to crit_3_constr_calc {j in TECHNOLOGIES}:
 	Crit_3_constr [j] = crit_3_constr [j] * F [j];
 
-# [Eq. ?]
+# [Eq. 1003.3]
 subject to crit_3_op_calc {i in RESOURCES}:
 	Crit_3_op [i] = crit_3_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
-
-
-## EP
-#-----------
-
-# [Eq. ?]
-subject to totalEP_calc:
-	TotalEP = sum {j in TECHNOLOGIES} (EP_constr [j] / lifetime [j]) + sum {i in RESOURCES} EP_op [i];
-	#JUST RESOURCES :          TotalEP = sum {i in RESOURCES} EP_op [i];
-	#INCLUDING GREY EMISSIONS: TotalEP = sum {j in TECHNOLOGIES} (EP_constr [j] / lifetime [j]) + sum {i in RESOURCES} EP_op [i];
-
-# [Eq. ?]
-subject to ep_constr_calc {j in TECHNOLOGIES}:
-	EP_constr [j] = ep_constr [j] * F [j];
-
-# [Eq. ?]
-subject to ep_op_calc {i in RESOURCES}:
-	EP_op [i] = ep_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
-
-## AGRO_LAND
-#-----------
-
-# [Eq. ?]
-subject to totalAGRO_LAND_calc:
-	TotalAGRO_LAND = sum {j in TECHNOLOGIES} (AGRO_LAND_constr [j] / lifetime [j]) + sum {i in RESOURCES} AGRO_LAND_op [i];
-	#JUST RESOURCES :          TotalAGRO_LAND = sum {i in RESOURCES} AGRO_LAND_op [i];
-	#INCLUDING GREY EMISSIONS: TotalAGRO_LAND = sum {j in TECHNOLOGIES} (AGRO_LAND_constr [j] / lifetime [j]) + sum {i in RESOURCES} AGRO_LAND_op [i];
-
-# [Eq. ?]
-subject to agro_land_constr_calc {j in TECHNOLOGIES}:
-	AGRO_LAND_constr [j] = agro_land_constr [j] * F [j];
-
-# [Eq. ?]
-subject to agro_land_op_calc {i in RESOURCES}:
-	AGRO_LAND_op [i] = agro_land_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
-
-
-## URBAN_LAND
-#-----------
-
-# [Eq. ?]
-subject to totalURBAN_LAND_calc:
-	TotalURBAN_LAND = sum {j in TECHNOLOGIES} (URBAN_LAND_constr [j] / lifetime [j]) + sum {i in RESOURCES} URBAN_LAND_op [i];
-	#JUST RESOURCES :          TotalURBAN_LAND = sum {i in RESOURCES} URBAN_LAND_op [i];
-	#INCLUDING GREY EMISSIONS: TotalURBAN_LAND = sum {j in TECHNOLOGIES} (URBAN_LAND_constr [j] / lifetime [j]) + sum {i in RESOURCES} URBAN_LAND_op [i];
-
-# [Eq. ?]
-subject to urban_land_constr_calc {j in TECHNOLOGIES}:
-	URBAN_LAND_constr [j] = urban_land_constr [j] * F [j];
-
-# [Eq. ?]
-subject to urban_land_op_calc {i in RESOURCES}:
-	URBAN_LAND_op [i] = urban_land_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
-
-## HH
-#-----------
-
-# [Eq. ?]
-subject to totalHH_calc:
-	TotalHH = sum {j in TECHNOLOGIES} (HH_constr [j] / lifetime [j]) + sum {i in RESOURCES} HH_op [i];
-	#JUST RESOURCES :          TotalHH = sum {i in RESOURCES} HH_op [i];
-	#INCLUDING GREY EMISSIONS: TotalHH = sum {j in TECHNOLOGIES} (HH_constr [j] / lifetime [j]) + sum {i in RESOURCES} HH_op [i];
-
-# [Eq. ?]
-subject to hh_constr_calc {j in TECHNOLOGIES}:
-	HH_constr [j] = hh_constr [j] * F [j];
-
-# [Eq. ?]
-subject to hh_op_calc {i in RESOURCES}:
-	HH_op [i] = hh_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
-
-## Einv
-#-----------
-
-# [Eq. ?]
-subject to totalEinv_calc:
-	TotalEinv = sum {j in TECHNOLOGIES} (Einv_constr [j] / lifetime [j]) + sum {i in RESOURCES} Einv_op [i];
-	#JUST RESOURCES :          TotalEinv = sum {i in RESOURCES} Einv_op [i];
-	#INCLUDING GREY EMISSIONS: TotalEinv = sum {j in TECHNOLOGIES} (Einv_constr [j] / lifetime [j]) + sum {i in RESOURCES} Einv_op [i];
-
-# [Eq. ?]
-subject to einv_constr_calc {j in TECHNOLOGIES}:
-	Einv_constr [j] = einv_constr [j] * F [j];
-
-# [Eq. ?]
-subject to einv_op_calc {i in RESOURCES}:
-	Einv_op [i] = einv_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
-
-## ECOSYS
-#-----------
-
-# [Eq. ?]
-subject to totalECOSYS_calc:
-	TotalECOSYS = sum {j in TECHNOLOGIES} (ECOSYS_constr [j] / lifetime [j]) + sum {i in RESOURCES} ECOSYS_op [i];
-	#JUST RESOURCES :          TotalECOSYS = sum {i in RESOURCES} ECOSYS_op [i];
-	#INCLUDING GREY EMISSIONS: TotalECOSYS = sum {j in TECHNOLOGIES} (ECOSYS_constr [j] / lifetime [j]) + sum {i in RESOURCES} ECOSYS_op [i];
-
-# [Eq. ?]
-subject to ecosys_constr_calc {j in TECHNOLOGIES}:
-	ECOSYS_constr [j] = ecosys_constr [j] * F [j];
-
-# [Eq. ?]
-subject to ecosys_op_calc {i in RESOURCES}:
-	ECOSYS_op [i] = ecosys_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
-
-## RSC
-#-----------
-
-# [Eq. ?]
-subject to totalRSC_calc:
-	TotalRSC = sum {j in TECHNOLOGIES} (RSC_constr [j] / lifetime [j]) + sum {i in RESOURCES} RSC_op [i];
-	#JUST RESOURCES :          TotalRSC = sum {i in RESOURCES} RSC_op [i];
-	#INCLUDING GREY EMISSIONS: TotalRSC = sum {j in TECHNOLOGIES} (RSC_constr [j] / lifetime [j]) + sum {i in RESOURCES} RSC_op [i];
-
-# [Eq. ?]
-subject to rsc_constr_calc {j in TECHNOLOGIES}:
-	RSC_constr [j] = rsc_constr [j] * F [j];
-
-# [Eq. ?]
-subject to rsc_op_calc {i in RESOURCES}:
-	RSC_op [i] = rsc_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
-
-## RCM
-#-----------
-
-# [Eq. ?]
-subject to totalRCM_calc:
-	TotalRCM = sum {j in TECHNOLOGIES} (RCM_constr [j] / lifetime [j]) + sum {i in RESOURCES} RCM_op [i];
-	#JUST RESOURCES :          TotalRCM = sum {i in RESOURCES} RCM_op [i];
-	#INCLUDING GREY EMISSIONS: TotalRCM = sum {j in TECHNOLOGIES} (RCM_constr [j] / lifetime [j]) + sum {i in RESOURCES} RCM_op [i];
-
-# [Eq. ?]
-subject to rcm_constr_calc {j in TECHNOLOGIES}:
-	RCM_constr [j] = rcm_constr [j] * F [j];
-
-# [Eq. ?]
-subject to rcm_op_calc {i in RESOURCES}:
-	RCM_op [i] = rcm_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
 
 ## Multiplication factor
 #-----------------------
@@ -846,7 +699,6 @@ subject to GWP_normalization :
 # New objectives #
 subject to LCA_normalization :
 	TotalLCA_norm = ((TotalLCA - lca_min) / (lca_max - lca_min))*100000;
-
 subject to Crit_1_normalization :
 	TotalCrit_1_norm = ((TotalCrit_1 - crit_1_min) / (crit_1_max - crit_1_min))*100000;
 subject to Crit_2_normalization :
@@ -862,7 +714,6 @@ subject to GWP_deviation_computation :
 # New objectives #
 subject to LCA_deviation_computation :
 	Positive_deviation_lca = TotalLCA_norm - goal_lca_norm;
-
 subject to Crit_1_deviation_computation :
 	Positive_deviation_crit_1 = TotalCrit_1_norm - goal_crit_1_norm;
 subject to Crit_2_deviation_computation :

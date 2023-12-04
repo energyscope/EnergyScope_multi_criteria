@@ -22,7 +22,7 @@
 	},
     "loss_network" : {"ELECTRICITY": 4.7E-02, "HEAT_LOW_T_DHN": 5.0E-02},
     "c_grid_extra" : 367.8,
-    "import_capacity" : 9.72,
+    "import_capacity" : 11.894,
     "STORAGE_DAILY" : ["TS_DEC_HP_ELEC","TS_DEC_THHP_GAS","TS_DEC_COGEN_GAS","TS_DEC_COGEN_OIL",
                     "TS_DEC_ADVCOGEN_GAS","TS_DEC_ADVCOGEN_H2","TS_DEC_BOILER_GAS","TS_DEC_BOILER_WOOD","TS_DEC_BOILER_OIL",
                     "TS_DEC_DIRECT_ELEC","TS_DHN_DAILY","BATT_LI","TS_HIGH_TEMP"]

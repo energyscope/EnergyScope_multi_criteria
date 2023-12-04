@@ -63,49 +63,6 @@ for {i in TECHNOLOGIES union RESOURCES} {
 printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Crit_3_constr[i] / lifetime[i] else 0, if i in RESOURCES then Crit_3_op[i] else 0 >> (PathName & "/crit_3_breakdown.txt");
 }
 
-# New parameters #
-## Print ENVIRONMENTAL PRICES breakdown to txt file
-print "--------------SAVING EP ----------";
-printf "%s\t%s\t%s\n", "Name", "EP_constr", "EP_op" > (PathName & "/ep_breakdown.txt");
-for {i in TECHNOLOGIES union RESOURCES} {
-    printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then EP_constr[i] / lifetime[i] else 0, if i in RESOURCES then EP_op[i] else 0 >> (PathName & "/ep_breakdown.txt");
-}
-
-## Print AGRO_LAND breakdown to txt file
-print "--------------SAVING AGRO_LAND ----------";
-printf "%s\t%s\t%s\n", "Name", "AGRO_LAND_constr", "AGRO_LAND_op" > (PathName & "/agro_land_breakdown.txt");
-for {i in TECHNOLOGIES union RESOURCES} {
-    printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then AGRO_LAND_constr[i] / lifetime[i] else 0, if i in RESOURCES then AGRO_LAND_op[i] else 0 >> (PathName & "/agro_land_breakdown.txt");
-}
-
-## Print DAMAGE TO HUMAN HEALTH breakdown to txt file
-print "--------------SAVING HH ----------";
-printf "%s\t%s\t%s\n", "Name", "HH_constr", "HH_op" > (PathName & "/hh_breakdown.txt");
-for {i in TECHNOLOGIES union RESOURCES} {
-    printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then HH_constr[i] / lifetime[i] else 0, if i in RESOURCES then HH_op[i] else 0 >> (PathName & "/hh_breakdown.txt");
-}
-
-## Print Crit_1 breakdown to txt file
-print "--------------SAVING Einv ----------";
-printf "%s\t%s\t%s\n", "Name", "Einv_constr", "Einv_op" > (PathName & "/einv_breakdown.txt");
-for {i in TECHNOLOGIES union RESOURCES} {
-printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then Einv_constr[i] / lifetime[i] else 0, if i in RESOURCES then Einv_op[i] else 0 >> (PathName & "/einv_breakdown.txt");
-}
-
-## Print DAMAGE TO RESOURCE AVAILABILITY breakdown to txt file
-print "--------------SAVING RSC ----------";
-printf "%s\t%s\t%s\n", "Name", "RSC_constr", "RSC_op" > (PathName & "/rsc_breakdown.txt");
-for {i in TECHNOLOGIES union RESOURCES} {
-    printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then RSC_constr[i] / lifetime[i] else 0, if i in RESOURCES then RSC_op[i] else 0 >> (PathName & "/rsc_breakdown.txt");
-}
-
-## Print DAMAGE TO ECOSYSTEMS breakdown to txt file
-print "--------------SAVING ECOSYS ----------";
-printf "%s\t%s\t%s\n", "Name", "ECOSYS_constr", "ECOSYS_op" > (PathName & "/ecosys_breakdown.txt");
-for {i in TECHNOLOGIES union RESOURCES} {
-    printf "%s\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then ECOSYS_constr[i] / lifetime[i] else 0, if i in RESOURCES then ECOSYS_op[i] else 0 >> (PathName & "/ecosys_breakdown.txt");
-}
-
 ## Print losses to txt file
 print "--------------SAVING Losses -----------";
 printf "%s\t%s\n", "End use", "Losses" > (PathName & "/losses.txt");

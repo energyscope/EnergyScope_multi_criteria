@@ -61,20 +61,18 @@ def print_data(config):
         cost_limit = config['Cost_limit'] #NEW_cost
         gwp_limit = config['GWP_limit']
 
+
         # New objectives #
         lca_limit = config['LCA_limit']
         crit_1_limit = config['Crit_1_limit']
         crit_2_limit = config['Crit_2_limit']
         crit_3_limit = config['Crit_3_limit']
 
-        cost_limit = config['Cost_limit']
-        #cost_max = config['Cost_limit']
 
         # Pre-processing df #
 
         # pre-processing resources # New objectives # # New parameters #
-        resources_simple = resources.loc[:, ['avail', 'gwp_op', 'c_op', 'crit_1_op', 'crit_2_op', 'crit_3_op' , 'ep_op','agro_land_op','urban_land_op','hh_op','ecosys_op','rsc_op','rcm_op','einv_op', 'lca_res'
-                                                                                                                                                                     '']]
+        resources_simple = resources.loc[:, ['avail', 'gwp_op', 'c_op', 'crit_1_op', 'crit_2_op', 'crit_3_op', 'lca_res' '']]
         resources_simple.index.name = 'param :'
         resources_simple = resources_simple.astype('float')
         # pre-processing eud

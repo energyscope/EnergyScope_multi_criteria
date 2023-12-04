@@ -1,0 +1,62 @@
+
+Presolve eliminates 651212 constraints and 417558 variables.
+"option presolve 10;" used, but "option presolve 11;" might work better.
+Adjusted problem:
+276190 variables, all linear
+503371 constraints, all linear; 1603634 nonzeros
+	354852 equality constraints
+	148519 inequality constraints
+1 linear objective; 1 nonzero.
+
+presolve results:
+	variables omitted:	417558
+	constraints omitted:	651212
+	ranges relaxed:		181627
+	bounds improved:	418727
+	nba cycles:		9
+	bound row scans:	1289556
+	row-scan updates:	556817
+Gurobi 10.0.3:   pre:dual = -1
+  alg:method = 2
+  bar:crossover = 0
+  pre:passes = 3
+  bar:convtol = 1e-06
+  pre:solve = -1
+Gurobi 10.0.3: optimal solution; objective 51404.32936
+0 simplex iterations
+105 barrier iterations
+ 
+------------ WARNINGS ------------
+WARNING:  "Solution Check"
+     [ sol:chk:feastol=1e-06, :feastolrel=1e-06, :inttol=1e-05,
+       :round='', :prec='' ]
+Algebraic expression violations:
+  - 26 original expression(s) of type ':linrange',
+        up to 1E-03 (abs)
+ 
+ 
+solve_result = solved
+
+solve_result_num = 0
+
+_solve_elapsed_time = 22.734
+
+TotalCost 51404.32935511387
+GWP_tot 19999.999990236487
+GWP_op 9099.177662565839
+GWP_cstr 10900.822327670649
+Crit_1_tot 757309.723688881
+Crit_2_tot 4199.031824584437
+Crit_3_tot 4143.230342957831
+--------------SAVING COSTS -----------
+--------------SAVING RESOURCES -----------
+--------------SAVING GWP -----------
+--------------SAVING LCA ----------
+--------------SAVING Crit_1 ----------
+--------------SAVING Crit_2 ----------
+--------------SAVING Crit_3 ----------
+--------------SAVING Losses -----------
+--------------SAVING ASSETS -----------
+--------------SAVING STORAGE -----------
+--------------SAVING LAYERS -----------
+--------------SAVING SANKEY --------

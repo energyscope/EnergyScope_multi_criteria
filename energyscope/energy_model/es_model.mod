@@ -38,7 +38,6 @@ set RESOURCES; # Resources: fuels (renewables and fossils) and electricity impor
 set RES_IMPORT_CONSTANT within RESOURCES; # resources imported at constant power (e.g. NG, diesel, ...)
 set BIOFUELS within RESOURCES; # imported biofuels.
 set EXPORT within RESOURCES; # exported resources
-set LCA within RESOURCES; # computed lca new 06/10
 set END_USES_TYPES := setof {i in END_USES_CATEGORIES, j in END_USES_TYPES_OF_CATEGORY [i]} j; # secondary set
 set TECHNOLOGIES_OF_END_USES_TYPE {END_USES_TYPES}; # set all energy conversion technologies (excluding storage technologies and infrastructure)
 set STORAGE_TECH; #  set of storage technologies 
@@ -108,7 +107,6 @@ param c_maint {TECHNOLOGIES} >= 0; # O&M cost [Meuros/GW/year]: O&M cost does no
 param lifetime {TECHNOLOGIES} >= 0; # n: lifetime [years]
 param tau {i in TECHNOLOGIES} := i_rate * (1 + i_rate)^lifetime [i] / (((1 + i_rate)^lifetime [i]) - 1); # Annualisation factor ([-]) for each different technology [Eq. 2.2]
 param gwp_constr {TECHNOLOGIES} >= 0; # GWP emissions associated to the construction of technologies [ktCO2-eq./GW]. Refers to [GW] of main output
-param lca_op {TECHNOLOGIES} >= 0; # GWP emissions associated to the construction of technologies [ktCO2-eq./GW]. Refers to [GW] of main output
 param gwp_op {RESOURCES} >= 0; # GWP emissions associated to the use of resources [ktCO2-eq./GWh]. Includes extraction/production/transportation and combustion
 param c_p {TECHNOLOGIES} >= 0, <= 1 default 1; # yearly capacity factor of each technology [-], defined on annual basis. Different than 1 if sum {t in PERIODS} F_t (t) <= c_p * F
 param storage_eff_in {STORAGE_TECH , LAYERS} >= 0, <= 1; # eta_sto_in [-]: efficiency of input to storage from layers.  If 0 storage_tech/layer are incompatible
@@ -127,6 +125,12 @@ param power_density_pv >=0 default 0;# Maximum power irradiance for PV.
 param power_density_solar_thermal >=0 default 0;# Maximum power irradiance for solar thermal.
 
 # New objectives #
+param lca_tech {TECHNOLOGIES} >= 0;
+param lca_res {RESOURCES} >= 0;
+param lca_op {TECHNOLOGIES} >= 0;
+param lca_limit >=0; # [GWh/year] maximum system energy invested allowed
+
+
 param crit_1_op {RESOURCES} >= 0; # Energy invested to get a resources [GWh/y] #
 param crit_1_constr {TECHNOLOGIES} >= 0; # Energy invested in the construction of the technologies [GWh/GW].
 param crit_1_limit >=0; # [GWh/year] maximum system energy invested allowed
@@ -164,9 +168,14 @@ param weight_cost >= 0;
 param weight_gwp >= 0;
 
 # New objectives #
+param weight_lca>= 0;
+param lca_min >= 0;
+param lca_max >= 0;
+
 param weight_crit_1 >= 0;
 param crit_1_min >= 0;
 param crit_1_max >= 0;
+
 param weight_crit_2 >= 0;
 param crit_2_min >= 0;
 param crit_2_max >= 0;
@@ -178,6 +187,8 @@ param goal_cost_norm >= 0;
 param goal_gwp_norm >= 0;
 
 # New objectives #
+param goal_lca_norm >= 0;
+
 param goal_crit_1_norm >= 0;
 param goal_crit_2_norm >= 0;
 param goal_crit_3_norm >= 0;
@@ -187,6 +198,8 @@ let weight_cost := 0.65;
 let weight_gwp := 0.25;
 
 # New objectives #
+let weight_lca := 0.00;
+
 let weight_crit_1 := 0.01;
 let weight_crit_2 := 0;
 let weight_crit_3 := 0.09;
@@ -198,6 +211,9 @@ let gwp_min := 5000;
 let gwp_max := 100000;
 
 # New objectives #
+let lca_min := 0;
+let lca_max := 10000000;
+
 let crit_1_min := 20000;
 let crit_1_max := 10000000;
 let crit_2_min := 150;#20
@@ -209,6 +225,7 @@ let goal_cost_norm := 0;
 let goal_gwp_norm := 0;
 
 # New objectives #
+let goal_lca_norm := 0;
 let goal_crit_1_norm := 0;
 let goal_crit_2_norm := 0;
 let goal_crit_3_norm := 0;
@@ -239,6 +256,11 @@ var F_solar         {TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DECEN"] diff {"DE
 var F_t_solar       {TECHNOLOGIES_OF_END_USES_TYPE["HEAT_LOW_T_DECEN"] diff {"DEC_SOLAR"}, h in HOURS, td in TYPICAL_DAYS} >= 0; # F_t_sol [GW]: Solar thermal operating per heat decentralised technologies
 
 # New objectives #
+var TotalLCA >= 0; # TotalLCA [impact/year]
+var LCA_tech {TECHNOLOGIES} >= 0; # LCA of the construction of the technologies
+var LCA_res {RESOURCES} >= 0; # LCA of the extraction/production/transport of the resources
+var LCA_op {TECHNOLOGIES} >= 0; # LCA of the operation of the technologies
+
 var TotalCrit_1 >= 0; # Crit_1_tot [GWh/year]: Total Cumulative energy demand (Crit_1) in the system
 var Crit_1_constr {TECHNOLOGIES} >= 0; #Total Crit_1 of the technologies
 var Crit_1_op {RESOURCES} >= 0; # Total yearly Crit_1 of the resources
@@ -263,6 +285,7 @@ var Network_losses {END_USES_TYPES, HOURS, TYPICAL_DAYS} >= 0; # Net_loss [GW]: 
 var Storage_level {STORAGE_TECH, PERIODS} >= 0; # Sto_level [GWh]: Energy stored at each period
 
 # New objectives #
+var TotalLCA_norm >= 0;
 var TotalCrit_1_norm >= 0;
 var TotalCrit_2_norm >= 0;
 var TotalCrit_3_norm >= 0;
@@ -301,6 +324,8 @@ var Positive_deviation_cost >= 0;
 var Positive_deviation_gwp >= 0;
 
 # New objectives #
+var Positive_deviation_lca >= 0;
+
 var Positive_deviation_crit_1 >= 0;
 var Positive_deviation_crit_2 >= 0;
 var Positive_deviation_crit_3 >= 0;
@@ -382,6 +407,25 @@ subject to gwp_op_calc {i in RESOURCES}:
 	GWP_op [i] = gwp_op [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );	
 
 # New objectives #
+## LCA_tot
+# ---------
+
+# [Eq. 1000.1]
+subject to totalLCA_calc:
+	TotalLCA = sum {j in TECHNOLOGIES} (LCA_tech [j] / lifetime [j]) + sum {i in RESOURCES} LCA_res [i] + sum {j in TECHNOLOGIES} LCA_op [j];
+
+# [Eq. 1000.2]
+subject to lca_tech_calc {j in TECHNOLOGIES}:
+	LCA_tech [j] = lca_tech [j] * F [j];
+
+# [Eq. 1000.3]
+subject to lca_res_calc {i in RESOURCES}:
+	LCA_res [i] = lca_res [i] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} ( F_t [i, h, td] * t_op [h, td] );
+
+# [Eq. 1000.4]
+subject to lca_op_calc {j in TECHNOLOGIES}:
+	LCA_op [j] = lca_op [j] * sum {t in PERIODS, h in HOUR_OF_PERIOD [t], td in TYPICAL_DAY_OF_PERIOD [t]} (F [j] * c_p_t [j, h, td] * t_op [h, td]);
+
 ## Criteria 1
 #-----------
 
@@ -745,6 +789,10 @@ subject to Minimum_GWP_reduction :
 
 # New objectives #
 
+#[Eq. ?]  constraint to reduce the LCA subject to Maximum_LCA :
+subject to Maximum_LCA :
+	TotalLCA <= lca_limit;
+
 #[Eq. ?]  constraint to reduce the Crit_1 subject to Maximum_Crit_1 :
 subject to Maximum_Crit_1 :
 	TotalCrit_1 <= crit_1_limit;
@@ -796,6 +844,9 @@ subject to GWP_normalization :
 	TotalGWP_norm = ((TotalGWP - gwp_min) / (gwp_max - gwp_min))*100000;
 
 # New objectives #
+subject to LCA_normalization :
+	TotalLCA_norm = ((TotalLCA - lca_min) / (lca_max - lca_min))*100000;
+
 subject to Crit_1_normalization :
 	TotalCrit_1_norm = ((TotalCrit_1 - crit_1_min) / (crit_1_max - crit_1_min))*100000;
 subject to Crit_2_normalization :
@@ -809,6 +860,9 @@ subject to GWP_deviation_computation :
 	Positive_deviation_gwp = TotalGWP_norm - goal_gwp_norm;
 
 # New objectives #
+subject to LCA_deviation_computation :
+	Positive_deviation_lca = TotalLCA_norm - goal_lca_norm;
+
 subject to Crit_1_deviation_computation :
 	Positive_deviation_crit_1 = TotalCrit_1_norm - goal_crit_1_norm;
 subject to Crit_2_deviation_computation :
@@ -818,7 +872,7 @@ subject to Crit_3_deviation_computation :
 
 
 subject to Multi_crit_computation :
-	Multi_crit_obj = Positive_deviation_cost * weight_cost + weight_gwp * Positive_deviation_gwp + weight_crit_1 * Positive_deviation_crit_1 + weight_crit_2 * Positive_deviation_crit_2 + weight_crit_3 * Positive_deviation_crit_3; # New objectives
+	Multi_crit_obj = Positive_deviation_cost * weight_cost + weight_gwp * Positive_deviation_gwp + weight_crit_1 * Positive_deviation_crit_1 + weight_crit_2 * Positive_deviation_crit_2 + weight_crit_3 * Positive_deviation_crit_3 + weight_lca * Positive_deviation_lca; # New objectives
 
-# Can choose between TotalGWP, TotalCost, TotalCrit_1, TotalCrit_2, TotalCrit_3 and Multi_crit_obj
+# Can choose between TotalGWP, TotalCost, TotalCrit_1, TotalCrit_2, TotalCrit_3, TotalLCA and Multi_crit_obj
 minimize obj: TotalCost;

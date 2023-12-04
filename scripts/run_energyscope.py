@@ -28,11 +28,18 @@ if __name__ == '__main__':
         es.build_td_of_days(config)
 
     # Example to change data:
-    #config['all_data']['Resources'].loc['WOOD', 'avail'] = 23400
+    #config['all_data']['Resources'].loc['WOOD', 'avail'] = 10000
+
     #config['all_data']['Misc']['share_mobility_public_max'] = 0.5
 
     #f_max
     #config['all_data']['Technologies'].loc['NUCLEAR','f_max'] = 1000000
+    #config['all_data']['Technologies'].loc['REDIFUEL','f_min'] = 10
+    #config['all_data']['Technologies'].loc['ADLIBIO_TO_FUEL', 'f_min'] = 10
+    #config['all_data']['Technologies'].loc['ADLIBIO_TO_HVC', 'f_min'] = 4
+    #config['all_data']['Technologies'].loc['METHANOL_TO_HVC', 'f_max'] = 1
+    #config['all_data']['Technologies'].loc['BIOMASS_TO_HVC', 'f_max'] = 1
+
 
     if not analysis_only:
         # Printing the .dat files for the optimisation problem       

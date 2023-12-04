@@ -1,6 +1,6 @@
 # Case study definition
 # name of the case study. The problem formulation and ouptuts will be printed into the following relative path from main directory : case_studies/config['case_study']
-'case_study': 'Test_LCA_data_1'
+'case_study': '2035_4'
 # number of typical days to consider
 'nbr_td': 12
 # Dictionnary with the dataframes containing all the data in the form : {'Demand': eud, 'Resources': resources, 'Technologies': technologies, 'End_uses_categories': end_uses_categories, 'Layers_in_out': layers_in_out, 'Storage_characteristics': storage_characteristics, 'Storage_eff_in': storage_eff_in, 'Storage_eff_out': storage_eff_out, 'Time_series': time_series, 'Misc': misc}
@@ -10,16 +10,17 @@
 #CAUTION : The limits used for criteria normalization (defined in es_model.mod line 164) have to be modify to explore "extreme" scenarios
 #REMARK : The weights of criteria can be change in es_model.mod line 159
 
-'GWP_limit': 20000 #[ktCO2-eq./year]
+'GWP_limit': 5000 #[ktCO2-eq./year]
 'Cost_limit': 200000 #[beuro/year]
 
 # New objectives #
+'LCA_limit': 100000000 #[Gwh/year]
 'Crit_1_limit': 100000000 #[Gwh/year]
 'Crit_2_limit': 2000000 #[Gwh/year]
 'Crit_3_limit': 100000 #[Gwh/year]
 
 # Relative path from main directory to energyscope subdirectories and files
-'data_dir': 'Data/2050_VUB'  # Folders containing the csv data files
+'data_dir': 'Data/2035_LCA_2'  # Folders containing the csv data files
 'es_path': 'energyscope/energy_model'  # Path to the energy model (.mod and .run files)
 'cs_path': 'case_studies' # Path to the directory containing the different case studies
 'step1_path': 'energyscope/preprocessing/td_selection' # Path to the step1 selection of typical days
@@ -47,6 +48,6 @@ printing_td: True
 }
 
 # Printing more detailed outputs
-'print_barh' : True
+'print_barh' : False
 'print_hourly_data': False
-'print_sankey': True
+'print_sankey': False

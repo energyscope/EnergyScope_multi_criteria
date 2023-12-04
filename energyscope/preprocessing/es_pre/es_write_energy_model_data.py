@@ -62,6 +62,7 @@ def print_data(config):
         gwp_limit = config['GWP_limit']
 
         # New objectives #
+        lca_limit = config['LCA_limit']
         crit_1_limit = config['Crit_1_limit']
         crit_2_limit = config['Crit_2_limit']
         crit_3_limit = config['Crit_3_limit']
@@ -72,7 +73,7 @@ def print_data(config):
         # Pre-processing df #
 
         # pre-processing resources # New objectives # # New parameters #
-        resources_simple = resources.loc[:, ['avail', 'gwp_op', 'c_op', 'crit_1_op', 'crit_2_op', 'crit_3_op'  , 'ep_op','agro_land_op','urban_land_op','hh_op','ecosys_op','rsc_op','rcm_op','einv_op'
+        resources_simple = resources.loc[:, ['avail', 'gwp_op', 'c_op', 'crit_1_op', 'crit_2_op', 'crit_3_op' , 'ep_op','agro_land_op','urban_land_op','hh_op','ecosys_op','rsc_op','rcm_op','einv_op', 'lca_res'
                                                                                                                                                                      '']]
         resources_simple.index.name = 'param :'
         resources_simple = resources_simple.astype('float')
@@ -138,7 +139,6 @@ def print_data(config):
         RE_RESOURCES = list(
             resources.loc[(resources['Category'] == 'Renewable'), :].index)
         EXPORT = list(resources.loc[resources['Category'] == 'Export', :].index)
-        LCA = list(resources.loc[resources['Category'] == 'LCA', :].index)
 
         END_USES_TYPES_OF_CATEGORY = []
         for i in END_USES_CATEGORIES:
@@ -234,7 +234,6 @@ def print_data(config):
         print_set(BIOFUELS, 'BIOFUELS', out_path)
         print_set(RE_RESOURCES, 'RE_RESOURCES', out_path)
         print_set(EXPORT, 'EXPORT', out_path)
-        print_set(LCA, 'LCA', out_path)
         newline(out_path)
         n = 0
         for j in END_USES_TYPES_OF_CATEGORY:
@@ -299,6 +298,8 @@ def print_data(config):
         print_param('gwp_limit', gwp_limit, 'gwp_limit [ktCO2-eq./year]: maximum GWP emissions', out_path) #ligne 99 excel
         print_param('cost_limit', cost_limit, 'cost_limit [beuro/year]: maximum Cost', out_path)#NEW_cost
         # New objectives #
+        print_param('lca_limit', lca_limit, 'lca_limit [impact/year]: maximum impact on the environment', out_path)
+
         print_param('crit_1_limit', crit_1_limit, 'crit_1_limit [GWh/year]: maximum GWh invested', out_path)
         print_param('crit_2_limit', crit_2_limit, 'crit_2_limit [GWh/year]: maximum GWh invested', out_path)
         print_param('crit_3_limit', crit_3_limit, 'crit_3_limit [GWh/year]: maximum GWh invested', out_path)

@@ -103,6 +103,13 @@ else {
 
             # New objectives #
 
+            ## Print LCA breakdown to txt file
+	        print "---------- SAVING LCA ----------";
+	        printf "%s\t%s\t%s\t%s\n", "Name", "LCA_tech", "LCA_res", "LCA_op" > (PathName & "/lca_breakdown.txt");
+	        for {i in TECHNOLOGIES union RESOURCES} {
+		    printf "%s\t%.6f\t%.6f\t%.6f\n", i, if i in TECHNOLOGIES then LCA_tech[i] / lifetime[i] else 0, if i in RESOURCES then LCA_res[i] else 0, if i in TECHNOLOGIES then LCA_op[i] else 0 >> (PathName & "/lca_breakdown.txt");
+	        }
+
             ## Print Crit_1 breakdown to txt file
 	        print "---------- SAVING Crit_1 ----------";
 	        printf "%s\t%s\t%s\n", "Name", "Crit_1_constr", "Crit_1_op" > (PathName & "/crit_1_breakdown.txt");
